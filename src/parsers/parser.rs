@@ -32,8 +32,9 @@ pub trait Parser<T> {
 
 /// A Reader is a trait that can be used to
 /// parse a collection of a type T.
-pub trait Reader<T> {
-    fn read<R: Read>(reader: BufReader<R>) -> Result<T>;
+pub trait Reader {
+    type Item;
+    fn read<R: Read>(reader: BufReader<R>) -> Result<Self::Item>;
 }
 
 /// A BlockIterator takes an object implementing the Read trait

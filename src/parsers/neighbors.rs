@@ -3,6 +3,8 @@ use lazy_static::lazy_static;
 use regex::Regex;
 use std::io::{BufRead, BufReader, Read};
 
+use rayon::prelude::*; // fix this
+
 use crate::{
     parsers::{
         datetime,
@@ -42,8 +44,10 @@ enum State {
 }
 
 /// Implement reader for neighbor
-impl Reader<Vec<Neighbor>> for Neighbor {
-    fn read<R: Read>(reader: BufReader<R>) -> Result<Vec<Self>> {
+impl Reader for Neighbor {
+    type Item = Vec<Neighbor>;
+
+    fn read<R: Read>(reader: BufReader<R>) -> Result<Self::Item> {
         let mut neighbors: Vec<Self> = vec![];
         let iterator = BlockIterator::new(reader, "1002-");
         for block in iterator {
@@ -53,6 +57,15 @@ impl Reader<Vec<Neighbor>> for Neighbor {
             }
             neighbors.push(neighbor);
         }
+
+        /*
+        let blocks: Vec<Block> = BlockIterator::new(reader, "1002-").collect();
+        let neighbors = blocks
+            .par_iter()
+            .map(|block| Neighbor::parse(block.clone()).unwrap())
+            .filter(|neighbor| !neighbor.id.is_empty())
+            .collect();
+        */
 
         Ok(neighbors)
     }
