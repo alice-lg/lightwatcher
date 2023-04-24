@@ -1,10 +1,15 @@
-use std::io::{BufRead, BufReader, Read};
-
 use anyhow::{anyhow, Result};
 use lazy_static::lazy_static;
 use regex::Regex;
+use std::io::{BufRead, BufReader, Read};
 
-use crate::{parsers::datetime, protocol::Neighbor};
+use crate::{
+    parsers::{
+        datetime,
+        parser::{Block, BlockIterator, ParseError, Parser, Reader},
+    },
+    state::Neighbor,
+};
 
 lazy_static! {
     /// Regex: Neighbor header (protocol, state, uptime, ...)
@@ -37,50 +42,51 @@ enum State {
     Done,
 }
 
-#[derive(Debug)]
-pub struct Parser {
-    state: State,
-    current: Neighbor,
-}
-
-/// Parse neighbors from input stream
-impl Parser {
-    pub fn new() -> Self {
-        Parser {
-            state: State::Start,
-            current: Neighbor::default(),
+/// Implement reader for neighbor
+impl Reader<Vec<Neighbor>> for Neighbor {
+    fn read<R: Read>(reader: BufReader<R>) -> Result<Vec<Self>> {
+        let mut neighbors: Vec<Self> = vec![];
+        let iterator = BlockIterator::new(reader);
+        for block in iterator {
+            let neighbor = Neighbor::parse(block)?;
+            neighbors.push(neighbor);
         }
-    }
 
-    pub fn parse<T: Read>(&mut self, reader: BufReader<T>) -> Result<Vec<Neighbor>> {
-        let mut neighbors = Vec::new();
-        for line in reader.lines() {
-            self.state = self.parse_line(&line?)?;
-            if self.state == State::Done {
-                neighbors.push(self.current.clone());
-                // reset
-                self.current = Neighbor::default();
-                self.state = State::Start;
-            }
-        }
         Ok(neighbors)
     }
+}
 
-    fn parse_line(&mut self, line: &str) -> Result<State> {
-        if line.trim().is_empty() {
-            return Ok(State::Done); // End of neighbor
+/// Implement block parser for neighbor
+impl Parser<Neighbor> for Neighbor {
+    /// Parse a block of lines into a neighbor
+    fn parse(block: Block) -> Result<Self> {
+        let mut neighbor = Neighbor::default();
+
+        // Parse lines in block
+        let mut state = State::Start;
+        for line in block.iter() {
+            match parse_line(&mut neighbor, state, &line) {
+                Ok(next_state) => state = next_state,
+                Err(e) => {
+                    println!("Error parsing line: {}, {}", line, e);
+                    return Err(e);
+                }
+            }
         }
 
-        let next_state = match self.state {
-            State::Start => parse_neighbor_header(&mut self.current, &line)?,
-            State::Meta => parse_neighbor_meta(&mut self.current, &line)?,
-            State::BgpState => parse_bgp_state(&mut self.current, &line)?,
-            State::RouteChangeStats => parse_route_change_stats(&mut self.current, &line)?,
-            State::Done => State::Done,
-        };
-
-        Ok(next_state)
+        Ok(neighbor)
     }
+}
+
+fn parse_line(mut neighbor: &mut Neighbor, state: State, line: &str) -> Result<State> {
+    let state = match state {
+        State::Start => parse_neighbor_header(&mut neighbor, line)?,
+        State::Meta => parse_neighbor_meta(&mut neighbor, line)?,
+        State::BgpState => parse_bgp_state(&mut neighbor, line)?,
+        State::RouteChangeStats => parse_route_change_stats(&mut neighbor, line)?,
+        State::Done => State::Done,
+    };
+    Ok(state)
 }
 
 /// Parse Neighbor Header (name, state, uptime) and return next state
@@ -251,12 +257,24 @@ mod tests {
     }
 
     #[test]
+    fn test_neighbor_parse() {
+        let block: Block = vec![
+            "1002-R194_42    BGP        ---        up     2023-04-19 09:39:25  Established".into(),
+            "1006-  Description:    Packet Clearing House".into(),
+            "   BGP state:          Established".into(),
+            "    Neighbor address: 172.31.194.42".into(),
+            "    Neighbor AS:      42".into(),
+        ];
+        let neighbor = Neighbor::parse(block).unwrap();
+        assert_eq!(neighbor.id, "R194_42");
+    }
+
+    #[test]
     fn test_parse_neighbors() {
         let input = File::open("tests/birdc/show-protocols-all").unwrap();
         let reader = BufReader::new(input);
+        let neighbors = Neighbor::read(reader).unwrap();
 
-        let mut parser = Parser::new();
-        let neighbors = parser.parse(reader).unwrap();
         let neighbor = &neighbors[5];
         assert_eq!(neighbor.id, "R194_42");
         assert_eq!(neighbor.address, "172.31.194.42");

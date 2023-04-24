@@ -4,7 +4,7 @@ use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum Error {
-    #[error("Invalid date time string: {0}")]
+    #[error("Invalid date time string: '{0}'")]
     InvalidDateTimeString(String),
 }
 

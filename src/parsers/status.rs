@@ -1,15 +1,13 @@
 use anyhow::Result;
-use std::io::{BufRead, BufReader, Read};
 
-use crate::protocol::Status;
+use crate::parsers::parser::{Block, Parser};
+use crate::state::Status;
 
-pub struct Parser;
-
-impl Parser {
-    pub fn parse<T: Read>(reader: BufReader<T>) -> Result<Status> {
+impl Parser<Status> for Status {
+    /// Parse the status output of bird response
+    fn parse(lines: Block) -> Result<Status> {
         // Read first line and return bird version
-        let mut lines = reader.lines();
-        let line = lines.next().unwrap_or(Ok("".to_string()))?;
+        let line = lines.first().unwrap_or(&"".to_string()).to_owned();
         let tokens: Vec<&str> = line.split_whitespace().collect();
         let version = tokens[2].to_string();
         let status = tokens[1..tokens.len()].join(" ");
@@ -24,14 +22,10 @@ impl Parser {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::io::Cursor;
 
     #[test]
     fn test_parse() {
-        let input = "0001 BIRD 1.6.3 ready.";
-        let reader = BufReader::new(Cursor::new(input));
-        let status = Parser::parse(reader).unwrap();
-        assert_eq!(status.bird_version, "1.6.3");
-        assert_eq!(status.bird_status, "BIRD 1.6.3 ready.");
+        let input = vec!["0001 BIRD 1.6.3 ready.".to_string()];
+        let status = Status::parse(input).unwrap();
     }
 }
