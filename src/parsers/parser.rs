@@ -1,5 +1,6 @@
 use anyhow::Result;
-use std::io::{BufRead, BufReader, Read};
+use std::io::{BufRead, BufReader, Lines, Read};
+use std::iter::Peekable;
 
 #[derive(thiserror::Error, Debug)]
 pub struct ParseError {
@@ -35,41 +36,51 @@ pub trait Reader<T> {
     fn read<R: Read>(reader: BufReader<R>) -> Result<T>;
 }
 
-pub struct BlockIterator<R: Read> {
-    reader: BufReader<R>,
+/// A BlockIterator takes an object implementing the Read trait
+/// and a marker token
+/// which separates the input lines into blocks.
+/// A new block starts when the marker token is found.
+pub struct BlockIterator<R: BufRead> {
+    start: String,
+    lines: Peekable<Lines<R>>,
 }
 
-impl<R: Read> BlockIterator<R> {
-    pub fn new(reader: BufReader<R>) -> Self {
-        Self { reader }
+impl<R: BufRead> BlockIterator<R> {
+    /// Create a new BlockIterator
+    pub fn new(reader: R, start: &str) -> Self {
+        Self {
+            start: start.to_string(),
+            lines: reader.lines().peekable(),
+        }
     }
 }
 
-impl<R: Read> Iterator for BlockIterator<R> {
+/// Implement the Iterator trait for BlockIterator
+impl<R: BufRead> Iterator for BlockIterator<R> {
     type Item = Block;
 
     fn next(&mut self) -> Option<Self::Item> {
         let mut block = Block::new();
-        let mut line = String::new();
-        let mut total_read = 0;
 
+        // Create a peekable line iterator
         loop {
-            let bytes_read = self.reader.read_line(&mut line).ok()?;
-            if bytes_read == 0 {
-                break;
-            }
-            total_read += bytes_read;
+            // Read next line
+            let line = self.lines.next()?;
+            // Add line to block
+            let line = line.ok()?;
+            block.push(line.clone());
 
-            line = line.trim_end().to_string();
-            if line.is_empty() {
-                break;
+            // Check next line in iterator
+            if let Some(Ok(next)) = self.lines.peek() {
+                if next.starts_with(&self.start) {
+                    break;
+                }
             } else {
-                block.push(line.clone());
+                break; // EOF
             }
-            line.clear();
         }
 
-        if total_read == 0 {
+        if block.is_empty() {
             None
         } else {
             Some(block)
@@ -83,15 +94,15 @@ mod tests {
 
     #[test]
     fn test_block_iterator() {
-        let input = "line1\nline2\n\nline3\n\nline4\n\n\nline5\n";
+        let input = "1003-line1\nline2\n\n1003-line3\n\nline4\n9009-line5\n";
         let reader = BufReader::new(input.as_bytes());
-        let mut iter = BlockIterator { reader };
+        let mut iter = BlockIterator::new(reader, "1003-");
 
-        assert_eq!(iter.next().unwrap(), vec!["line1", "line2"]);
-        assert_eq!(iter.next().unwrap(), vec!["line3"]);
-        assert_eq!(iter.next().unwrap(), vec!["line4"]);
-        assert_eq!(iter.next().unwrap(), Block::new());
-        assert_eq!(iter.next().unwrap(), vec!["line5"]);
+        assert_eq!(iter.next().unwrap(), vec!["1003-line1", "line2", ""]);
+        assert_eq!(
+            iter.next().unwrap(),
+            vec!["1003-line3", "", "line4", "9009-line5"]
+        );
         assert_eq!(iter.next(), None);
     }
 }

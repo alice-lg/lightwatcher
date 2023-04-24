@@ -39,16 +39,18 @@ enum State {
     Meta,
     BgpState,
     RouteChangeStats,
-    Done,
 }
 
 /// Implement reader for neighbor
 impl Reader<Vec<Neighbor>> for Neighbor {
     fn read<R: Read>(reader: BufReader<R>) -> Result<Vec<Self>> {
         let mut neighbors: Vec<Self> = vec![];
-        let iterator = BlockIterator::new(reader);
+        let iterator = BlockIterator::new(reader, "1002-");
         for block in iterator {
             let neighbor = Neighbor::parse(block)?;
+            if neighbor.id.is_empty() {
+                continue;
+            }
             neighbors.push(neighbor);
         }
 
@@ -84,7 +86,6 @@ fn parse_line(mut neighbor: &mut Neighbor, state: State, line: &str) -> Result<S
         State::Meta => parse_neighbor_meta(&mut neighbor, line)?,
         State::BgpState => parse_bgp_state(&mut neighbor, line)?,
         State::RouteChangeStats => parse_route_change_stats(&mut neighbor, line)?,
-        State::Done => State::Done,
     };
     Ok(state)
 }
@@ -275,7 +276,7 @@ mod tests {
         let reader = BufReader::new(input);
         let neighbors = Neighbor::read(reader).unwrap();
 
-        let neighbor = &neighbors[5];
+        let neighbor = &neighbors[0];
         assert_eq!(neighbor.id, "R194_42");
         assert_eq!(neighbor.address, "172.31.194.42");
     }
