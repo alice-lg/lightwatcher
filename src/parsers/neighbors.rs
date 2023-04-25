@@ -1,14 +1,12 @@
 use anyhow::{anyhow, Result};
 use lazy_static::lazy_static;
 use regex::Regex;
-use std::io::{BufRead, BufReader, Read};
-
-use rayon::prelude::*; // fix this
+use std::io::BufRead;
 
 use crate::{
     parsers::{
         datetime,
-        parser::{Block, BlockIterator, ParseError, Parser, Reader},
+        parser::{Block, BlockIterator, Parse},
     },
     state::Neighbor,
 };
@@ -43,36 +41,34 @@ enum State {
     RouteChangeStats,
 }
 
-/// Implement reader for neighbor
-impl Reader for Neighbor {
-    type Item = Vec<Neighbor>;
+pub struct NeighborReader<R: BufRead> {
+    iter: BlockIterator<R>,
+}
 
-    fn read<R: Read>(reader: BufReader<R>) -> Result<Self::Item> {
-        let mut neighbors: Vec<Self> = vec![];
-        let iterator = BlockIterator::new(reader, "1002-");
-        for block in iterator {
-            let neighbor = Neighbor::parse(block)?;
-            if neighbor.id.is_empty() {
-                continue;
+impl<R: BufRead> NeighborReader<R> {
+    pub fn new(reader: R) -> Self {
+        let iter = BlockIterator::new(reader, "1002-");
+        Self { iter }
+    }
+}
+
+impl<R: BufRead> Iterator for NeighborReader<R> {
+    type Item = Neighbor;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let block = self.iter.next()?;
+        match Neighbor::parse(block) {
+            Ok(neighbor) => Some(neighbor),
+            Err(e) => {
+                println!("Error parsing neighbor: {}", e);
+                Some(Neighbor::default())
             }
-            neighbors.push(neighbor);
         }
-
-        /*
-        let blocks: Vec<Block> = BlockIterator::new(reader, "1002-").collect();
-        let neighbors = blocks
-            .par_iter()
-            .map(|block| Neighbor::parse(block.clone()).unwrap())
-            .filter(|neighbor| !neighbor.id.is_empty())
-            .collect();
-        */
-
-        Ok(neighbors)
     }
 }
 
 /// Implement block parser for neighbor
-impl Parser<Neighbor> for Neighbor {
+impl Parse for Neighbor {
     /// Parse a block of lines into a neighbor
     fn parse(block: Block) -> Result<Self> {
         let mut neighbor = Neighbor::default();
@@ -284,10 +280,11 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_neighbors() {
+    fn test_neighbor_reader() {
         let input = File::open("tests/birdc/show-protocols-all").unwrap();
-        let reader = BufReader::new(input);
-        let neighbors = Neighbor::read(reader).unwrap();
+        let buf = BufReader::new(input);
+        let reader = NeighborReader::new(buf);
+        let neighbors: Vec<Neighbor> = reader.filter(|n| !n.id.is_empty()).collect();
 
         let neighbor = &neighbors[0];
         assert_eq!(neighbor.id, "R194_42");

@@ -1,6 +1,7 @@
 use anyhow::Result;
-use std::io::{BufRead, BufReader, Lines, Read};
+use std::io::{BufRead, Lines};
 use std::iter::Peekable;
+use std::sync::Arc;
 
 #[derive(thiserror::Error, Debug)]
 pub struct ParseError {
@@ -24,17 +25,11 @@ impl std::fmt::Display for ParseError {
 /// A block is a list of lines
 pub type Block = Vec<String>;
 
-/// A parser is a function that takes a chunk and
-/// parses it into a type T.
-pub trait Parser<T> {
-    fn parse(block: Block) -> Result<T>;
-}
+pub type ParBlock = Arc<Block>;
 
-/// A Reader is a trait that can be used to
-/// parse a collection of a type T.
-pub trait Reader {
-    type Item;
-    fn read<R: Read>(reader: BufReader<R>) -> Result<Self::Item>;
+/// Parse is a parser trait which can be implemented
+pub trait Parse: Sized {
+    fn parse(block: Block) -> Result<Self>;
 }
 
 /// A BlockIterator takes an object implementing the Read trait
@@ -89,9 +84,96 @@ impl<R: BufRead> Iterator for BlockIterator<R> {
     }
 }
 
+/// A ParBlockIterator takes an object implementing the Read trait
+/// and a marker token
+/// which separates the input lines into blocks.
+/// A new block starts when the marker token is found.
+pub struct ParBlockIterator<R: BufRead> {
+    start: String,
+    lines: Peekable<Lines<R>>,
+}
+
+impl<R: BufRead> ParBlockIterator<R> {
+    /// Create a new BlockIterator
+    pub fn new(reader: R, start: &str) -> Self {
+        Self {
+            start: start.to_string(),
+            lines: reader.lines().peekable(),
+        }
+    }
+}
+
+/// Implement the Iterator trait for BlockIterator
+impl<R: BufRead> Iterator for ParBlockIterator<R> {
+    type Item = ParBlock;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let mut block = Block::new();
+
+        // Create a peekable line iterator
+        loop {
+            // Read next line
+            let line = self.lines.next()?;
+            // Add line to block
+            let line = line.ok()?;
+            block.push(line.clone());
+
+            // Check next line in iterator
+            if let Some(Ok(next)) = self.lines.peek() {
+                if next.starts_with(&self.start) {
+                    break;
+                }
+            } else {
+                break; // EOF
+            }
+        }
+
+        if block.is_empty() {
+            None
+        } else {
+            Some(ParBlock::new(block))
+        }
+    }
+}
+
+/*
+pub struct Reader<B: BufRead, T> {
+    iter: BlockIterator<B>,
+}
+
+impl<B, T> Reader<B, T> {
+    pub fn new(buf: B, start: &str) -> Self {
+        Self {
+            iter: BlockIterator::new(buf, start),
+        }
+    }
+}
+
+impl<B, T> Iterator for Reader<B, T>
+where
+    B: BufRead,
+    T: Parse + Default,
+{
+    type Item = T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let block = self.iter.next()?;
+        match T::parse(block) {
+            Ok(t) => Some(t),
+            Err(e) => {
+                eprintln!("Error: {}", e);
+                T::default()
+            }
+        }
+        Some(T::parse(block))
+    }
+}
+*/
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::io::BufReader;
 
     #[test]
     fn test_block_iterator() {

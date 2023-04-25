@@ -28,35 +28,20 @@ pub struct Neighbor {
     pub route_server_id: String,
 }
 
-/*
-// BGPInfo is a set of BGP attributes
-type BGPInfo struct {
-    Origin           *string        `json:"origin"`
-    AsPath           []int          `json:"as_path"`
-    NextHop          *string        `json:"next_hop"`
-    Communities      Communities    `json:"communities"`
-    LargeCommunities Communities    `json:"large_communities"`
-    ExtCommunities   ExtCommunities `json:"ext_communities"`
-    LocalPref        int            `json:"local_pref"`
-    Med              int            `json:"med"`
-}
-
-*/
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+pub struct Community(pub u32, pub u32);
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
-pub struct Community(u32, u32);
+pub struct LargeCommunity(pub u32, pub u32, pub u32);
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
-pub struct LargeCommunity(u32, u32, u32);
-
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
-pub struct ExtCommunity(String, u32, u32);
+pub struct ExtCommunity(pub String, pub u32, pub u32);
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct BGPInfo {
-    pub origin: Option<String>,
+    pub origin: String,
     pub as_path: Vec<u32>,
-    pub next_hop: Option<String>,
+    pub next_hop: String,
     pub communities: Vec<Community>,
     pub large_communities: Vec<LargeCommunity>,
     pub ext_communities: Vec<ExtCommunity>,
@@ -68,10 +53,10 @@ pub struct BGPInfo {
 pub struct Route {
     pub neighbor_id: Option<String>,
     pub network: String,
-    pub interface: Option<String>,
-    pub gateway: Option<String>,
+    pub interface: String,
+    pub gateway: String,
     pub metric: u32,
-    pub bgp: Option<BGPInfo>,
+    pub bgp: BGPInfo,
     pub age: f64,
     #[serde(rename = "type")]
     pub route_type: Vec<String>,

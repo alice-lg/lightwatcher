@@ -1,9 +1,9 @@
 use anyhow::Result;
 
-use crate::parsers::parser::{Block, Parser};
+use crate::parsers::parser::{Block, Parse};
 use crate::state::Status;
 
-impl Parser<Status> for Status {
+impl Parse for Status {
     /// Parse the status output of bird response
     fn parse(lines: Block) -> Result<Status> {
         // Read first line and return bird version
