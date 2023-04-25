@@ -3,6 +3,8 @@ use lazy_static::lazy_static;
 use regex::Regex;
 use std::io::BufRead;
 
+use rayon::prelude::*; // i hate this.
+
 use crate::{
     parsers::{
         datetime,
@@ -63,6 +65,41 @@ enum State {
     Meta,
     BGP,
     Communities(CommunityType),
+}
+/// Reader for routes
+pub struct ParRoutesReader<R: BufRead> {
+    iter: BlockIterator<R>,
+    prefix: String,
+}
+
+impl<R: BufRead> ParRoutesReader<R> {
+    pub fn new(reader: R) -> Self {
+        Self {
+            iter: BlockIterator::new(reader, "1007-"),
+            prefix: "".to_string(),
+        }
+    }
+}
+
+/// Implement reader iterator
+impl<R: BufRead> Iterator for ParRoutesReader<R> {
+    type Item = Route;
+    fn next(&mut self) -> Option<Self::Item> {
+        let block = self.iter.next()?;
+        let mut route = match Route::parse(block) {
+            Ok(route) => route,
+            Err(e) => {
+                println!("Error parsing neighbor: {}", e);
+                Route::default()
+            }
+        };
+        if route.network.is_empty() {
+            route.network = self.prefix.clone();
+        } else {
+            self.prefix = route.network.clone();
+        }
+        Some(route)
+    }
 }
 
 /// Reader for routes
@@ -388,7 +425,8 @@ mod tests {
 
     #[test]
     fn test_routes_reader() {
-        let file: File = File::open("tests/birdc/show-route-all-protocol-R192_175").unwrap();
+        // let file: File = File::open("tests/birdc/show-route-all-protocol-R192_175").unwrap();
+        let file: File = File::open("tests/birdc/show-route-all-table-master4").unwrap();
         let reader = BufReader::new(file);
         let mut reader = RoutesReader::new(reader);
         let routes: Vec<Route> = reader.collect();
