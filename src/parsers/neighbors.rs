@@ -12,6 +12,9 @@ use crate::{
 };
 
 lazy_static! {
+    /// Regex for start neighbor
+    static ref RE_NEIGHBOR_START: Regex = Regex::new(r"1002-").unwrap();
+
     /// Regex: Neighbor header (protocol, state, uptime, ...)
     static ref RE_NEIGHBOR_HEADER: Regex = Regex::new(r"(?x)
         1002-(?P<protocol>\w+)   # protocol id
@@ -47,7 +50,7 @@ pub struct NeighborReader<R: BufRead> {
 
 impl<R: BufRead> NeighborReader<R> {
     pub fn new(reader: R) -> Self {
-        let iter = BlockIterator::new(reader, "1002-");
+        let iter = BlockIterator::new(reader, &RE_NEIGHBOR_START);
         Self { iter }
     }
 }

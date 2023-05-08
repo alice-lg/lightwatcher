@@ -1,4 +1,5 @@
 use anyhow::Result;
+use regex::Regex;
 use std::io::{BufRead, Lines};
 use std::iter::Peekable;
 use std::sync::Arc;
@@ -25,11 +26,61 @@ impl std::fmt::Display for ParseError {
 /// A block is a list of lines
 pub type Block = Vec<String>;
 
-pub type ParBlock = Arc<Block>;
-
 /// Parse is a parser trait which can be implemented
 pub trait Parse: Sized {
     fn parse(block: Block) -> Result<Self>;
+}
+
+/// A block group iterates a block and emits new blocks when
+/// a starting condition matches.
+pub struct BlockGroup {
+    iter: Peekable<std::vec::IntoIter<String>>,
+    start: Regex,
+}
+
+impl BlockGroup {
+    /// Create a new iterable block group
+    pub fn new(block: Block, start: &Regex) -> Self {
+        Self {
+            iter: block.into_iter().peekable(),
+            start: start.clone(),
+        }
+    }
+}
+
+/// Implement iterator for block group.
+/// This is pretty much the same as the block iterator, so
+/// maybe these two can be merged into one. However, my rust
+/// skills are not good enough to do this.
+impl Iterator for BlockGroup {
+    type Item = Block;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let mut block = Block::new();
+
+        // Create a peekable line iterator
+        loop {
+            // Read next line
+            let line = self.iter.next()?;
+            // Add line to block
+            block.push(line.clone());
+
+            // Check next line in iterator
+            if let Some(next) = self.iter.peek() {
+                if self.start.is_match(next) {
+                    break;
+                }
+            } else {
+                break; // EOF
+            }
+        }
+
+        if block.is_empty() {
+            None
+        } else {
+            Some(block)
+        }
+    }
 }
 
 /// A BlockIterator takes an object implementing the Read trait
@@ -37,15 +88,15 @@ pub trait Parse: Sized {
 /// which separates the input lines into blocks.
 /// A new block starts when the marker token is found.
 pub struct BlockIterator<R: BufRead> {
-    start: String,
+    start: Regex,
     lines: Peekable<Lines<R>>,
 }
 
 impl<R: BufRead> BlockIterator<R> {
     /// Create a new BlockIterator
-    pub fn new(reader: R, start: &str) -> Self {
+    pub fn new(reader: R, start: &Regex) -> Self {
         Self {
-            start: start.to_string(),
+            start: start.clone(),
             lines: reader.lines().peekable(),
         }
     }
@@ -68,7 +119,7 @@ impl<R: BufRead> Iterator for BlockIterator<R> {
 
             // Check next line in iterator
             if let Some(Ok(next)) = self.lines.peek() {
-                if next.starts_with(&self.start) {
+                if self.start.is_match(next) {
                     break;
                 }
             } else {
@@ -84,92 +135,6 @@ impl<R: BufRead> Iterator for BlockIterator<R> {
     }
 }
 
-/// A ParBlockIterator takes an object implementing the Read trait
-/// and a marker token
-/// which separates the input lines into blocks.
-/// A new block starts when the marker token is found.
-pub struct ParBlockIterator<R: BufRead> {
-    start: String,
-    lines: Peekable<Lines<R>>,
-}
-
-impl<R: BufRead> ParBlockIterator<R> {
-    /// Create a new BlockIterator
-    pub fn new(reader: R, start: &str) -> Self {
-        Self {
-            start: start.to_string(),
-            lines: reader.lines().peekable(),
-        }
-    }
-}
-
-/// Implement the Iterator trait for BlockIterator
-impl<R: BufRead> Iterator for ParBlockIterator<R> {
-    type Item = ParBlock;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        let mut block = Block::new();
-
-        // Create a peekable line iterator
-        loop {
-            // Read next line
-            let line = self.lines.next()?;
-            // Add line to block
-            let line = line.ok()?;
-            block.push(line.clone());
-
-            // Check next line in iterator
-            if let Some(Ok(next)) = self.lines.peek() {
-                if next.starts_with(&self.start) {
-                    break;
-                }
-            } else {
-                break; // EOF
-            }
-        }
-
-        if block.is_empty() {
-            None
-        } else {
-            Some(ParBlock::new(block))
-        }
-    }
-}
-
-/*
-pub struct Reader<B: BufRead, T> {
-    iter: BlockIterator<B>,
-}
-
-impl<B, T> Reader<B, T> {
-    pub fn new(buf: B, start: &str) -> Self {
-        Self {
-            iter: BlockIterator::new(buf, start),
-        }
-    }
-}
-
-impl<B, T> Iterator for Reader<B, T>
-where
-    B: BufRead,
-    T: Parse + Default,
-{
-    type Item = T;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        let block = self.iter.next()?;
-        match T::parse(block) {
-            Ok(t) => Some(t),
-            Err(e) => {
-                eprintln!("Error: {}", e);
-                T::default()
-            }
-        }
-        Some(T::parse(block))
-    }
-}
-*/
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -179,7 +144,31 @@ mod tests {
     fn test_block_iterator() {
         let input = "1003-line1\nline2\n\n1003-line3\n\nline4\n9009-line5\n";
         let reader = BufReader::new(input.as_bytes());
-        let mut iter = BlockIterator::new(reader, "1003-");
+        let re_start = Regex::new(r"1003-").unwrap();
+        let mut iter = BlockIterator::new(reader, &re_start);
+
+        assert_eq!(iter.next().unwrap(), vec!["1003-line1", "line2", ""]);
+        assert_eq!(
+            iter.next().unwrap(),
+            vec!["1003-line3", "", "line4", "9009-line5"]
+        );
+        assert_eq!(iter.next(), None);
+    }
+
+    #[test]
+    fn test_block_group_iterator() {
+        let block = vec![
+            "1003-line1".to_string(),
+            "line2".to_string(),
+            "".to_string(),
+            "1003-line3".to_string(),
+            "".to_string(),
+            "line4".to_string(),
+            "9009-line5".to_string(),
+        ];
+
+        let re_start = Regex::new(r"1003-").unwrap();
+        let mut iter = BlockGroup::new(block, &re_start);
 
         assert_eq!(iter.next().unwrap(), vec!["1003-line1", "line2", ""]);
         assert_eq!(

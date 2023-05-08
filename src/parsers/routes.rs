@@ -3,12 +3,10 @@ use lazy_static::lazy_static;
 use regex::Regex;
 use std::io::BufRead;
 
-use rayon::prelude::*; // i hate this.
-
 use crate::{
     parsers::{
         datetime,
-        parser::{Block, BlockIterator, Parse},
+        parser::{Block, BlockGroup, BlockIterator, Parse},
     },
     state::{Community, ExtCommunity, LargeCommunity, Route},
 };
@@ -49,6 +47,9 @@ lazy_static! {
 
     /// BGP Community Regex
     static ref RE_BGP_COMMUNITY: Regex = Regex::new(r"\((.+), (\d+), (\d+)\)").unwrap();
+
+    static ref RE_ROUTES_START: Regex = Regex::new(r"1007-\S").unwrap();
+    static ref RE_ROUTE_START: Regex = Regex::new(r"1007-").unwrap();
 }
 
 #[derive(Debug, PartialEq)]
@@ -66,75 +67,31 @@ enum State {
     BGP,
     Communities(CommunityType),
 }
-/// Reader for routes
-pub struct ParRoutesReader<R: BufRead> {
-    iter: BlockIterator<R>,
-    prefix: String,
-}
 
-impl<R: BufRead> ParRoutesReader<R> {
-    pub fn new(reader: R) -> Self {
-        Self {
-            iter: BlockIterator::new(reader, "1007-"),
-            prefix: "".to_string(),
-        }
-    }
-}
+/// A routes group that shares the same prefix. However while parsing
+/// only the first route has a prefix.
+pub type PrefixGroup = Vec<Route>;
 
-/// Implement reader iterator
-impl<R: BufRead> Iterator for ParRoutesReader<R> {
-    type Item = Route;
-    fn next(&mut self) -> Option<Self::Item> {
-        let block = self.iter.next()?;
-        let mut route = match Route::parse(block) {
-            Ok(route) => route,
-            Err(e) => {
-                println!("Error parsing neighbor: {}", e);
-                Route::default()
+impl Parse for PrefixGroup {
+    fn parse(block: Block) -> Result<Self> {
+        let mut routes: PrefixGroup = Vec::new();
+        let mut iter = BlockGroup::new(block, &RE_ROUTE_START);
+        let mut prefix: String = String::new(); // Current prefix
+
+        while let Some(block) = iter.next() {
+            if block[0].starts_with("0001") {
+                continue;
             }
-        };
-        if route.network.is_empty() {
-            route.network = self.prefix.clone();
-        } else {
-            self.prefix = route.network.clone();
-        }
-        Some(route)
-    }
-}
-
-/// Reader for routes
-pub struct RoutesReader<R: BufRead> {
-    iter: BlockIterator<R>,
-    prefix: String,
-}
-
-impl<R: BufRead> RoutesReader<R> {
-    pub fn new(reader: R) -> Self {
-        Self {
-            iter: BlockIterator::new(reader, "1007-"),
-            prefix: "".to_string(),
-        }
-    }
-}
-
-/// Implement reader iterator
-impl<R: BufRead> Iterator for RoutesReader<R> {
-    type Item = Route;
-    fn next(&mut self) -> Option<Self::Item> {
-        let block = self.iter.next()?;
-        let mut route = match Route::parse(block) {
-            Ok(route) => route,
-            Err(e) => {
-                println!("Error parsing neighbor: {}", e);
-                Route::default()
+            let mut route = Route::parse(block)?;
+            if route.network == "" {
+                route.network = prefix.clone();
+            } else {
+                prefix = route.network.clone();
             }
-        };
-        if route.network.is_empty() {
-            route.network = self.prefix.clone();
-        } else {
-            self.prefix = route.network.clone();
+            routes.push(route);
         }
-        Some(route)
+
+        Ok(routes)
     }
 }
 
@@ -423,6 +380,7 @@ mod tests {
         println!("{:?}", route);
     }
 
+    /*
     #[test]
     fn test_routes_reader() {
         // let file: File = File::open("tests/birdc/show-route-all-protocol-R192_175").unwrap();
@@ -433,4 +391,5 @@ mod tests {
         println!("Decoded {:?}", routes.len());
         println!("{:?}", routes[5]);
     }
+    */
 }
