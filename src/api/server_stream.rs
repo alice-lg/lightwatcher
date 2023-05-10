@@ -9,15 +9,67 @@ use std::fs::File;
 use std::io::BufReader;
 use std::io::Write;
 use std::pin::Pin;
-use std::sync::mpsc::Receiver;
+// use std::sync::mpsc::Receiver;
 use std::task::{Context, Poll};
-use std::thread;
+use tokio::sync::mpsc::Receiver;
 
+use crate::parsers::async_routes_worker;
 use crate::parsers::parser::BlockIterator;
-use crate::parsers::routes::PrefixGroup;
 use crate::parsers::routes_worker::RoutesWorkerPool;
 use crate::state::Route;
 
+struct RoutesStream {
+    receiver: Receiver<Route>,
+    start: bool,
+    end: bool,
+}
+
+impl RoutesStream {
+    fn new(receiver: Receiver<Route>) -> Self {
+        Self {
+            receiver,
+            start: true,
+            end: false,
+        }
+    }
+}
+
+impl Stream for RoutesStream {
+    type Item = Result<Bytes, Error>;
+
+    fn poll_next(self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
+        let this = self.get_mut();
+        let buf = BytesMut::new();
+        let mut writer = buf.writer();
+
+        if this.end {
+            return Poll::Ready(None);
+        }
+        if this.start {
+            writer.write(b"[\n").unwrap();
+            this.start = false;
+        }
+
+        match this.receiver.blocking_recv() {
+            Some(route) => {
+                serde_json::to_writer(&mut writer, &route).unwrap();
+            }
+            None => {
+                this.end = true;
+            }
+        };
+
+        if this.end {
+            writer.write(b"\n]\n").unwrap();
+        } else {
+            writer.write(b",\n").unwrap();
+        }
+
+        Poll::Ready(Some(Ok(writer.into_inner().freeze())))
+    }
+}
+
+/*
 /// Routes response stream
 pub struct RoutesStream {
     receiver: Receiver<Result<PrefixGroup>>,
@@ -89,6 +141,27 @@ async fn index() -> impl Responder {
     }
 
     HttpResponse::Ok().json(routes) // .streaming(routes_stream)
+}
+*/
+
+async fn index() -> impl Responder {
+    let file = File::open("tests/birdc/show-route-all-table-master4").unwrap();
+
+    let reader = BufReader::new(file);
+    let re_routes_start = Regex::new(r"1007-\S").unwrap();
+
+    let blocks = BlockIterator::new(reader, &re_routes_start);
+    let (blocks_tx, results_rx) = async_routes_worker::spawn(4).await;
+
+    let routes_stream = RoutesStream::new(results_rx);
+
+    tokio::spawn(async move {
+        for block in blocks {
+            blocks_tx.send(block).await;
+        }
+    });
+
+    HttpResponse::Ok().streaming(routes_stream)
 }
 
 /// Start the server on a given listening port

@@ -1,137 +1,40 @@
-use actix_web::{
-    middleware::Compress, web, web::Bytes, App, Error, HttpResponse, HttpServer, Responder,
-};
+use actix_web::{middleware::Compress, web, App, Error, HttpResponse, HttpServer, Responder};
 use anyhow::Result;
-use bytes::{BufMut, BytesMut};
-use futures::Stream;
-use regex::Regex;
+use tokio::task;
+
 use std::fs::File;
 use std::io::BufReader;
-use std::io::Write;
-use std::pin::Pin;
-// use std::sync::mpsc::Receiver;
-use std::task::{Context, Poll};
-use tokio::sync::mpsc::Receiver;
+use std::num::NonZeroUsize;
+use std::thread;
 
-use crate::parsers::async_routes_worker;
 use crate::parsers::parser::BlockIterator;
+use crate::parsers::routes::RE_ROUTES_START;
 use crate::parsers::routes_worker::RoutesWorkerPool;
 use crate::state::Route;
 
-struct RoutesStream {
-    receiver: Receiver<Route>,
-    start: bool,
-    end: bool,
-}
-
-impl RoutesStream {
-    fn new(receiver: Receiver<Route>) -> Self {
-        Self {
-            receiver,
-            start: true,
-            end: false,
-        }
-    }
-}
-
-impl Stream for RoutesStream {
-    type Item = Result<Bytes, Error>;
-
-    fn poll_next(self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
-        let this = self.get_mut();
-        let buf = BytesMut::new();
-        let mut writer = buf.writer();
-
-        if this.end {
-            return Poll::Ready(None);
-        }
-        if this.start {
-            writer.write(b"[\n").unwrap();
-            this.start = false;
-        }
-
-        match this.receiver.blocking_recv() {
-            Some(route) => {
-                serde_json::to_writer(&mut writer, &route).unwrap();
-            }
-            None => {
-                this.end = true;
-            }
-        };
-
-        if this.end {
-            writer.write(b"\n]\n").unwrap();
-        } else {
-            writer.write(b",\n").unwrap();
-        }
-
-        Poll::Ready(Some(Ok(writer.into_inner().freeze())))
-    }
-}
-
-/*
-/// Routes response stream
-pub struct RoutesStream {
-    receiver: Receiver<Result<PrefixGroup>>,
-    count: usize,
-    buf: BytesMut,
-}
-
-impl RoutesStream {
-    /// Create a new stream from a receiver
-    pub fn new(receiver: Receiver<Result<PrefixGroup>>) -> Self {
-        let buf = BytesMut::new();
-        Self {
-            receiver,
-            buf,
-            count: 0,
-        }
-    }
-}
-
-impl Stream for RoutesStream {
-    type Item = Result<Bytes, Error>;
-
-    fn poll_next(self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
-        let this = self.get_mut();
-        let buf = BytesMut::new();
-        let mut writer = buf.writer();
-
-        if this.count == 0 {
-            writer.write(b"[\n").unwrap();
-        }
-
-        match this.receiver.recv() {
-            Ok(prefix_group) => {
-                // Encode the routes using json and send them to the client
-                for route in prefix_group.unwrap() {
-                    serde_json::to_writer(&mut writer, &route).unwrap();
-                    writer.write(b",\n").unwrap();
-                    this.count += 1;
-                }
-
-                Poll::Ready(Some(Ok(Bytes::copy_from_slice(&this.buf))))
-            }
-            Err(_) => Poll::Ready(None),
-        }
-    }
+// Get number of available cores
+fn get_cpu_count() -> usize {
+    thread::available_parallelism()
+        .unwrap_or(NonZeroUsize::new(1).unwrap())
+        .get()
 }
 
 async fn index() -> impl Responder {
     // let file = File::open("tests/birdc/show-route-all-protocol-R192_175").unwrap();
-    let file = File::open("tests/birdc/show-route-all-table-master4").unwrap();
+    let file = File::open("tests/birdc/show-route-all-protocol-R192_175").unwrap();
 
     let reader = BufReader::new(file);
-    let re_routes_start = Regex::new(r"1007-\S").unwrap();
 
-    let blocks = BlockIterator::new(reader, &re_routes_start);
-    let (blocks_tx, results_rx) = RoutesWorkerPool::spawn(4);
+    let blocks = BlockIterator::new(reader, &RE_ROUTES_START);
+    let (blocks_tx, results_rx) = RoutesWorkerPool::spawn(get_cpu_count());
 
-    thread::spawn(move || {
+    task::spawn_blocking(move || {
         for block in blocks {
             blocks_tx.send(block).unwrap();
         }
-    });
+    })
+    .await
+    .unwrap();
 
     // let routes_stream = RoutesStream::new(results_rx);
     let mut routes: Vec<Route> = vec![];
@@ -141,27 +44,6 @@ async fn index() -> impl Responder {
     }
 
     HttpResponse::Ok().json(routes) // .streaming(routes_stream)
-}
-*/
-
-async fn index() -> impl Responder {
-    let file = File::open("tests/birdc/show-route-all-table-master4").unwrap();
-
-    let reader = BufReader::new(file);
-    let re_routes_start = Regex::new(r"1007-\S").unwrap();
-
-    let blocks = BlockIterator::new(reader, &re_routes_start);
-    let (blocks_tx, results_rx) = async_routes_worker::spawn(4).await;
-
-    let routes_stream = RoutesStream::new(results_rx);
-
-    tokio::spawn(async move {
-        for block in blocks {
-            blocks_tx.send(block).await;
-        }
-    });
-
-    HttpResponse::Ok().streaming(routes_stream)
 }
 
 /// Start the server on a given listening port

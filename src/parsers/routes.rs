@@ -48,7 +48,7 @@ lazy_static! {
     /// BGP Community Regex
     static ref RE_BGP_COMMUNITY: Regex = Regex::new(r"\((.+), (\d+), (\d+)\)").unwrap();
 
-    static ref RE_ROUTES_START: Regex = Regex::new(r"1007-\S").unwrap();
+    pub static ref RE_ROUTES_START: Regex = Regex::new(r"1007-\S").unwrap();
     static ref RE_ROUTE_START: Regex = Regex::new(r"1007-").unwrap();
 }
 
