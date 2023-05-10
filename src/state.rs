@@ -1,12 +1,45 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
+/// Cache Information
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+pub struct CacheInfo {
+    pub date: DateTime<Utc>,
+    pub timezone_type: String,
+    pub timezone: String,
+}
+
+/// Cache Status
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+pub struct CacheStatus {
+    pub cached_at: CacheInfo,
+}
+
+/// ApiStatus
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+pub struct ApiStatus {
+    pub version: String,
+    pub result_from_cache: bool,
+    pub cache_status: CacheStatus,
+}
+
+/// Bird status
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+pub struct BirdStatus {
+    pub current_server: String,
+    pub last_reboot: String,
+    pub last_reconfig: String,
+    pub message: String,
+    pub router_id: String,
+    pub version: String,
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct Status {
-    pub bird_version: String,
-    pub bird_status: String,
-    pub server_version: String,
-    pub error: Option<String>,
+    pub api: ApiStatus,
+    pub cached_at: DateTime<Utc>,
+    pub status: BirdStatus,
+    pub ttl: DateTime<Utc>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]

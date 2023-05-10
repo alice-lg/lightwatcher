@@ -1,3 +1,6 @@
-mod server;
+mod error;
+use error::Error;
 
-pub use server::start_server;
+mod status;
+
+pub mod server;
