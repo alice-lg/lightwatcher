@@ -1,16 +1,11 @@
 use anyhow::Result;
 use axum::{
     extract::{Extension, Path},
-    http::StatusCode,
-    response::{IntoResponse, Response},
     routing::get,
     Router,
 };
-use serde::Serialize;
 
-use crate::api::status;
-use crate::api::Error;
-use crate::state::Status;
+use crate::api::{neighbors, status, tables, Error};
 
 /// Server Options
 #[derive(Default, Debug)]
@@ -32,17 +27,25 @@ pub async fn start(opts: &Opts) -> Result<()> {
     let addr = opts.listen.parse()?;
     let app = Router::new()
         .route("/", get(welcome))
-        .route("/status", get(status::retrieve));
-    /*
-    .route("/protocols/bgp", get(list_neighbors))
-    .route("/routes/received/:neighbor_id", get(list_routes_recieved))
-    .route("/routes/filtered/:neighbor_id", get(list_routes_filtered))
-    .route("/routes/table/:table", get(list_routes_table))
-    .route(
-        "/routes/table/:table/filtered",
-        get(list_routes_table_filtered),
-    );
-    */
+        .route("/status", get(status::retrieve))
+        .route("/protocols/bgp", get(neighbors::list))
+        .route(
+            "/routes/received/:neighbor_id",
+            get(neighbors::list_routes_received),
+        )
+        .route(
+            "/routes/filtered/:neighbor_id",
+            get(neighbors::list_routes_filtered),
+        )
+        .route(
+            "/routes/noexport/:neighbor_id",
+            get(neighbors::list_routes_noexport),
+        )
+        .route("/routes/table/:table", get(tables::list_routes))
+        .route(
+            "/routes/table/:table/filtered",
+            get(tables::list_routes_filtered),
+        );
     //      .layer(Extension(store));
 
     println!("Starting server on {}", addr);

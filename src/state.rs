@@ -16,11 +16,22 @@ pub struct CacheStatus {
 }
 
 /// ApiStatus
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ApiStatus {
+    #[serde(rename = "Version")]
     pub version: String,
     pub result_from_cache: bool,
-    pub cache_status: CacheStatus,
+    pub cache_status: Option<CacheStatus>,
+}
+
+impl Default for ApiStatus {
+    fn default() -> Self {
+        ApiStatus {
+            version: "0.0.1".to_string(),
+            result_from_cache: false,
+            cache_status: None,
+        }
+    }
 }
 
 /// Bird status
@@ -43,17 +54,22 @@ pub struct Status {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
+pub struct RoutesCount {
+    accepted: u32,
+    exported: u32,
+    filtered: u32,
+    imported: u32,
+    preferred: u32,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct Neighbor {
     pub id: String,
     pub address: String,
     pub asn: u32,
     pub state: String,
     pub description: String,
-    pub routes_received: u32,
-    pub routes_filtered: u32,
-    pub routes_exported: u32,
-    pub routes_preferred: u32,
-    pub routes_accepted: u32,
+    pub routes: RoutesCount,
     pub uptime: f64, // seconds
     pub since: DateTime<Utc>,
     pub last_error: String,

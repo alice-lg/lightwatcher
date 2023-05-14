@@ -44,6 +44,11 @@ fn parse_last_reconfig(status: &mut BirdStatus, line: &str) {
     status.last_reconfig = s.to_string(); // unparsed.
 }
 
+fn parse_message(status: &mut BirdStatus, line: &str) {
+    let message = line.strip_prefix("0013 ").unwrap_or("");
+    status.message = message.to_string();
+}
+
 fn parse_line(status: &mut BirdStatus, line: &str) -> Result<()> {
     if line.starts_with("0001 ") {
         parse_version(status, line);
@@ -55,6 +60,8 @@ fn parse_line(status: &mut BirdStatus, line: &str) -> Result<()> {
         parse_last_reboot(status, line);
     } else if line.starts_with(" Last reconfiguration") {
         parse_last_reconfig(status, line);
+    } else if line.starts_with("0013 ") {
+        parse_message(status, line);
     }
     Ok(())
 }
