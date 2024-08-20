@@ -75,6 +75,11 @@ pub struct Neighbor {
     pub last_error: String,
     #[serde(rename = "routeserver_id")]
     pub route_server_id: String,
+
+    pub routes_received: u32,
+    pub routes_filtered: u32,
+    pub routes_accepted: u32,
+    pub routes_exported: u32,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
