@@ -92,18 +92,27 @@ impl Parse for Neighbor {
     }
 }
 
-fn parse_line(mut neighbor: &mut Neighbor, state: State, line: &str) -> Result<State> {
+fn parse_line(
+    mut neighbor: &mut Neighbor,
+    state: State,
+    line: &str,
+) -> Result<State> {
     let state = match state {
         State::Start => parse_neighbor_header(&mut neighbor, line)?,
         State::Meta => parse_neighbor_meta(&mut neighbor, line)?,
         State::BgpState => parse_bgp_state(&mut neighbor, line)?,
-        State::RouteChangeStats => parse_route_change_stats(&mut neighbor, line)?,
+        State::RouteChangeStats => {
+            parse_route_change_stats(&mut neighbor, line)?
+        }
     };
     Ok(state)
 }
 
 /// Parse Neighbor Header (name, state, uptime) and return next state
-fn parse_neighbor_header(neighbor: &mut Neighbor, line: &str) -> Result<State> {
+fn parse_neighbor_header(
+    neighbor: &mut Neighbor,
+    line: &str,
+) -> Result<State> {
     // Does line match neighbor header
     if !line.contains("BGP") {
         return Ok(State::Start);
@@ -186,7 +195,10 @@ impl ChangeStats {
 }
 
 /// Parse route change stats
-fn parse_route_change_stats(neighbor: &mut Neighbor, line: &str) -> Result<State> {
+fn parse_route_change_stats(
+    neighbor: &mut Neighbor,
+    line: &str,
+) -> Result<State> {
     if let Some(caps) = RE_KEY_VALUE.captures(line) {
         let key = caps["key"].to_lowercase();
         let val = caps["value"].to_string();
@@ -198,7 +210,8 @@ fn parse_route_change_stats(neighbor: &mut Neighbor, line: &str) -> Result<State
             neighbor.routes_accepted = stats.accepted;
         } else if key == "export updates" {
             let stats = ChangeStats::parse(&val)?;
-            neighbor.routes_exported = stats.received - stats.rejected - stats.filtered;
+            neighbor.routes_exported =
+                stats.received - stats.rejected - stats.filtered;
         }
     }
 
@@ -287,10 +300,11 @@ mod tests {
         let input = File::open("tests/birdc/show-protocols-all").unwrap();
         let buf = BufReader::new(input);
         let reader = NeighborReader::new(buf);
-        let neighbors: Vec<Neighbor> = reader.filter(|n| !n.id.is_empty()).collect();
+        let neighbors: Vec<Neighbor> =
+            reader.filter(|n| !n.id.is_empty()).collect();
 
         let neighbor = &neighbors[0];
         assert_eq!(neighbor.id, "R194_42");
-        assert_eq!(neighbor.address, "172.31.194.42");
+        assert_eq!(neighbor.address, "111.111.194.42");
     }
 }

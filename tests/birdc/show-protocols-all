@@ -1,0 +1,259 @@
+0001 BIRD 2.0.10 ready.
+2002-Name       Proto      Table      State  Since         Info
+1002-device1    Device     ---        up     2023-04-19 09:08:03  
+1006-
+1002-direct1    Direct     ---        down   2023-04-19 09:08:03  
+1006-
+1002-kernel4    Kernel     master4    down   2023-04-19 09:08:03  
+1006-  Channel ipv4
+     State:          DOWN
+     Table:          master4
+     Preference:     10
+     Input filter:   ACCEPT
+     Output filter:  REJECT
+ 
+1002-kernel6    Kernel     master6    down   2023-04-19 09:08:03  
+1006-  Channel ipv6
+     State:          DOWN
+     Table:          master6
+     Preference:     10
+     Input filter:   ACCEPT
+     Output filter:  REJECT
+ 
+1002-p_mc       Pipe       ---        up     2023-04-19 09:08:03  master4 <=> collector4
+1006-  Description:    master4 → collector4
+   Channel main
+     Table:          master4
+     Peer table:     collector4
+     Import state:   up
+     Export state:   up
+     Import filter:  REJECT
+     Export filter:  ACCEPT
+   Routes:         0 imported, 712337 exported
+   Route change stats:     received   rejected   filtered    ignored   accepted
+     Import updates:         712337     712337          0          0          0
+     Import withdraws:            0          0        ---          0          0
+     Export updates:         712337          0          0          0     712337
+     Export withdraws:            0          0        ---          0          0
+ 
+1002-static_rpki Static     rt_rpki_static up     2023-04-19 09:08:03  
+1006-  Channel roa4
+     State:          UP
+     Table:          rt_rpki_static
+     Preference:     200
+     Input filter:   ACCEPT
+     Output filter:  REJECT
+     Routes:         324552 imported, 0 exported, 324552 preferred
+     Route change stats:     received   rejected   filtered    ignored   accepted
+       Import updates:         324552          0          0          0     324552
+       Import withdraws:            0          0        ---          0          0
+       Export updates:              0          0          0        ---          0
+       Export withdraws:            0        ---        ---        ---          0
+ 
+1002-static_bh_rpki Static     rt_bh_rpki_static up     2023-04-19 09:08:03  
+1006-  Channel roa4
+     State:          UP
+     Table:          rt_bh_rpki_static
+     Preference:     200
+     Input filter:   ACCEPT
+     Output filter:  REJECT
+     Routes:         324552 imported, 0 exported, 324080 preferred
+     Route change stats:     received   rejected   filtered    ignored   accepted
+       Import updates:         324552          0          0          0     324552
+       Import withdraws:            0          0        ---          0          0
+       Export updates:              0          0          0        ---          0
+       Export withdraws:            0        ---        ---        ---          0
+ 
+1002-R194_42    BGP        ---        up     2023-04-19 09:39:25  Established   
+1006-  Description:    Packet Pushers
+   BGP state:          Established
+     Neighbor address: 111.111.194.42
+     Neighbor AS:      42
+     Local AS:         6695
+     Neighbor ID:      111.111.194.42
+     Local capabilities
+       Multiprotocol
+         AF announced: ipv4
+       Route refresh
+       Graceful restart
+       4-octet AS numbers
+       Enhanced refresh
+       Hostname: rs1.met.ixp.example
+     Neighbor capabilities
+       Multiprotocol
+         AF announced: ipv4
+       Route refresh
+       Extended message
+       Graceful restart
+         Restart time: 180
+         Restart recovery
+         AF supported: ipv4
+         AF preserved: ipv4
+       4-octet AS numbers
+       Enhanced refresh
+     Session:          external route-server AS4
+     Source address:   111.111.193.157
+     Hold timer:       158.973/180
+     Keepalive timer:  51.101/60
+   Channel ipv4
+     State:          UP
+     Table:          master4
+     Preference:     100
+     Input filter:   (unnamed)
+     Output filter:  (unnamed)
+     Receive limit:  40000
+       Action:       disable
+     Import limit:   5000
+       Action:       warn
+     Export limit:   300000
+       Action:       warn
+     Routes:         88 imported, 0 filtered, 295747 exported, 85 preferred
+     Route change stats:     received   rejected   filtered    ignored   accepted
+       Import updates:             88          0          0          0         88
+       Import withdraws:            0          0        ---          0          0
+       Export updates:         435159        151     133526        ---     307687
+       Export withdraws:            0        ---        ---        ---          0
+     BGP Next hop:   111.111.193.157
+ 
+1002-R195_42    BGP        ---        up     2023-04-19 09:24:12  Established   
+1006-  Description:    Packet Clearing House
+   BGP state:          Established
+     Neighbor address: 111.111.195.42
+     Neighbor AS:      3856
+     Local AS:         6695
+     Neighbor ID:      111.111.195.42
+     Local capabilities
+       Multiprotocol
+         AF announced: ipv4
+       Route refresh
+       Graceful restart
+       4-octet AS numbers
+       Enhanced refresh
+       Hostname: rs1.met.ixp.example
+     Neighbor capabilities
+       Multiprotocol
+         AF announced: ipv4
+       Route refresh
+       Extended message
+       Graceful restart
+         Restart time: 180
+         Restart recovery
+         AF supported: ipv4
+         AF preserved: ipv4
+       4-octet AS numbers
+       Enhanced refresh
+     Session:          external route-server AS4
+     Source address:   111.111.193.157
+     Hold timer:       146.279/180
+     Keepalive timer:  12.783/60
+   Channel ipv4
+     State:          UP
+     Table:          master4
+     Preference:     100
+     Input filter:   (unnamed)
+     Output filter:  (unnamed)
+     Receive limit:  40000
+       Action:       disable
+     Import limit:   5000
+       Action:       warn
+     Export limit:   300000
+       Action:       warn
+     Routes:         1 imported, 0 filtered, 295850 exported, 1 preferred
+     Route change stats:     received   rejected   filtered    ignored   accepted
+       Import updates:              1          0          0          0          1
+       Import withdraws:            0          0        ---          0          0
+       Export updates:         686584          3     189874        ---     373402
+       Export withdraws:            0        ---        ---        ---          0
+     BGP Next hop:   111.111.193.157
+ 
+1002-R195_77    BGP        ---        up     2023-04-19 09:22:02  Established   
+1006-  Description:    AS112
+   BGP state:          Established
+     Neighbor address: 111.111.195.77
+     Neighbor AS:      112
+     Local AS:         6695
+     Neighbor ID:      111.111.195.77
+     Local capabilities
+       Multiprotocol
+         AF announced: ipv4
+       Route refresh
+       Graceful restart
+       4-octet AS numbers
+       Enhanced refresh
+       Hostname: rs1.met.ixp.example
+     Neighbor capabilities
+       Multiprotocol
+         AF announced: ipv4
+       Route refresh
+       Extended message
+       Graceful restart
+         Restart time: 240
+         Restart recovery
+         AF supported: ipv4
+         AF preserved: ipv4
+       4-octet AS numbers
+       Enhanced refresh
+     Session:          external route-server AS4
+     Source address:   111.111.193.157
+     Hold timer:       179.244/240
+     Keepalive timer:  35.634/80
+   Channel ipv4
+     State:          UP
+     Table:          master4
+     Preference:     100
+     Input filter:   (unnamed)
+     Output filter:  (unnamed)
+     Receive limit:  40000
+       Action:       disable
+     Import limit:   5000
+       Action:       warn
+     Export limit:   300000
+       Action:       warn
+     Routes:         2 imported, 0 filtered, 296065 exported, 2 preferred
+     Route change stats:     received   rejected   filtered    ignored   accepted
+       Import updates:              2          0          0          0          2
+       Import withdraws:            0          0        ---          0          0
+       Export updates:         709981          6     174686        ---     364358
+       Export withdraws:            0        ---        ---        ---          0
+     BGP Next hop:   111.111.193.157
+ 
+1002-R_pp_60    BGP        ---        start  2023-04-19 09:08:03  Passive       
+1006-  Description:    IXP Local
+   BGP state:          Passive
+     Neighbor address: 111.111.199.60
+     Neighbor AS:      205529
+     Local AS:         6695
+   Channel ipv4
+     State:          DOWN
+     Table:          master4
+     Preference:     100
+     Input filter:   REJECT
+     Output filter:  REJECT
+ 
+1002-R_pp_75    BGP        ---        start  2023-04-19 09:08:03  Passive       
+1006-  Description:    IXP Local
+   BGP state:          Passive
+     Neighbor address: 111.111.199.75
+     Neighbor AS:      205529
+     Local AS:         6695
+   Channel ipv4
+     State:          DOWN
+     Table:          master4
+     Preference:     100
+     Input filter:   REJECT
+     Output filter:  REJECT
+ 
+1002-R_pp_90    BGP        ---        start  2023-04-19 09:08:03  Passive       
+1006-  Description:    IXP Local
+   BGP state:          Passive
+     Neighbor address: 111.111.199.90
+     Neighbor AS:      205529
+     Local AS:         6695
+   Channel ipv4
+     State:          DOWN
+     Table:          master4
+     Preference:     100
+     Input filter:   REJECT
+     Output filter:  REJECT
+ 
+0000 

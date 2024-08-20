@@ -80,7 +80,7 @@ mod tests {
             reader.lines().map(|l| l.unwrap()).collect::<Vec<String>>();
         let status = BirdStatus::parse(block).unwrap();
         assert_eq!(status.version, "2.0.10");
-        assert_eq!(status.router_id, "172.31.192.157");
+        assert_eq!(status.router_id, "111.111.111.111");
         assert_eq!(status.current_server, "2023-05-10 14:27:32");
         assert_eq!(status.last_reboot, "2023-05-10 11:34:49");
         assert_eq!(status.last_reconfig, "2023-05-10 11:34:49");

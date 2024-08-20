@@ -95,9 +95,9 @@ mod tests {
 
     #[tokio::test]
     async fn test_routes_worker() {
-        // let file = File::open("tests/birdc/show-route-all-protocol-R192_175").unwrap();
-        let file: File =
-            File::open("tests/birdc/show-route-all-table-master4").unwrap();
+        let file =
+            File::open("tests/birdc/show-route-all-protocol-R1").unwrap();
+        // let file: File = File::open("tests/birdc/show-route-all-table-master4").unwrap();
         let reader = BufReader::new(file);
         let re_routes_start = Regex::new(r"1007-\S").unwrap();
 

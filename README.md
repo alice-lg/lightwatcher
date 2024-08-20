@@ -14,6 +14,7 @@ considered a 'preview' release.
 There are currently two environment variables to configure:
 
 `LIGHTWATCHER_LISTEN` (default: `127.0.0.1:8181`)
+
 `LIGHTWATCHER_BIRDC`  (default: `/var/run/bird/bird.ctl`)
 
 ## Contributing
