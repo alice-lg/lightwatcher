@@ -1,9 +1,6 @@
 use anyhow::Result;
 
-use crate::parsers::{
-    datetime,
-    parser::{Block, Parse},
-};
+use crate::parsers::parser::{Block, Parse};
 use crate::state::BirdStatus;
 
 impl Parse for BirdStatus {
@@ -79,7 +76,8 @@ mod tests {
     fn test_parse() {
         let file = File::open("tests/birdc/show-status").unwrap();
         let reader = BufReader::new(file);
-        let block = reader.lines().map(|l| l.unwrap()).collect::<Vec<String>>();
+        let block =
+            reader.lines().map(|l| l.unwrap()).collect::<Vec<String>>();
         let status = BirdStatus::parse(block).unwrap();
         assert_eq!(status.version, "2.0.10");
         assert_eq!(status.router_id, "172.31.192.157");

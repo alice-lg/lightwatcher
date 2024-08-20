@@ -12,18 +12,19 @@ use crate::{
     },
     bird,
     parsers::{
-        neighbors::NeighborReader, parser::BlockIterator, routes::RE_ROUTES_START,
-        routes_worker::RoutesWorkerPool,
+        neighbors::NeighborReader, parser::BlockIterator,
+        routes::RE_ROUTES_START, routes_worker::RoutesWorkerPool,
     },
     state::{Neighbor, Route},
 };
 
 /// List all neighbors (show protocols all, filter BGP)
 pub async fn list() -> Result<String, Error> {
-    let result = bird::show_protocols_all()?;
+    let result = bird::birdc(bird::Command::ShowProtocolsAll)?;
     let buf = BufReader::new(result);
     let reader = NeighborReader::new(buf);
-    let neighbors: Vec<Neighbor> = reader.filter(|n| !n.id.is_empty()).collect();
+    let neighbors: Vec<Neighbor> =
+        reader.filter(|n| !n.id.is_empty()).collect();
 
     let neighbors: HashMap<String, Neighbor> =
         neighbors.into_iter().map(|n| (n.id.clone(), n)).collect();
@@ -37,27 +38,30 @@ pub async fn list() -> Result<String, Error> {
 }
 
 /// List all routes received for a neighbor
-pub async fn list_routes_received(Path(id): Path<String>) -> Result<String, Error> {
-    let result = bird::show_route_all_protocol(&id)?;
+pub async fn list_routes_received(
+    Path(id): Path<String>,
+) -> Result<String, Error> {
+    let result = bird::birdc(bird::Command::ShowRouteAllProtocol(id))?;
     let buf = BufReader::new(result);
     let blocks = BlockIterator::new(buf, &RE_ROUTES_START);
     let mut routes: Vec<Route> = vec![];
 
     // Spawn workers
-    let (blocks_tx, results_rx) = RoutesWorkerPool::spawn(4);
+    let (blocks_tx, mut results_rx) = RoutesWorkerPool::spawn();
+
     task::spawn_blocking(move || {
         for block in blocks {
             blocks_tx.send(block).unwrap();
         }
-    })
-    .await?;
-    for result in results_rx {
-        let result = result.unwrap();
+    });
+
+    while let Some(result) = results_rx.recv().await {
+        let result = result?;
         routes.extend(result);
     }
 
     let response = RoutesResponse {
-        routes: routes,
+        routes,
         ..Default::default()
     };
     let body = serde_json::to_string(&response)?;
@@ -65,54 +69,61 @@ pub async fn list_routes_received(Path(id): Path<String>) -> Result<String, Erro
 }
 
 /// List all routes filtered by a neighbor
-pub async fn list_routes_filtered(Path(id): Path<String>) -> Result<String, Error> {
-    let result = bird::show_route_all_protocol_filtered(&id)?;
+pub async fn list_routes_filtered(
+    Path(id): Path<String>,
+) -> Result<String, Error> {
+    let result = bird::birdc(bird::Command::ShowRouteAllFilteredProtocol(id))?;
     let buf = BufReader::new(result);
     let blocks = BlockIterator::new(buf, &RE_ROUTES_START);
     let mut routes: Vec<Route> = vec![];
 
     // Spawn workers
-    let (blocks_tx, results_rx) = RoutesWorkerPool::spawn(4);
+    let (blocks_tx, mut results_rx) = RoutesWorkerPool::spawn();
+
     task::spawn_blocking(move || {
         for block in blocks {
             blocks_tx.send(block).unwrap();
         }
-    })
-    .await?;
-    for result in results_rx {
-        let result = result.unwrap();
+    });
+
+    while let Some(result) = results_rx.recv().await {
+        let result = result?;
         routes.extend(result);
     }
 
     let response = RoutesResponse {
-        routes: routes,
+        routes,
         ..Default::default()
     };
+
     let body = serde_json::to_string(&response)?;
     Ok(body)
 }
 
 /// List all routes not exported
-pub async fn list_routes_noexport(Path(id): Path<String>) -> Result<String, Error> {
-    let result = bird::show_route_all_protocol_noexport(&id)?;
+pub async fn list_routes_noexport(
+    Path(id): Path<String>,
+) -> Result<String, Error> {
+    let result = bird::birdc(bird::Command::ShowRouteAllNoexportProtocol(id))?;
     let buf = BufReader::new(result);
     let blocks = BlockIterator::new(buf, &RE_ROUTES_START);
     let mut routes: Vec<Route> = vec![];
 
     // Spawn workers
-    let (blocks_tx, results_rx) = RoutesWorkerPool::spawn(4);
+    let (blocks_tx, mut results_rx) = RoutesWorkerPool::spawn();
     task::spawn_blocking(move || {
         for block in blocks {
             blocks_tx.send(block).unwrap();
         }
-    })
-    .await?;
-    for result in results_rx {
-        let result = result.unwrap();
+    });
+
+    while let Some(result) = results_rx.recv().await {
+        let result = result?;
         routes.extend(result);
     }
+
     let response = RoutesResponse {
-        routes: routes,
+        routes,
         ..Default::default()
     };
     let body = serde_json::to_string(&response)?;

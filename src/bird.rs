@@ -1,47 +1,69 @@
 use std::fs::File;
+use std::io::Write;
+use std::os::unix::net::UnixStream;
 
 use anyhow::Result;
 
-pub fn show_status() -> Result<File> {
-    // Open Socket
+use crate::config;
 
-    // Send `show status\n`
-
-    let file = File::open("tests/birdc/show-status")?;
-    Ok(file)
+pub enum Command {
+    ShowStatus,
+    ShowProtocolsAll,
+    ShowRouteAllProtocol(String),
+    ShowRouteAllFilteredProtocol(String),
+    ShowRouteAllNoexportProtocol(String),
+    ShowRouteAllTable(String),
+    ShowRouteAllFilteredTable(String),
 }
 
-pub fn show_protocols_all() -> Result<File> {
-    let file = File::open("tests/birdc/show-protocols-all")?;
-    Ok(file)
+/// Remove potentially harmful characters from the string
+fn sanitize_userdata(s: String) -> String {
+    s.replace("'", "_")
+        .replace("`", "_")
+        .replace("\"", "_")
+        .replace("\n", "_")
+        .replace("\t", "_")
+        .replace(",", "_")
+        .replace(";", "_")
 }
 
-pub fn show_route_all_protocol(id: &str) -> Result<File> {
-    println!("show route all protocol '{}'", id);
-    let file = File::open("tests/birdc/show-route-all-protocol-R192_175")?;
-    Ok(file)
+impl Into<String> for Command {
+    fn into(self) -> String {
+        match self {
+            Command::ShowStatus => "show status\n".to_string(),
+            Command::ShowProtocolsAll => "show protocols all\n".to_string(),
+            Command::ShowRouteAllProtocol(id) => {
+                let id = sanitize_userdata(id);
+                format!("show route all protocol '{}'\n", id)
+            }
+            Command::ShowRouteAllFilteredProtocol(id) => {
+                let id = sanitize_userdata(id);
+                format!("show route all filtered protocol '{}'\n", id)
+            }
+            Command::ShowRouteAllNoexportProtocol(id) => {
+                let id = sanitize_userdata(id);
+                format!("show route all noexport protocol '{}'\n", id)
+            }
+            Command::ShowRouteAllTable(table) => {
+                let table = sanitize_userdata(table);
+                format!("show route all table '{}'\n", table)
+            }
+            Command::ShowRouteAllFilteredTable(table) => {
+                let table = sanitize_userdata(table);
+                format!("show route all filtered table '{}'\n", table)
+            }
+        }
+    }
 }
 
-pub fn show_route_all_protocol_filtered(id: &str) -> Result<File> {
-    println!("show route all filtered protocol '{}'", id);
-    let file = File::open("tests/birdc/show-route-all-filtered-protocol-R193_51")?;
-    Ok(file)
+/// Connect to birdc on the unix socket
+/// and send the command.
+pub fn birdc(cmd: Command) -> Result<UnixStream> {
+    let socket_addr = config::get_birdc_socket();
+    let mut stream = UnixStream::connect(socket_addr)?;
+    let req: String = cmd.into();
+
+    stream.write_all(&req.as_bytes())?;
+    Ok(stream)
 }
 
-pub fn show_route_all_protocol_noexport(id: &str) -> Result<File> {
-    println!("show route all noexport protocol '{}'", id);
-    let file = File::open("tests/birdc/show-route-all-noexport-protocol-R193_51")?;
-    Ok(file)
-}
-
-pub fn show_route_all_table(table: &str) -> Result<File> {
-    println!("show route all table '{}'", table);
-    let file = File::open("tests/birdc/show-route-all-table-master4")?;
-    Ok(file)
-}
-
-pub fn show_route_all_table_filtered(table: &str) -> Result<File> {
-    println!("show route all filtered table '{}'", table);
-    let file = File::open("tests/birdc/show-route-all-filtered-table-master4")?;
-    Ok(file)
-}

@@ -7,32 +7,36 @@ use tokio::task;
 use crate::{
     api::{responses::RoutesResponse, Error},
     bird,
-    parsers::{parser::BlockIterator, routes::RE_ROUTES_START, routes_worker::RoutesWorkerPool},
+    parsers::{
+        parser::BlockIterator, routes::RE_ROUTES_START,
+        routes_worker::RoutesWorkerPool,
+    },
     state::Route,
 };
 
 /// List all routes in a table
 pub async fn list_routes(Path(table): Path<String>) -> Result<String, Error> {
-    let result = bird::show_route_all_table(&table)?;
+    let result = bird::birdc(bird::Command::ShowRouteAllTable(table))?;
     let buf = BufReader::new(result);
     let blocks = BlockIterator::new(buf, &RE_ROUTES_START);
     let mut routes: Vec<Route> = vec![];
 
     // Spawn workers
-    let (blocks_tx, results_rx) = RoutesWorkerPool::spawn(4);
+    let (blocks_tx, mut results_rx) = RoutesWorkerPool::spawn();
+
     task::spawn_blocking(move || {
         for block in blocks {
             blocks_tx.send(block).unwrap();
         }
-    })
-    .await?;
-    for result in results_rx {
-        let result = result.unwrap();
+    });
+
+    while let Some(result) = results_rx.recv().await {
+        let result = result?;
         routes.extend(result);
     }
 
     let response = RoutesResponse {
-        routes: routes,
+        routes,
         ..Default::default()
     };
     let body = serde_json::to_string(&response)?;
@@ -40,27 +44,29 @@ pub async fn list_routes(Path(table): Path<String>) -> Result<String, Error> {
 }
 
 /// List all routes in a table
-pub async fn list_routes_filtered(Path(table): Path<String>) -> Result<String, Error> {
-    let result = bird::show_route_all_table_filtered(&table)?;
+pub async fn list_routes_filtered(
+    Path(table): Path<String>,
+) -> Result<String, Error> {
+    let result = bird::birdc(bird::Command::ShowRouteAllFilteredTable(table))?;
     let buf = BufReader::new(result);
     let blocks = BlockIterator::new(buf, &RE_ROUTES_START);
     let mut routes: Vec<Route> = vec![];
 
     // Spawn workers
-    let (blocks_tx, results_rx) = RoutesWorkerPool::spawn(4);
+    let (blocks_tx, mut results_rx) = RoutesWorkerPool::spawn();
     task::spawn_blocking(move || {
         for block in blocks {
             blocks_tx.send(block).unwrap();
         }
-    })
-    .await?;
-    for result in results_rx {
-        let result = result.unwrap();
+    });
+
+    while let Some(result) = results_rx.recv().await {
+        let result = result?;
         routes.extend(result);
     }
 
     let response = RoutesResponse {
-        routes: routes,
+        routes,
         ..Default::default()
     };
     let body = serde_json::to_string(&response)?;

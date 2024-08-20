@@ -1,20 +1,13 @@
 use anyhow::Result;
-use axum::{
-    extract::{Extension, Path},
-    routing::get,
-    Router,
-};
+use axum::{routing::get, Router};
 
-use crate::api::{neighbors, status, tables, Error};
+use crate::api::{neighbors, status, tables};
 
 /// Server Options
 #[derive(Default, Debug)]
 pub struct Opts {
     /// Server listen address
     pub listen: String,
-
-    /// Server workers
-    pub workers: usize,
 }
 
 /// Get the welcome message
@@ -46,9 +39,7 @@ pub async fn start(opts: &Opts) -> Result<()> {
             "/routes/table/:table/filtered",
             get(tables::list_routes_filtered),
         );
-    //      .layer(Extension(store));
 
-    println!("Starting server on {}", addr);
     axum::Server::bind(&addr)
         .serve(app.into_make_service())
         .await?;

@@ -1,12 +1,11 @@
 use anyhow::{anyhow, Result};
 use lazy_static::lazy_static;
 use regex::Regex;
-use std::io::BufRead;
 
 use crate::{
     parsers::{
         datetime,
-        parser::{Block, BlockGroup, BlockIterator, Parse},
+        parser::{Block, BlockGroup, Parse},
     },
     state::{Community, ExtCommunity, LargeCommunity, Route},
 };
@@ -119,7 +118,9 @@ fn parse_line(route: &mut Route, state: State, line: &str) -> Result<State> {
         State::Start => parse_route_header(route, line),
         State::Meta => parse_route_meta(route, line),
         State::BGP => parse_route_bgp(route, line),
-        State::Communities(community_type) => parse_route_communities(route, community_type, line),
+        State::Communities(community_type) => {
+            parse_route_communities(route, community_type, line)
+        }
     }
 }
 
@@ -374,7 +375,8 @@ mod tests {
  	BGP.ext_community: (rt, 271042, 0)
  	BGP.large_community: (6695, 1000, 1) (57463, 0, 5408) (57463, 0, 6461)
             "#;
-        let block: Vec<String> = block.split("\n").map(|s| s.to_string()).collect();
+        let block: Vec<String> =
+            block.split("\n").map(|s| s.to_string()).collect();
         let route = Route::parse(block).unwrap();
 
         println!("{:?}", route);

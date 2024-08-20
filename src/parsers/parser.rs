@@ -2,7 +2,6 @@ use anyhow::Result;
 use regex::Regex;
 use std::io::{BufRead, Lines};
 use std::iter::Peekable;
-use std::sync::Arc;
 
 #[derive(thiserror::Error, Debug)]
 pub struct ParseError {
