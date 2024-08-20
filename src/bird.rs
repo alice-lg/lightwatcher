@@ -1,4 +1,3 @@
-use std::fs::File;
 use std::io::Write;
 use std::os::unix::net::UnixStream;
 

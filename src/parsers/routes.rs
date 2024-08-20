@@ -321,9 +321,6 @@ fn parse_route_bgp(route: &mut Route, line: &str) -> Result<State> {
 mod tests {
     use super::*;
 
-    use std::fs::File;
-    use std::io::BufReader;
-
     #[test]
     fn test_match_route_header() {
         let line =

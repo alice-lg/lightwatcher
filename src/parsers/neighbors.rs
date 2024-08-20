@@ -222,7 +222,7 @@ fn parse_route_change_stats(
 mod tests {
     use super::*;
     use std::fs::File;
-    use std::io::{BufRead, BufReader};
+    use std::io::BufReader;
 
     #[test]
     fn test_parse_neighbor_header() {
