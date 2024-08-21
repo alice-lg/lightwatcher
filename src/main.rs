@@ -19,12 +19,9 @@ async fn main() -> Result<()> {
         .init();
 
     // Print info
-    tracing::info!("starting {}", lightwatcher::version());
-    tracing::info!(
-        "ENV: LIGHTWATCHER_LISTEN={}",
-        config::get_listen_address()
-    );
-    tracing::info!("ENV: LIGHTWATCHER_BIRDC={}", config::get_birdc_socket());
+    tracing::info!(version = lightwatcher::version(), "starting service");
+    tracing::info!(LIGHT_WATCHER_LISTEN = config::get_listen_address(), "env");
+    tracing::info!(LIGHT_WATCHER_BIRDC = config::get_birdc_socket(), "env");
 
     // Start API server
     let listen = config::get_listen_address();
