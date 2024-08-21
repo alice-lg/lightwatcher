@@ -18,7 +18,7 @@ lazy_static! {
           (?P<prefix>[0-9a-f:\./]+)?\s+   # Network
           (?P<type>\w+)\s+ 
           \[
-            (?P<from_protocol>.*?)\s+(?P<age>[\d\-:\s]+)
+            (?P<from_protocol>.*?)\s+(?P<age>[\d\-:\.\s]+)
             (\s+from\s+(?P<learnt_from>.+))?
           \]\s+
           ((?P<primary>\*)\s+)?
@@ -87,6 +87,10 @@ impl Parse for PrefixGroup {
             } else {
                 prefix = route.network.clone();
             }
+
+            if route.neighbor_id.is_none() {
+                continue; // ??
+            }
             routes.push(route);
         }
 
@@ -142,6 +146,9 @@ fn parse_route_header(route: &mut Route, line: &str) -> Result<State> {
         }
         if let Some(from) = caps.name("learnt_from") {
             route.learnt_from = Some(from.as_str().to_string());
+        }
+        if let Some(proto) = caps.name("from_protocol") {
+            route.neighbor_id = Some(proto.as_str().to_string());
         }
 
         return Ok(State::Meta);
@@ -325,6 +332,10 @@ mod tests {
     fn test_match_route_header() {
         let line =
             "1007-203.17.254.0/24      unicast [R192_172 2023-04-19 09:28:42] * (100) [AS7545i]";
+        let caps = RE_ROUTE_HEADER.captures(line).unwrap();
+        println!("{:?}", caps);
+
+        let line = "1007-219.0.0.0/9          unicast [ebgp_rs4 10:38:20.602 from 10.255.253.250] * (100) [AS64967i]";
         let caps = RE_ROUTE_HEADER.captures(line).unwrap();
         println!("{:?}", caps);
     }

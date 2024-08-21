@@ -1,10 +1,12 @@
+use std::{
+    num::NonZeroUsize,
+    sync::{Arc, Mutex},
+    thread,
+};
+
 use anyhow::Result;
-use std::num::NonZeroUsize;
-use std::sync::{Arc, Mutex};
-use std::thread;
-use tokio::sync::mpsc::error::TryRecvError;
 use tokio::sync::mpsc::{
-    unbounded_channel, UnboundedReceiver, UnboundedSender,
+    error::TryRecvError, unbounded_channel, UnboundedReceiver, UnboundedSender,
 };
 
 use crate::parsers::{
@@ -28,8 +30,7 @@ impl RoutesWorker {
     /// Spawn a new routes worker and create a response and
     /// request channel.
     pub fn spawn(&self, block_queue: BlockQueue, results_queue: ResultsQueue) {
-        println!("routes worker {} started.", self.id);
-
+        tracing::debug!("routes worker {} started.", self.id);
         thread::spawn(move || loop {
             let block = {
                 let mut queue = block_queue.lock().unwrap();
@@ -71,7 +72,10 @@ impl RoutesWorkerPool {
         let parallelism = std::thread::available_parallelism()
             .unwrap_or(NonZeroUsize::new(1).unwrap());
         let num_workers = parallelism.get();
-        println!("Starting routes worker pool with {} workers.", num_workers);
+        tracing::info!(
+            "Starting routes worker pool with {} workers.",
+            num_workers
+        );
 
         // Start workers
         for id in 0..num_workers {
@@ -97,7 +101,7 @@ mod tests {
     async fn test_routes_worker() {
         let file =
             File::open("tests/birdc/show-route-all-protocol-R1").unwrap();
-        // let file: File = File::open("tests/birdc/show-route-all-table-master4").unwrap();
+        // let file: File =             File::open("tests/birdc/show-route-all-table-master4").unwrap();
         let reader = BufReader::new(file);
         let re_routes_start = Regex::new(r"1007-\S").unwrap();
 

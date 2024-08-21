@@ -111,14 +111,25 @@ impl<R: BufRead> Iterator for BlockIterator<R> {
         // Create a peekable line iterator
         loop {
             // Read next line
-            let line = self.lines.next()?;
-            // Add line to block
-            let line = line.ok()?;
+            let line = self.lines.next()?.ok()?;
+
+            // Check stop marker
+            if line.starts_with("0000") {
+                return None;
+            }
+            if line.starts_with("9001") {
+                println!("ERROR: {}", line);
+                return None;
+            }
+
             block.push(line.clone());
 
             // Check next line in iterator
             if let Some(Ok(next)) = self.lines.peek() {
                 if self.start.is_match(next) {
+                    break;
+                }
+                if next.starts_with("0000") {
                     break;
                 }
             } else {
