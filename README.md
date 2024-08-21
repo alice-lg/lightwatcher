@@ -1,5 +1,7 @@
 # Lightwatcher
 
+[![Build and Test](https://github.com/alice-lg/lightwatcher/actions/workflows/rust.yml/badge.svg)](https://github.com/alice-lg/lightwatcher/actions/workflows/rust.yml)
+
 This is an experimental lightweight clone of the birdwatcher.
 It is written in rust and focusses on a small memory footprint
 and a minimal feature set in order to work with Alice.
