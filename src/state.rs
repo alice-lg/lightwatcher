@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
@@ -81,6 +83,8 @@ pub struct Neighbor {
     pub routes_accepted: u32,
     pub routes_exported: u32,
 }
+
+pub type NeighborsMap = HashMap<String, Neighbor>;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct Community(pub u32, pub u32);
