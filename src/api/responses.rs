@@ -22,16 +22,36 @@ impl Default for StatusResponse {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct NeighborsResponse {
     pub api: ApiStatus,
     pub cached_at: DateTime<Utc>,
     pub protocols: HashMap<String, Neighbor>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+impl Default for NeighborsResponse {
+    fn default() -> Self {
+        NeighborsResponse {
+            api: ApiStatus::default(),
+            cached_at: Utc::now(),
+            protocols: HashMap::new(),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct RoutesResponse {
     pub api: ApiStatus,
     pub cached_at: DateTime<Utc>,
     pub routes: Vec<Route>,
+}
+
+impl Default for RoutesResponse {
+    fn default() -> Self {
+        RoutesResponse {
+            api: ApiStatus::default(),
+            cached_at: Utc::now(),
+            routes: Vec::new(),
+        }
+    }
 }

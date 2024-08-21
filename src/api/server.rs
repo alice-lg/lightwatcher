@@ -1,5 +1,6 @@
 use anyhow::Result;
 use axum::{routing::get, Router};
+use tower_http::trace::TraceLayer;
 
 use crate::api::{neighbors, status, tables};
 
@@ -17,7 +18,6 @@ async fn welcome() -> &'static str {
 
 /// Start the API http server
 pub async fn start(opts: &Opts) -> Result<()> {
-    let addr = opts.listen.parse()?;
     let app = Router::new()
         .route("/", get(welcome))
         .route("/status", get(status::retrieve))
@@ -38,11 +38,11 @@ pub async fn start(opts: &Opts) -> Result<()> {
         .route(
             "/routes/table/:table/filtered",
             get(tables::list_routes_filtered),
-        );
+        )
+        .layer(TraceLayer::new_for_http());
 
-    axum::Server::bind(&addr)
-        .serve(app.into_make_service())
-        .await?;
+    let listener = tokio::net::TcpListener::bind(&opts.listen).await?;
+    axum::serve(listener, app).await?;
 
     Ok(())
 }
