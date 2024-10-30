@@ -1,23 +1,21 @@
 use anyhow::Result;
 use axum::{routing::get, Router};
 use tower_http::trace::TraceLayer;
+use tokio::net::TcpListener;
 
-use crate::api::{neighbors, status, tables};
+use crate::{
+    config,
+    api::{neighbors, status, tables},
+};
 
-/// Server Options
-#[derive(Default, Debug)]
-pub struct Opts {
-    /// Server listen address
-    pub listen: String,
-}
 
 /// Get the welcome message
-async fn welcome() -> &'static str {
-    "lightwatcher v0.0.1"
+async fn welcome() -> String {
+    format!("lightwatcher {}", crate::version())
 }
 
 /// Start the API http server
-pub async fn start(opts: &Opts) -> Result<()> {
+pub async fn start() -> Result<()> {
     let app = Router::new()
         .route("/", get(welcome))
         .route("/status", get(status::retrieve))
@@ -41,8 +39,8 @@ pub async fn start(opts: &Opts) -> Result<()> {
         )
         .layer(TraceLayer::new_for_http());
 
-    let listener = tokio::net::TcpListener::bind(&opts.listen).await?;
+    let listen = config::get_listen_address();
+    let listener = TcpListener::bind(&listen).await?;
     axum::serve(listener, app).await?;
-
     Ok(())
 }

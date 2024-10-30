@@ -1,8 +1,7 @@
 use anyhow::Result;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-use lightwatcher::api::{self, server::Opts};
-use lightwatcher::config;
+use lightwatcher::{api, config};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -24,8 +23,6 @@ async fn main() -> Result<()> {
     tracing::info!(LIGHTWATCHER_BIRDC = config::get_birdc_socket(), "env");
 
     // Start API server
-    let listen = config::get_listen_address();
-    api::server::start(&Opts { listen }).await?;
-
+    api::server::start().await?;
     Ok(())
 }
