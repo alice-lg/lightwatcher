@@ -55,33 +55,69 @@ pub struct Status {
     pub ttl: DateTime<Utc>,
 }
 
+// TODO: These should be options
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct RoutesCount {
-    accepted: u32,
-    exported: u32,
-    filtered: u32,
-    imported: u32,
-    preferred: u32,
+    pub imported: u32,
+    pub filtered: u32,
+    pub exported: u32,
+    pub preferred: u32,
 }
+
+#[derive(Serialize, Deserialize, Clone, Debug, Default)]
+pub struct RouteChangeStats {
+    pub received: u32,
+    pub rejected: u32,
+    pub filtered: u32,
+    pub ignored: u32,
+    pub rx_limit: u32,
+    pub limit: u32,
+    pub accepted: u32,
+}
+
+/// Change stats
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+pub struct RouteChanges {
+    pub import_updates: RouteChangeStats,
+    pub import_withdraws: RouteChangeStats,
+    pub export_updates: RouteChangeStats,
+    pub export_withdraws: RouteChangeStats,
+}
+
+/// Channel
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+pub struct Channel {
+    pub state: String,
+    pub import_state: String,
+    pub export_state: String,
+    pub table: String,
+    pub preference: u32,
+    pub input_filter: String,
+    pub output_filter: String,
+    pub routes_count: RoutesCount,
+    pub route_change_stats: RouteChangeStats,
+    pub bgp_next_hop: String,
+}
+
+/// Per channel statistics
+pub type ChannelMap = HashMap<String, Channel>;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct Neighbor {
     pub id: String,
+    #[serde(rename="neighbor_address")]
     pub address: String,
+    #[serde(rename="neighbor_as")]
     pub asn: u32,
     pub state: String,
     pub description: String,
     pub routes: RoutesCount,
+    pub channels: ChannelMap, 
     pub uptime: f64, // seconds
     pub since: DateTime<Utc>,
     pub last_error: String,
     #[serde(rename = "routeserver_id")]
     pub route_server_id: String,
-
-    pub routes_received: u32,
-    pub routes_filtered: u32,
-    pub routes_accepted: u32,
-    pub routes_exported: u32,
 }
 
 pub type NeighborsMap = HashMap<String, Neighbor>;

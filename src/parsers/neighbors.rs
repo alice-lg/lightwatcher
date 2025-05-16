@@ -8,7 +8,7 @@ use crate::{
         datetime,
         parser::{Block, BlockIterator, Parse},
     },
-    state::Neighbor,
+    state::{Neighbor, RoutesCount, RouteChangeStats},
 };
 
 lazy_static! {
@@ -35,13 +35,22 @@ lazy_static! {
     ").unwrap();
 }
 
+/// Channel sections
+#[derive(Debug, PartialEq, Clone)]
+enum ChannelSection {
+    Meta,
+    RoutesCount,
+    RouteChangeStats,
+}
+
 /// Parser sections
 #[derive(Debug, PartialEq, Clone)]
 enum State {
     Start,
     Meta,
     BgpState,
-    RouteChangeStats,
+    Channel(String, ChannelSection),
+    Done,
 }
 
 pub struct NeighborReader<R: BufRead> {
@@ -71,7 +80,7 @@ impl<R: BufRead> Iterator for NeighborReader<R> {
 }
 
 /// Implement block parser for neighbor
-impl Parse for Neighbor {
+impl Parse<Block> for Neighbor {
     /// Parse a block of lines into a neighbor
     fn parse(block: Block) -> Result<Self> {
         let mut neighbor = Neighbor::default();
@@ -101,9 +110,10 @@ fn parse_line(
         State::Start => parse_neighbor_header(&mut neighbor, line)?,
         State::Meta => parse_neighbor_meta(&mut neighbor, line)?,
         State::BgpState => parse_bgp_state(&mut neighbor, line)?,
-        State::RouteChangeStats => {
-            parse_route_change_stats(&mut neighbor, line)?
+        State::Channel(ch, sec) => {
+            parse_channel(&mut neighbor, ch, sec, line)?
         }
+        State::Done => State::Done,
     };
     Ok(state)
 }
@@ -144,7 +154,10 @@ fn parse_neighbor_meta(neighbor: &mut Neighbor, line: &str) -> Result<State> {
     // Parse description
     let caps = RE_KEY_VALUE.captures(line);
     if let Some(caps) = caps {
-        neighbor.description = caps["value"].to_string();
+        let key = &caps["key"].to_lowercase();
+        if key == "description" {
+            neighbor.description = caps["value"].to_string();
+        }
     }
 
     Ok(State::BgpState)
@@ -152,6 +165,15 @@ fn parse_neighbor_meta(neighbor: &mut Neighbor, line: &str) -> Result<State> {
 
 /// ParseBGP State
 fn parse_bgp_state(neighbor: &mut Neighbor, line: &str) -> Result<State> {
+    // Check if we reached a channel section, so we can continue with
+    // the next parser state:
+    {
+        let line = line.clone().trim().to_lowercase();
+        if let Some(channel) = line.strip_prefix("channel ") {
+            return Ok(State::Channel(channel.into(), ChannelSection::Meta));
+        }
+    }
+
     // This is a collection of key value pairs.
     if let Some(caps) = RE_KEY_VALUE.captures(line) {
         let key = caps["key"].to_lowercase();
@@ -161,40 +183,100 @@ fn parse_bgp_state(neighbor: &mut Neighbor, line: &str) -> Result<State> {
             neighbor.address = val
         } else if key == "neighbor as" {
             neighbor.asn = val.parse::<u32>()?;
-        } else if key == "route change stats" {
-            // We found the next segment
-            return Ok(State::RouteChangeStats);
         }
     }
 
     Ok(State::BgpState)
 }
 
-/// Change Stats
-struct ChangeStats {
-    received: u32,
-    accepted: u32,
-    rejected: u32,
-    filtered: u32,
-}
+/*
 
-impl ChangeStats {
-    fn parse(row: &str) -> Result<ChangeStats> {
+impl Parse for RoutesCount {
+    fn parse(row: &str) -> Result<RoutesCount> {
         let parts: Vec<&str> = row.split_whitespace().collect();
-        if parts.len() != 5 {
+        let n_parts = parts.len();
+        if parts.len() < 5 {
             return Err(anyhow!("Invalid change stats row: {}", row));
         }
 
-        Ok(ChangeStats {
-            received: parts[0].parse().unwrap_or(0),
+        Ok(RoutesCount {
+            accepted: parts[0].parse().unwrap_or(0),
             rejected: parts[1].parse().unwrap_or(0),
             filtered: parts[2].parse().unwrap_or(0),
-            accepted: parts[4].parse().unwrap_or(0),
+            // Last value
+            accepted: parts[n_parts-1].parse().unwrap_or(0),
         })
+    }
+}
+*/
+
+/// Parse per channel information
+fn parse_channel(
+    neighbor: &mut Neighbor,
+    channel: String,
+    section: ChannelSection,
+    line: &str,
+) -> Result<State> {
+    match section {
+        ChannelSection::Meta => parse_channel_meta(neighbor, channel, line),
+        ChannelSection::RoutesCount => {
+            parse_channel_routes_count(neighbor, channel, line)
+        }
+        ChannelSection::RouteChangeStats => {
+            parse_channel_route_change_stats(neighbor, channel, line)
+        }
+    }
+}
+
+/// Parse channel metadata like
+/// state, import, export, table, etc...
+fn parse_channel_meta(
+    neighbor: &mut Neighbor,
+    channel: String,
+    line: &str,
+) -> Result<State> {
+    let channel = neighbor.channels
+    let line = line.to_lowercase();
+    if let Some(caps) = RE_KEY_VALUE.captures(&line) {
+        match caps["key"] {
+
+        } 
+    }
+
+    Ok(State::Channel(channel.into(), ChannelSection::Meta))
+}
+
+/// Parse channel routes count:
+/// Routes: 1 imported, 0 filtered, 295850 exported, 1 preferred
+fn parse_channel_routes_count(
+    neighbor: &mut Neighbor,
+    channel: String,
+    line: &str) -> Result<State> {
+    Ok(State::Channel(channel, ChannelSection::RouteChangeStats))
+}
+
+/// Parse channel route change stats
+fn parse_channel_route_change_stats(
+    neighbor: &mut Neighbor,
+    channel: String,
+    line: &str,
+) -> Result<State> {
+    let line = line.to_lowercase();
+    if let Some(caps) = RE_KEY_VALUE.captures(&line) {
+        /*
+        let key = caps["key"];
+        let val = caps["value"];
+        */
+
+
+        Ok(State::Channel(channel, ChannelSection::RouteChangeStats))
+    } else {
+        Ok(State::Done)
     }
 }
 
 /// Parse route change stats
+/*
 fn parse_route_change_stats(
     neighbor: &mut Neighbor,
     line: &str,
@@ -202,21 +284,22 @@ fn parse_route_change_stats(
     if let Some(caps) = RE_KEY_VALUE.captures(line) {
         let key = caps["key"].to_lowercase();
         let val = caps["value"].to_string();
-
+        let mut counters = &neighbor.routes;
         if key == "import updates" {
-            let stats = ChangeStats::parse(&val)?;
-            neighbor.routes_received = stats.received;
-            neighbor.routes_filtered = stats.filtered;
-            neighbor.routes_accepted = stats.accepted;
+            let c = RoutesCount::parse(&val)?;
+            counters.exported = c.exported;
+            counters.filtered = c.filtered;
+            counters.
         } else if key == "export updates" {
-            let stats = ChangeStats::parse(&val)?;
-            neighbor.routes_exported =
-                stats.received - stats.rejected - stats.filtered;
+            let stats = RoutesCount::parse(&val)?;
+            neighbor.routes.exported =
+                stats.imported - stats.rejected - stats.filtered;
         }
     }
 
     Ok(State::RouteChangeStats)
 }
+*/
 
 #[cfg(test)]
 mod tests {

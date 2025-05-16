@@ -26,8 +26,8 @@ impl std::fmt::Display for ParseError {
 pub type Block = Vec<String>;
 
 /// Parse is a parser trait which can be implemented
-pub trait Parse: Sized {
-    fn parse(block: Block) -> Result<Self>;
+pub trait Parse<T>: Sized {
+    fn parse(input: T) -> Result<Self>;
 }
 
 /// A block group iterates a block and emits new blocks when

@@ -25,6 +25,10 @@ pub async fn start() -> Result<()> {
             get(neighbors::list_routes_received),
         )
         .route(
+            "/routes/protocol/:neighbor_id",
+            get(neighbors::list_routes_received),
+        )
+        .route(
             "/routes/filtered/:neighbor_id",
             get(neighbors::list_routes_filtered),
         )

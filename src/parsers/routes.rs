@@ -53,6 +53,7 @@ lazy_static! {
 
 #[derive(Debug, PartialEq)]
 enum CommunityType {
+    None,
     Standard,
     Extended,
     Large,
@@ -65,6 +66,7 @@ enum State {
     Meta,
     BGP,
     Communities(CommunityType),
+    End,
 }
 
 /// A routes group that shares the same prefix. However while parsing
@@ -124,7 +126,8 @@ fn parse_line(route: &mut Route, state: State, line: &str) -> Result<State> {
         State::BGP => parse_route_bgp(route, line),
         State::Communities(community_type) => {
             parse_route_communities(route, community_type, line)
-        }
+        },
+        State::End => Ok(State::End)
     }
 }
 
@@ -254,12 +257,13 @@ fn parse_route_communities(
     community_type: CommunityType,
     line: &str,
 ) -> Result<State> {
+    let line = line.to_owned().to_lowercase().replace(".", "_");
     let mut line = line.trim_start();
-    let next_type = if line.starts_with("BGP.community") {
+    let next_type = if line.starts_with("bgp_community") {
         CommunityType::Standard
-    } else if line.starts_with("BGP.large_community") {
+    } else if line.starts_with("bgp_large_community") {
         CommunityType::Large
-    } else if line.starts_with("BGP.ext_community") {
+    } else if line.starts_with("bgp_ext_community") {
         CommunityType::Extended
     } else {
         community_type
@@ -294,6 +298,9 @@ fn parse_route_communities(
                 .ext_communities
                 .append(&mut parse_ext_communities(line)?);
         }
+        CommunityType::None => {
+            return Ok(State::End) // only for match
+        }
     }
 
     Ok(State::Communities(next_type))
@@ -306,18 +313,23 @@ fn parse_route_bgp(route: &mut Route, line: &str) -> Result<State> {
         let key = caps["key"].to_lowercase();
         let val = caps["value"].to_string();
 
-        if key == "bgp.origin" {
+        if !key.starts_with("bgp") {
+            return Ok(State::BGP)
+        }
+        let key = &key[4..];
+
+        if key == "origin" { // bgp.origin or bgp_origin
             route.bgp.origin = val;
-        } else if key == "bgp.as_path" {
+        } else if key == "as_path" {
             route.bgp.as_path = parse_as_path(&val)?;
-        } else if key == "bgp.next_hop" {
+        } else if key == "next_hop" {
             route.bgp.next_hop = val;
-        } else if key == "bgp.med" {
+        } else if key == "med" {
             route.bgp.med = val.parse()?;
-        } else if key == "bgp.local_pref" {
+        } else if key == "local_pref" {
             route.bgp.local_pref = val.parse()?;
-            // After this the Communities start
-            return Ok(State::Communities(CommunityType::Standard));
+            // After this, we are interested in the communities
+            return Ok(State::Communities(CommunityType::None));
         }
     }
 
