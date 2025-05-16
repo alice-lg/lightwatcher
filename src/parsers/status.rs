@@ -3,7 +3,7 @@ use anyhow::Result;
 use crate::parsers::parser::{Block, Parse};
 use crate::state::BirdStatus;
 
-impl Parse for BirdStatus {
+impl Parse<Block> for BirdStatus {
     /// Parse the status output of bird response
     fn parse(lines: Block) -> Result<BirdStatus> {
         let mut status = BirdStatus::default();

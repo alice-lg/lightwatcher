@@ -42,7 +42,6 @@ lazy_static! {
 #[derive(Debug, PartialEq, Clone)]
 enum ChannelSection {
     Meta,
-    RoutesCount,
     RouteChangeStats,
 }
 
@@ -256,7 +255,7 @@ fn parse_channel_meta(
         } else if key == "output_filter" {
             chan.output_filter = val;
         } else if key == "routes" {
-            chan.routes_count = RoutesCount::parse(val)?;
+            chan.routes_count = RoutesCount::parse(&val)?;
         } else if key == "bgp next hop" {
             chan.bgp_next_hop = val;
         } else if key == "route change stats" {

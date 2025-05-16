@@ -73,7 +73,7 @@ enum State {
 /// only the first route has a prefix.
 pub type PrefixGroup = Vec<Route>;
 
-impl Parse for PrefixGroup {
+impl Parse<Block> for PrefixGroup {
     fn parse(block: Block) -> Result<Self> {
         let mut routes: PrefixGroup = Vec::new();
         let mut iter = BlockGroup::new(block, &RE_ROUTE_START);
@@ -101,7 +101,7 @@ impl Parse for PrefixGroup {
 }
 
 /// Implement Parse for route
-impl Parse for Route {
+impl Parse<Block> for Route {
     fn parse(block: Block) -> Result<Self> {
         let mut route = Route::default();
         let mut state = State::Start;
