@@ -71,7 +71,9 @@ impl<R: BufRead> Iterator for NeighborReader<R> {
         match Neighbor::parse(block) {
             Ok(neighbor) => Some(neighbor),
             Err(e) => {
-                println!("Error parsing neighbor: {}", e);
+                tracing::error!(
+                    error = e.to_string(),
+                    "parsing neighbor failed");
                 Some(Neighbor::default())
             }
         }
@@ -90,7 +92,10 @@ impl Parse<Block> for Neighbor {
             match parse_line(&mut neighbor, state, &line) {
                 Ok(next_state) => state = next_state,
                 Err(e) => {
-                    println!("Error parsing line: {}, {}", line, e);
+                    tracing::error!(
+                        line = line,
+                        error = e.to_string(),
+                        "failed parsing line");
                     return Err(e);
                 }
             }

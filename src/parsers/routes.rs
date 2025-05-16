@@ -109,7 +109,10 @@ impl Parse<Block> for Route {
             match parse_line(&mut route, state, &line) {
                 Ok(next_state) => state = next_state,
                 Err(e) => {
-                    println!("Error parsing line: {}, {}", line, e);
+                    tracing::error!(
+                        line = line,
+                        error = e.to_string(),
+                        "failed parsing line");
                     return Err(e);
                 }
             }

@@ -118,7 +118,7 @@ impl<R: BufRead> Iterator for BlockIterator<R> {
                 return None;
             }
             if line.starts_with("9001") {
-                println!("ERROR: {}", line);
+                tracing::error!(line = line, "error when parsing");
                 return None;
             }
 
