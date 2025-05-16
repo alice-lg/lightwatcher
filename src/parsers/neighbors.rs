@@ -1,14 +1,17 @@
 use anyhow::{anyhow, Result};
 use lazy_static::lazy_static;
 use regex::Regex;
-use std::io::BufRead;
+use std::{
+    io::BufRead,
+    convert::TryFrom,
+};
 
 use crate::{
     parsers::{
         datetime,
         parser::{Block, BlockIterator, Parse},
     },
-    state::{Neighbor, RoutesCount, RouteChangeStats},
+    state::{Neighbor, RoutesCount, RouteChangeStats, Channel},
 };
 
 lazy_static! {
@@ -189,26 +192,22 @@ fn parse_bgp_state(neighbor: &mut Neighbor, line: &str) -> Result<State> {
     Ok(State::BgpState)
 }
 
-/*
-
-impl Parse for RoutesCount {
+impl Parse<&str> for RoutesCount {
     fn parse(row: &str) -> Result<RoutesCount> {
         let parts: Vec<&str> = row.split_whitespace().collect();
         let n_parts = parts.len();
-        if parts.len() < 5 {
-            return Err(anyhow!("Invalid change stats row: {}", row));
+        if parts.len() < 4 {
+            return Err(anyhow!("Invalid routes count row: {}", row));
         }
 
         Ok(RoutesCount {
-            accepted: parts[0].parse().unwrap_or(0),
-            rejected: parts[1].parse().unwrap_or(0),
-            filtered: parts[2].parse().unwrap_or(0),
-            // Last value
-            accepted: parts[n_parts-1].parse().unwrap_or(0),
+            imported: parts[0].parse().unwrap_or(0),
+            filtered: parts[1].parse().unwrap_or(0),
+            exported: parts[2].parse().unwrap_or(0),
+            preferred: parts[3].parse().unwrap_or(0),
         })
     }
 }
-*/
 
 /// Parse per channel information
 fn parse_channel(
@@ -219,14 +218,13 @@ fn parse_channel(
 ) -> Result<State> {
     match section {
         ChannelSection::Meta => parse_channel_meta(neighbor, channel, line),
-        ChannelSection::RoutesCount => {
-            parse_channel_routes_count(neighbor, channel, line)
-        }
         ChannelSection::RouteChangeStats => {
             parse_channel_route_change_stats(neighbor, channel, line)
         }
     }
 }
+
+
 
 /// Parse channel metadata like
 /// state, import, export, table, etc...
@@ -235,25 +233,41 @@ fn parse_channel_meta(
     channel: String,
     line: &str,
 ) -> Result<State> {
-    let channel = neighbor.channels
+    let mut chan = neighbor.channels.get_mut(&channel).unwrap_or(&mut Channel::default()).clone();
+
     let line = line.to_lowercase();
     if let Some(caps) = RE_KEY_VALUE.captures(&line) {
-        match caps["key"] {
-
-        } 
+        let key = caps["key"].to_string();
+        let val = caps["val"].to_string();
+    
+        // Match keys
+        if key == "state" {
+            chan.state = val;
+        } else if key == "import state" {
+            chan.import_state = val;
+        } else if key == "export state" {
+            chan.export_state = val;
+        } else if key == "table" {
+            chan.table = val;
+        } else if key == "preference" {
+            chan.preference = val.parse()?;
+        } else if key == "input_filter" {
+            chan.input_filter = val;
+        } else if key == "output_filter" {
+            chan.output_filter = val;
+        } else if key == "routes" {
+            chan.routes_count = RoutesCount::parse(val)?;
+        } else if key == "bgp next hop" {
+            chan.bgp_next_hop = val;
+        } else if key == "route change stats" {
+            return Ok(State::Channel(channel, ChannelSection::RouteChangeStats))
+        }
     }
 
+    neighbor.channels.insert(channel.clone(), chan);
     Ok(State::Channel(channel.into(), ChannelSection::Meta))
 }
 
-/// Parse channel routes count:
-/// Routes: 1 imported, 0 filtered, 295850 exported, 1 preferred
-fn parse_channel_routes_count(
-    neighbor: &mut Neighbor,
-    channel: String,
-    line: &str) -> Result<State> {
-    Ok(State::Channel(channel, ChannelSection::RouteChangeStats))
-}
 
 /// Parse channel route change stats
 fn parse_channel_route_change_stats(
