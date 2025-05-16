@@ -1,17 +1,14 @@
 use anyhow::{anyhow, Result};
 use lazy_static::lazy_static;
 use regex::Regex;
-use std::{
-    io::BufRead,
-    convert::TryFrom,
-};
+use std::io::BufRead;
 
 use crate::{
     parsers::{
         datetime,
         parser::{Block, BlockIterator, Parse},
     },
-    state::{Neighbor, RoutesCount, RouteChangeStats, Channel},
+    route_server::{Channel, Neighbor, RouteChangeStats, RoutesCount},
 };
 
 lazy_static! {
@@ -223,8 +220,6 @@ fn parse_channel(
     }
 }
 
-
-
 /// Parse channel metadata like
 /// state, import, export, table, etc...
 fn parse_channel_meta(
@@ -232,13 +227,17 @@ fn parse_channel_meta(
     channel: String,
     line: &str,
 ) -> Result<State> {
-    let mut chan = neighbor.channels.get_mut(&channel).unwrap_or(&mut Channel::default()).clone();
+    let mut chan = neighbor
+        .channels
+        .get_mut(&channel)
+        .unwrap_or(&mut Channel::default())
+        .clone();
 
     let line = line.to_lowercase();
     if let Some(caps) = RE_KEY_VALUE.captures(&line) {
         let key = caps["key"].to_string();
         let val = caps["val"].to_string();
-    
+
         // Match keys
         if key == "state" {
             chan.state = val;
@@ -259,14 +258,16 @@ fn parse_channel_meta(
         } else if key == "bgp next hop" {
             chan.bgp_next_hop = val;
         } else if key == "route change stats" {
-            return Ok(State::Channel(channel, ChannelSection::RouteChangeStats))
+            return Ok(State::Channel(
+                channel,
+                ChannelSection::RouteChangeStats,
+            ));
         }
     }
 
     neighbor.channels.insert(channel.clone(), chan);
     Ok(State::Channel(channel.into(), ChannelSection::Meta))
 }
-
 
 /// Parse channel route change stats
 fn parse_channel_route_change_stats(
@@ -280,7 +281,6 @@ fn parse_channel_route_change_stats(
         let key = caps["key"];
         let val = caps["value"];
         */
-
 
         Ok(State::Channel(channel, ChannelSection::RouteChangeStats))
     } else {

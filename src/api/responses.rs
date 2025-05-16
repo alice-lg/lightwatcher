@@ -1,7 +1,9 @@
-use crate::state::{ApiStatus, BirdStatus, Neighbor, Route};
+use std::collections::HashMap;
+
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+
+use crate::route_server::{ApiStatus, BirdStatus, Neighbor, Route};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct StatusResponse {

@@ -18,7 +18,7 @@ use crate::{
         routes::RE_ROUTES_START,
         routes_worker::RoutesWorkerPool,
     },
-    state::{BirdStatus, Neighbor, NeighborsMap, Route},
+    route_server::{BirdStatus, Neighbor, NeighborsMap, Route},
 };
 
 lazy_static! {

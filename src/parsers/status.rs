@@ -1,7 +1,10 @@
 use anyhow::Result;
 
-use crate::parsers::parser::{Block, Parse};
-use crate::state::BirdStatus;
+use crate::{
+    parsers::parser::{Block, Parse},
+    route_server::BirdStatus,
+};
+
 
 impl Parse<Block> for BirdStatus {
     /// Parse the status output of bird response
