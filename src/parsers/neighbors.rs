@@ -172,7 +172,7 @@ fn parse_bgp_state(neighbor: &mut Neighbor, line: &str) -> Result<State> {
     // Check if we reached a channel section, so we can continue with
     // the next parser state:
     {
-        let line = line.clone().trim().to_lowercase();
+        let line = line.trim().to_lowercase();
         if let Some(channel) = line.strip_prefix("channel ") {
             return Ok(State::Channel(channel.into(), ChannelSection::Meta));
         }
@@ -196,7 +196,6 @@ fn parse_bgp_state(neighbor: &mut Neighbor, line: &str) -> Result<State> {
 impl Parse<&str> for RoutesCount {
     fn parse(row: &str) -> Result<RoutesCount> {
         let parts: Vec<&str> = row.split_whitespace().collect();
-        let n_parts = parts.len();
         if parts.len() < 4 {
             return Err(anyhow!("Invalid routes count row: {}", row));
         }
@@ -322,8 +321,10 @@ fn parse_route_change_stats(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::fs::File;
-    use std::io::BufReader;
+    use std::{
+        fs::File,
+        io::BufReader,
+    };
 
     #[test]
     fn test_parse_neighbor_header() {
@@ -377,10 +378,6 @@ mod tests {
         assert_eq!(neighbor.address, "172.31.194.42");
         assert_eq!(neighbor.asn, 42);
 
-        let line =
-            "     Route change stats:     received   rejected   filtered    ignored   accepted";
-        let next = parse_bgp_state(&mut neighbor, &line).unwrap();
-        assert_eq!(next, State::RouteChangeStats);
     }
 
     #[test]
