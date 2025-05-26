@@ -1,5 +1,5 @@
 use axum::{
-    http::StatusCode,
+    http::{header, StatusCode},
     response::{IntoResponse, Response},
 };
 use serde::Serialize;
@@ -33,6 +33,10 @@ impl IntoResponse for Error {
             error: format!("{}", self.0),
         };
         let body = serde_json::to_string(&err).unwrap();
-        (code, body).into_response()
+        (
+            code,
+            [(header::CONTENT_TYPE, "application/json")],
+            body,
+        ).into_response()
     }
 }

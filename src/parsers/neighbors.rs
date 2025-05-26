@@ -240,7 +240,7 @@ fn parse_channel_meta(
     let line = line.to_lowercase();
     if let Some(caps) = RE_KEY_VALUE.captures(&line) {
         let key = caps["key"].to_string();
-        let val = caps["val"].to_string();
+        let val = caps["value"].to_string();
 
         // Match keys
         if key == "state" {

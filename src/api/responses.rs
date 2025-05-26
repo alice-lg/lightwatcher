@@ -2,6 +2,10 @@ use std::collections::HashMap;
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use axum::{
+    Json,
+    response::{IntoResponse, Response},
+};
 
 use crate::route_server::{ApiStatus, BirdStatus, Neighbor, Route};
 
@@ -24,6 +28,12 @@ impl Default for StatusResponse {
     }
 }
 
+impl IntoResponse for StatusResponse {
+    fn into_response(self) -> Response {
+        Json::from(self).into_response()
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct NeighborsResponse {
     pub api: ApiStatus,
@@ -41,6 +51,13 @@ impl Default for NeighborsResponse {
     }
 }
 
+impl IntoResponse for NeighborsResponse {
+    fn into_response(self) -> Response {
+        Json::from(self).into_response()
+    }
+}
+
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RoutesResponse {
     pub api: ApiStatus,
@@ -55,5 +72,11 @@ impl Default for RoutesResponse {
             cached_at: Utc::now(),
             routes: Vec::new(),
         }
+    }
+}
+
+impl IntoResponse for RoutesResponse {
+    fn into_response(self) -> Response {
+        Json::from(self).into_response()
     }
 }
