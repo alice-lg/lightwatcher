@@ -6,13 +6,12 @@ use crate::{
 };
 
 /// Get the current status
-pub async fn retrieve() -> Result<String, Error> {
+pub async fn retrieve() -> Result<StatusResponse, Error> {
     let birdc = Birdc::default();
     let status = birdc.show_status().await?;
     let response = StatusResponse {
         status,
         ..Default::default()
     };
-    let body = serde_json::to_string(&response)?;
-    Ok(body)
+    Ok(response)
 }

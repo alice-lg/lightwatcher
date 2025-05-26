@@ -7,7 +7,7 @@ use crate::{
 };
 
 /// List all routes in a table
-pub async fn list_routes(Path(table): Path<String>) -> Result<String, Error> {
+pub async fn list_routes(Path(table): Path<String>) -> Result<RoutesResponse, Error> {
     let birdc = Birdc::default();
     let table = TableID::parse(&table)?;
 
@@ -16,14 +16,13 @@ pub async fn list_routes(Path(table): Path<String>) -> Result<String, Error> {
         routes,
         ..Default::default()
     };
-    let body = serde_json::to_string(&response)?;
-    Ok(body)
+    Ok(response)
 }
 
 /// List all routes in a table
 pub async fn list_routes_filtered(
     Path(table): Path<String>,
-) -> Result<String, Error> {
+) -> Result<RoutesResponse, Error> {
     let birdc = Birdc::default();
     let table = TableID::parse(&table)?;
     let routes = birdc.show_route_all_filtered_table(&table).await?;
@@ -32,7 +31,6 @@ pub async fn list_routes_filtered(
         routes,
         ..Default::default()
     };
-    let body = serde_json::to_string(&response)?;
-    Ok(body)
+    Ok(response)
 }
 
