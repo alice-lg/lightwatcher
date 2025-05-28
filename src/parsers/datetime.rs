@@ -8,6 +8,17 @@ pub enum Error {
     InvalidDateTimeString(String),
 }
 
+/// Helper: is_date checks if the input string follows the
+/// date format YYYY-MM-DD.
+fn is_date(s: &str) -> bool {
+    let parts: Vec<&str> = s.split("-").collect();
+    match parts.len() {
+        3 => true,
+        _ => false
+    }
+}
+
+
 /// Parse date time string.
 /// TODO: A timezone should be specified as a parameter.
 pub fn parse(s: &str) -> Result<DateTime<Utc>> {
@@ -24,8 +35,13 @@ pub fn parse(s: &str) -> Result<DateTime<Utc>> {
     let parts = time.split('.').collect::<Vec<&str>>();
     let time = parts[0];
 
+    let datetime =  if is_date(time) {
+        format!("{} 00:00:00", time)
+    } else {
+        format!("{} {}", date, time)
+    };
+
     // Parse date time string
-    let datetime = format!("{} {}", date, time);
     let datetime =
         NaiveDateTime::parse_from_str(datetime.as_ref(), "%Y-%m-%d %H:%M:%S")?;
     let datetime = Utc.from_utc_datetime(&datetime);
@@ -70,6 +86,14 @@ mod tests {
 
         let result = parse("10:42:11.123").unwrap();
         assert_eq!(result.hour(), 10);
+    }
+
+    #[test]
+    fn test_parse_date() {
+        let result = parse("2025-05-23").unwrap();
+        assert_eq!(result.year(), 2025);
+        assert_eq!(result.month(), 5);
+        assert_eq!(result.day(), 23);
     }
 
     #[test]
