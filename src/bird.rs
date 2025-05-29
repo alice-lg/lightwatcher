@@ -22,8 +22,9 @@ use crate::{
 };
 
 lazy_static! {
-    /// Regex for start neighbor
-    static ref RE_STATUS_START: Regex = Regex::new(r"\d\d\d\d\s").unwrap();
+    /// Regex for start / stop status. TODO: refactor.
+    static ref RE_STATUS_START: Regex = Regex::new(r"EOF").unwrap();
+    static ref RE_STATUS_STOP: Regex = Regex::new(r"0013\s").unwrap();
 }
 
 #[derive(Error, Debug)]
@@ -149,7 +150,8 @@ impl Birdc {
         stream.write_all(&cmd.as_bytes())?;
 
         let reader = BufReader::new(stream);
-        let mut iter = BlockIterator::new(reader, &RE_STATUS_START);
+        let mut iter = BlockIterator::new(reader, &RE_STATUS_START)
+            .with_stop(&RE_STATUS_STOP);
         let block = iter.next().unwrap();
         let status = BirdStatus::parse(block)?;
 
@@ -246,7 +248,7 @@ impl Birdc {
         protocol: &ProtocolID,
     ) -> Result<Vec<Route>> {
         // TODO: check command
-        let cmd = format!("show route all noexport protocol '{}'\n", protocol);
+        let cmd = format!("show route all noexport '{}'\n", protocol);
         let routes = self.fetch_routes_cmd(&cmd).await?;
         Ok(routes)
     }

@@ -4,11 +4,21 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 /// Cache Information
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CacheInfo {
     pub date: DateTime<Utc>,
     pub timezone_type: String,
     pub timezone: String,
+}
+
+impl Default for CacheInfo {
+    fn default() -> Self {
+        Self {
+            date: Utc::now(),
+            timezone_type: "UTC".into(),
+            timezone: "UTC".into(),
+        }
+    }
 }
 
 /// Cache Status
@@ -23,7 +33,7 @@ pub struct ApiStatus {
     #[serde(rename = "Version")]
     pub version: String,
     pub result_from_cache: bool,
-    pub cache_status: Option<CacheStatus>,
+    pub cache_status: CacheStatus,
 }
 
 impl Default for ApiStatus {
@@ -31,7 +41,7 @@ impl Default for ApiStatus {
         ApiStatus {
             version: "0.0.1".to_string(),
             result_from_cache: false,
-            cache_status: None,
+            cache_status: CacheStatus::default(),
         }
     }
 }

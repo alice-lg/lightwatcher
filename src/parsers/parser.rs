@@ -70,7 +70,7 @@ impl Iterator for BlockGroup {
                     break;
                 }
             } else {
-                break; // EOF
+                break;
             }
         }
 
@@ -88,6 +88,7 @@ impl Iterator for BlockGroup {
 /// A new block starts when the marker token is found.
 pub struct BlockIterator<R: BufRead> {
     start: Regex,
+    stop: Option<Regex>,
     lines: Peekable<Lines<R>>,
 }
 
@@ -96,7 +97,17 @@ impl<R: BufRead> BlockIterator<R> {
     pub fn new(reader: R, start: &Regex) -> Self {
         Self {
             start: start.clone(),
+            stop: None,
             lines: reader.lines().peekable(),
+        }
+    }
+
+    /// Configure a stop condition
+    pub fn with_stop(self, stop: &Regex) -> Self {
+        Self {
+            start: self.start,
+            stop: Some(stop.clone()),
+            lines: self.lines,
         }
     }
 }
@@ -117,12 +128,20 @@ impl<R: BufRead> Iterator for BlockIterator<R> {
             if line.starts_with("0000") {
                 return None;
             }
+
             if line.starts_with("9001") {
                 tracing::error!(line = line, "error when parsing");
                 return None;
             }
 
             block.push(line.clone());
+
+            // Check if we run into a soft stop
+            if let Some(re) = &self.stop {
+                if re.is_match(&line) {
+                    break;
+                }
+            }
 
             // Check next line in iterator
             if let Some(Ok(next)) = self.lines.peek() {
@@ -133,7 +152,7 @@ impl<R: BufRead> Iterator for BlockIterator<R> {
                     break;
                 }
             } else {
-                break; // EOF
+                break;
             }
         }
 

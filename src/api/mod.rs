@@ -1,6 +1,7 @@
 mod error;
 use error::Error;
 
+mod cache;
 mod neighbors;
 mod responses;
 mod status;

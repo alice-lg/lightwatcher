@@ -5,7 +5,6 @@ use crate::{
     route_server::BirdStatus,
 };
 
-
 impl Parse<Block> for BirdStatus {
     /// Parse the status output of bird response
     fn parse(lines: Block) -> Result<BirdStatus> {
@@ -87,5 +86,6 @@ mod tests {
         assert_eq!(status.current_server, "2023-05-10 14:27:32");
         assert_eq!(status.last_reboot, "2023-05-10 11:34:49");
         assert_eq!(status.last_reconfig, "2023-05-10 11:34:49");
+        assert_eq!(status.message, "Daemon is up and running");
     }
 }
