@@ -56,6 +56,7 @@ pub struct Status {
 }
 
 // TODO: These should be options
+/*
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct RoutesCount {
     pub imported: u32,
@@ -63,7 +64,10 @@ pub struct RoutesCount {
     pub exported: u32,
     pub preferred: u32,
 }
+*/
+pub type RoutesCount = HashMap<String, u32>;
 
+/*
 #[derive(Serialize, Deserialize, Clone, Debug, Default)]
 pub struct RouteChangeStats {
     pub received: u32,
@@ -74,6 +78,8 @@ pub struct RouteChangeStats {
     pub limit: u32,
     pub accepted: u32,
 }
+*/
+pub type RouteChangeStats = HashMap<String, u32>;
 
 /// Change stats
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
@@ -95,7 +101,7 @@ pub struct Channel {
     pub input_filter: String,
     pub output_filter: String,
     pub routes_count: RoutesCount,
-    pub route_change_stats: RouteChangeStats,
+    pub route_change_stats: RouteChanges,
     pub bgp_next_hop: String,
 }
 
@@ -115,9 +121,10 @@ pub struct Neighbor {
     pub channels: ChannelMap, 
     pub uptime: f64, // seconds
     pub since: DateTime<Utc>,
+    pub state_changed: String,
     pub last_error: String,
-    #[serde(rename = "routeserver_id")]
-    pub route_server_id: String,
+    // #[serde(rename = "routeserver_id")]
+    // pub route_server_id: String,
 }
 
 pub type NeighborsMap = HashMap<String, Neighbor>;
