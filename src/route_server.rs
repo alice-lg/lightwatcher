@@ -165,6 +165,7 @@ pub struct BGPInfo {
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct Route {
+    #[serde(rename = "from_protocol")]
     pub neighbor_id: Option<String>,
     pub network: String,
     pub interface: String,
