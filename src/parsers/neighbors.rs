@@ -1,7 +1,8 @@
-use anyhow::{anyhow, Result};
-use lazy_static::lazy_static;
 use regex::Regex;
 use std::io::BufRead;
+
+use anyhow::Result;
+use lazy_static::lazy_static;
 
 use crate::{
     parsers::{
@@ -107,6 +108,7 @@ impl Parse<Block> for Neighbor {
 
         // Finalize neighbor for compatibility: Update number
         // of routes according to stats in the channel.
+        finalize_counters(&mut neighbor);
 
         Ok(neighbor)
     }
@@ -252,15 +254,9 @@ fn parse_change_stats_fields(s: &str) -> Vec<String> {
 }
 
 /// Parse field values
-fn parse_change_stats_values(s: &str) -> Vec<u32> {
+fn parse_change_stats_values(s: &str) -> Vec<Option<u32>> {
     s.split_whitespace()
-        .filter_map(|v| {
-            if let Ok(v) = v.parse() {
-                Some(v)
-            } else {
-                Some(0)
-            }
-        })
+        .map(|v| if let Ok(v) = v.parse() { Some(v) } else { None })
         .collect()
 }
 
@@ -361,6 +357,25 @@ fn parse_channel_route_change_stats(
     }
 }
 
+/// Finalize counts: As we accept routes through multiple channels
+/// e.g. IPv4 and IPv6 the global counter object `routes` has to
+/// be calculated after parsing the neighbor.
+fn finalize_counters(neighbor: &mut Neighbor) {
+    // We assume that the total number of routes received, filtered, preferred, ...
+    // is the sum over all channels. TODO: validate.
+    let mut total = RoutesCount::default();
+    for (_, chan) in neighbor.channels.iter() {
+        for (key, count) in &chan.routes_count {
+            total
+                .entry(key.into())
+                .and_modify(|c| *c += count)
+                .or_insert(count.clone());
+        }
+    }
+
+    neighbor.routes = total;
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -444,10 +459,10 @@ mod tests {
     fn test_parse_change_stats_values() {
         let s = "            471         47         12          0        ---          0        412";
         let values = parse_change_stats_values(s);
-        assert_eq!(values[0], 471);
-        assert_eq!(values[1], 47);
-        assert_eq!(values[4], 0);
-        assert_eq!(values[6], 412);
+        assert_eq!(values[0], Some(471));
+        assert_eq!(values[1], Some(47));
+        assert_eq!(values[4], None);
+        assert_eq!(values[6], Some(412));
     }
 
     #[test]

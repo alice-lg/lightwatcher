@@ -3,10 +3,7 @@ use lazy_static::lazy_static;
 use regex::Regex;
 
 use crate::{
-    parsers::{
-        datetime,
-        parser::{Block, BlockGroup, Parse},
-    },
+    parsers::parser::{Block, BlockGroup, Parse},
     route_server::{Community, ExtCommunity, LargeCommunity, Route},
 };
 
@@ -112,7 +109,8 @@ impl Parse<Block> for Route {
                     tracing::error!(
                         line = line,
                         error = e.to_string(),
-                        "failed parsing line");
+                        "failed parsing line"
+                    );
                     return Err(e);
                 }
             }
@@ -129,8 +127,8 @@ fn parse_line(route: &mut Route, state: State, line: &str) -> Result<State> {
         State::BGP => parse_route_bgp(route, line),
         State::Communities(community_type) => {
             parse_route_communities(route, community_type, line)
-        },
-        State::End => Ok(State::End)
+        }
+        State::End => Ok(State::End),
     }
 }
 
@@ -142,7 +140,8 @@ fn parse_route_header(route: &mut Route, line: &str) -> Result<State> {
             route.network = prefix.as_str().to_string();
         }
         if let Some(age) = caps.name("age") {
-            route.age = datetime::parse_duration_sec(age.as_str())?;
+            // route.age = datetime::parse_duration_sec(age.as_str())?;
+            route.age = age.as_str().to_string();
         }
         if let Some(_) = caps.name("primary") {
             route.primary = true;
@@ -197,11 +196,16 @@ fn parse_route_meta(route: &mut Route, line: &str) -> Result<State> {
 }
 
 /// Parse AS path
-fn parse_as_path(s: &str) -> Result<Vec<u32>> {
-    let mut as_path: Vec<u32> = vec![];
+fn parse_as_path(s: &str) -> Result<Vec<String>> {
+    /*
+    let mut as_path: Vec<String> = vec![];
     for asn in s.split(" ") {
-        as_path.push(asn.parse()?);
+        as_path.push(asn);
     }
+    */
+    // To keep this backwards compatible this needs to
+    // be stringly typed. Sigh.
+    let as_path: Vec<String> = s.split(" ").map(|p| p.to_string()).collect();
     Ok(as_path)
 }
 
@@ -302,7 +306,7 @@ fn parse_route_communities(
                 .append(&mut parse_ext_communities(line)?);
         }
         CommunityType::None => {
-            return Ok(State::End) // only for match
+            return Ok(State::End); // only for match
         }
     }
 
@@ -317,20 +321,25 @@ fn parse_route_bgp(route: &mut Route, line: &str) -> Result<State> {
         let val = caps["value"].to_string();
 
         if !key.starts_with("bgp") {
-            return Ok(State::BGP)
+            return Ok(State::BGP);
         }
         let key = &key[4..];
 
-        if key == "origin" { // bgp.origin or bgp_origin
+        if key == "origin" {
+            // bgp.origin or bgp_origin
             route.bgp.origin = val;
         } else if key == "as_path" {
+            route.bgp.as_path = parse_as_path(&val)?;
+        } else if key == "path" {
             route.bgp.as_path = parse_as_path(&val)?;
         } else if key == "next_hop" {
             route.bgp.next_hop = val;
         } else if key == "med" {
-            route.bgp.med = val.parse()?;
+            // route.bgp.med = val.parse()?;
+            route.bgp.med = val;
         } else if key == "local_pref" {
-            route.bgp.local_pref = val.parse()?;
+            route.bgp.local_pref = val;
+            // route.bgp.local_pref = val.parse()?;
             // After this, we are interested in the communities
             return Ok(State::Communities(CommunityType::None));
         }
