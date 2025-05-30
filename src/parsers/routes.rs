@@ -224,11 +224,7 @@ fn parse_ext_communities(s: &str) -> Result<Vec<ExtCommunity>> {
     let communities: Vec<ExtCommunity> = RE_BGP_COMMUNITY
         .captures_iter(s)
         .map(|c| {
-            ExtCommunity(
-                c[1].to_string(),
-                c[2].parse().unwrap_or(0),
-                c[3].parse().unwrap_or(0),
-            )
+            ExtCommunity(c[1].to_string(), c[2].to_string(), c[3].to_string())
         })
         .collect();
     Ok(communities)

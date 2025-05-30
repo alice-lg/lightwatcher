@@ -146,7 +146,7 @@ pub struct Community(pub u32, pub u32);
 pub struct LargeCommunity(pub u32, pub u32, pub u32);
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
-pub struct ExtCommunity(pub String, pub u32, pub u32);
+pub struct ExtCommunity(pub String, pub String, pub String);
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct BGPInfo {
