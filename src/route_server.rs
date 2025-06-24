@@ -3,49 +3,6 @@ use std::collections::HashMap;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
-/// Cache Information
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct CacheInfo {
-    pub date: DateTime<Utc>,
-    pub timezone_type: String,
-    pub timezone: String,
-}
-
-impl Default for CacheInfo {
-    fn default() -> Self {
-        Self {
-            date: Utc::now(),
-            timezone_type: "UTC".into(),
-            timezone: "UTC".into(),
-        }
-    }
-}
-
-/// Cache Status
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
-pub struct CacheStatus {
-    pub cached_at: CacheInfo,
-}
-
-/// ApiStatus
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct ApiStatus {
-    #[serde(rename = "Version")]
-    pub version: String,
-    pub result_from_cache: bool,
-    pub cache_status: CacheStatus,
-}
-
-impl Default for ApiStatus {
-    fn default() -> Self {
-        ApiStatus {
-            version: "0.0.1".to_string(),
-            result_from_cache: false,
-            cache_status: CacheStatus::default(),
-        }
-    }
-}
-
 /// Bird status
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct BirdStatus {
@@ -55,14 +12,6 @@ pub struct BirdStatus {
     pub message: String,
     pub router_id: String,
     pub version: String,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
-pub struct Status {
-    pub api: ApiStatus,
-    pub cached_at: DateTime<Utc>,
-    pub status: BirdStatus,
-    pub ttl: DateTime<Utc>,
 }
 
 // TODO: These should be options

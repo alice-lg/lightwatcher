@@ -1,13 +1,71 @@
 use std::collections::HashMap;
 
-use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
 use axum::{
-    Json,
     response::{IntoResponse, Response},
+    Json,
+};
+use chrono::{DateTime, Duration, Utc};
+use serde::{Deserialize, Serialize};
+
+use crate::{
+    api::cache::CachedResponse,
+    route_server::{BirdStatus, Neighbor, Route},
 };
 
-use crate::route_server::{ApiStatus, BirdStatus, Neighbor, Route};
+/// Cache Information
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct CacheInfo {
+    pub date: DateTime<Utc>,
+    pub timezone_type: String,
+    pub timezone: String,
+}
+
+impl Default for CacheInfo {
+    fn default() -> Self {
+        Self {
+            date: Utc::now(),
+            timezone_type: "UTC".into(),
+            timezone: "UTC".into(),
+        }
+    }
+}
+
+/// Cache Status
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+pub struct CacheStatus {
+    pub cached_at: CacheInfo,
+}
+
+/// ApiStatus
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ApiStatus {
+    #[serde(rename = "Version")]
+    pub version: String,
+    pub result_from_cache: bool,
+    pub cache_status: CacheStatus,
+}
+
+impl Default for ApiStatus {
+    fn default() -> Self {
+        ApiStatus {
+            version: "0.0.1".to_string(),
+            result_from_cache: false,
+            cache_status: CacheStatus::default(),
+        }
+    }
+}
+
+impl CachedResponse for ApiStatus {
+    fn mark_cached(&mut self) {
+        self.result_from_cache = true;
+        self.cache_status = CacheStatus::default();
+    }
+
+    fn is_expired(&self) -> bool {
+        let cached_at = &self.cache_status.cached_at.date;
+        (Utc::now() - cached_at) > Duration::minutes(5)
+    }
+}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct StatusResponse {
@@ -25,6 +83,18 @@ impl Default for StatusResponse {
             status: BirdStatus::default(),
             ttl: Utc::now(),
         }
+    }
+}
+
+impl CachedResponse for StatusResponse {
+    fn mark_cached(&mut self) {
+        self.api.mark_cached();
+        self.ttl = Utc::now() + Duration::minutes(5);
+        self.cached_at = Utc::now();
+    }
+
+    fn is_expired(&self) -> bool {
+        self.api.is_expired()
     }
 }
 
@@ -56,7 +126,6 @@ impl IntoResponse for NeighborsResponse {
         Json::from(self).into_response()
     }
 }
-
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RoutesResponse {
