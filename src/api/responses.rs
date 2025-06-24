@@ -65,9 +65,14 @@ impl CachedResponse for ApiStatus {
         let cached_at = &self.cache_status.cached_at.date;
         (Utc::now() - cached_at) > Duration::minutes(5)
     }
+
+    fn get_cached_at(&self) -> DateTime<Utc> {
+        let cached_at = &self.cache_status.cached_at.date;
+        cached_at.clone()
+    }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct StatusResponse {
     pub api: ApiStatus,
     pub cached_at: DateTime<Utc>,
@@ -96,6 +101,10 @@ impl CachedResponse for StatusResponse {
     fn is_expired(&self) -> bool {
         self.api.is_expired()
     }
+
+    fn get_cached_at(&self) -> DateTime<Utc> {
+        self.cached_at.clone()
+    }
 }
 
 impl IntoResponse for StatusResponse {
@@ -104,7 +113,7 @@ impl IntoResponse for StatusResponse {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct NeighborsResponse {
     pub api: ApiStatus,
     pub cached_at: DateTime<Utc>,
@@ -121,13 +130,28 @@ impl Default for NeighborsResponse {
     }
 }
 
+impl CachedResponse for NeighborsResponse {
+    fn mark_cached(&mut self) {
+        self.api.mark_cached();
+        self.cached_at = Utc::now();
+    }
+
+    fn get_cached_at(&self) -> DateTime<Utc> {
+        self.cached_at.clone()
+    }
+
+    fn is_expired(&self) -> bool {
+        self.api.is_expired()
+    }
+}
+
 impl IntoResponse for NeighborsResponse {
     fn into_response(self) -> Response {
         Json::from(self).into_response()
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct RoutesResponse {
     pub api: ApiStatus,
     pub cached_at: DateTime<Utc>,
@@ -141,6 +165,21 @@ impl Default for RoutesResponse {
             cached_at: Utc::now(),
             routes: Vec::new(),
         }
+    }
+}
+
+impl CachedResponse for RoutesResponse {
+    fn mark_cached(&mut self) {
+        self.api.mark_cached();
+        self.cached_at = Utc::now();
+    }
+
+    fn is_expired(&self) -> bool {
+        self.api.is_expired()
+    }
+
+    fn get_cached_at(&self) -> DateTime<Utc> {
+        self.cached_at.clone()
     }
 }
 

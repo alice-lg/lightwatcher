@@ -1,3 +1,13 @@
+use chrono::Duration;
+
+/// The TTL and maximum number of entries can
+/// be set in the CacheConfig.
+#[derive(Debug, Clone)]
+pub struct CacheConfig {
+    pub max_entries: usize,
+    pub ttl: Duration,
+}
+
 /// Get the birdc socket path from the environment
 /// or use the default value.
 pub fn get_birdc_socket() -> String {
