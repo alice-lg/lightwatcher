@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
 use chrono::{DateTime, Utc};
-use tracing::debug;
 
 use crate::bird::ProtocolID;
 use crate::config::CacheConfig;

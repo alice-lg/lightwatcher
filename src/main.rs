@@ -21,6 +21,18 @@ async fn main() -> Result<()> {
     tracing::info!(version = lightwatcher::version(), "starting service");
     tracing::info!(LIGHTWATCHER_LISTEN = config::get_listen_address(), "env");
     tracing::info!(LIGHTWATCHER_BIRDC = config::get_birdc_socket(), "env");
+    let cache = config::get_neighbors_cache_config();
+    tracing::info!(
+        LIGHTWATCHER_NEIGHBORS_CACHE_MAX_ENTRIES = cache.max_entries,
+        LIGHTWATCHER_NEIGHBORS_CACHE_TTL = cache.ttl.num_seconds(),
+        "env"
+    );
+    let cache = config::get_routes_cache_config();
+    tracing::info!(
+        LIGHTWATCHER_ROUTES_CACHE_MAX_ENTRIES = cache.max_entries,
+        LIGHTWATCHER_ROUTES_CACHE_TTL = cache.ttl.num_seconds(),
+        "env"
+    );
 
     // Start API server
     api::server::start().await?;

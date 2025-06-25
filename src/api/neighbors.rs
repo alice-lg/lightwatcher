@@ -2,7 +2,6 @@ use std::sync::Arc;
 
 use anyhow::Result;
 use axum::extract::Path;
-use chrono::Duration;
 use lazy_static::lazy_static;
 use tokio::sync::Mutex;
 
@@ -13,7 +12,7 @@ use crate::{
         Error,
     },
     bird::{Birdc, ProtocolID},
-    config::CacheConfig,
+    config,
 };
 
 type NeighborsCache = Arc<Mutex<ResponseCache<NeighborsResponse>>>;
@@ -21,31 +20,19 @@ type RoutesCache = Arc<Mutex<ResponseCache<RoutesResponse>>>;
 
 lazy_static! {
     static ref NEIGHBORS_CACHE: NeighborsCache = {
-        let config = CacheConfig {
-            max_entries: 1,
-            ttl: Duration::new(300, 0).unwrap(),
-        };
+        let config = config::get_neighbors_cache_config();
         Arc::new(Mutex::new(ResponseCache::new(config)))
     };
     static ref ROUTES_RECEIVED_CACHE: RoutesCache = {
-        let config = CacheConfig {
-            max_entries: 10,
-            ttl: Duration::new(300, 0).unwrap(),
-        };
+        let config = config::get_routes_cache_config();
         Arc::new(Mutex::new(ResponseCache::new(config)))
     };
     static ref ROUTES_FILTERED_CACHE: RoutesCache = {
-        let config = CacheConfig {
-            max_entries: 10,
-            ttl: Duration::new(300, 0).unwrap(),
-        };
+        let config = config::get_routes_cache_config();
         Arc::new(Mutex::new(ResponseCache::new(config)))
     };
     static ref ROUTES_NO_EXPORT_CACHE: RoutesCache = {
-        let config = CacheConfig {
-            max_entries: 10,
-            ttl: Duration::new(300, 0).unwrap(),
-        };
+        let config = config::get_routes_cache_config();
         Arc::new(Mutex::new(ResponseCache::new(config)))
     };
 }

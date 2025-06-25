@@ -1,13 +1,12 @@
 use anyhow::Result;
 use axum::{routing::get, Router};
-use tower_http::trace::TraceLayer;
 use tokio::net::TcpListener;
+use tower_http::trace::TraceLayer;
 
 use crate::{
-    config,
     api::{neighbors, status, tables},
+    config,
 };
-
 
 /// Get the welcome message
 async fn welcome() -> String {
