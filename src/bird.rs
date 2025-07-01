@@ -141,6 +141,7 @@ pub struct Channel {
     pub import_state: String,
     pub export_state: String,
     pub table: String,
+    pub peer_table: String,
     pub preference: u32,
     pub input_filter: String,
     pub output_filter: String,
@@ -167,9 +168,26 @@ pub struct Neighbor {
     pub since: DateTime<Utc>,
     pub state_changed: String,
     pub last_error: String,
-    // #[serde(rename = "routeserver_id")]
-    // pub route_server_id: String,
 }
+
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+pub struct Protocol {
+    pub id: String,
+    #[serde(rename = "neighbor_address")]
+    pub address: String,
+    #[serde(rename = "neighbor_as")]
+    pub asn: u32,
+    pub state: String,
+    pub description: String,
+    pub routes: RoutesCount,
+    pub channels: ChannelMap,
+    pub uptime: f64, // seconds
+    pub since: DateTime<Utc>,
+    pub state_changed: String,
+    pub last_error: String,
+}
+
+pub type ProtocolsMap = HashMap<String, Protocol>;
 
 pub type NeighborsMap = HashMap<String, Neighbor>;
 
@@ -247,6 +265,22 @@ impl Birdc {
 
     /// Get neighbors
     pub async fn show_protocols_all(&self) -> Result<NeighborsMap> {
+        let mut stream = UnixStream::connect(&self.socket)?;
+        let cmd = format!("show protocols all\n");
+        stream.write_all(&cmd.as_bytes())?;
+
+        let buf = BufReader::new(stream);
+        let reader = NeighborReader::new(buf);
+        let neighbors: Vec<Neighbor> =
+            reader.filter(|n| !n.id.is_empty()).collect();
+
+        let neighbors: NeighborsMap =
+            neighbors.into_iter().map(|n| (n.id.clone(), n)).collect();
+
+        Ok(neighbors)
+    }
+
+    pub async fn show_protocols_bgp_all(&self) -> Result<NeighborsMap> {
         let mut stream = UnixStream::connect(&self.socket)?;
         let cmd = format!("show protocols all\n");
         stream.write_all(&cmd.as_bytes())?;

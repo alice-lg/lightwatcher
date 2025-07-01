@@ -6,23 +6,14 @@ use lazy_static::lazy_static;
 use tokio::sync::Mutex;
 
 use crate::{
-    api::{
-        cache::ResponseCache,
-        responses::{NeighborsResponse, RoutesResponse},
-        Error,
-    },
-    bird::{Birdc, ProtocolID},
+    api::{cache::ResponseCache, responses::RoutesResponse, Error},
+    bird::{Birdc, ProtocolID, TableID},
     config,
 };
 
-type NeighborsCache = Arc<Mutex<ResponseCache<NeighborsResponse>>>;
 type RoutesCache = Arc<Mutex<ResponseCache<RoutesResponse>>>;
 
 lazy_static! {
-    static ref NEIGHBORS_CACHE: NeighborsCache = {
-        let config = config::get_neighbors_cache_config();
-        Arc::new(Mutex::new(ResponseCache::new(config)))
-    };
     static ref ROUTES_RECEIVED_CACHE: RoutesCache = {
         let config = config::get_routes_cache_config();
         Arc::new(Mutex::new(ResponseCache::new(config)))
@@ -35,33 +26,6 @@ lazy_static! {
         let config = config::get_routes_cache_config();
         Arc::new(Mutex::new(ResponseCache::new(config)))
     };
-}
-
-/// List all neighbors (show protocols all, filter BGP)
-pub async fn list() -> Result<NeighborsResponse, Error> {
-    let birdc = Birdc::default();
-
-    let res = {
-        let cache = NEIGHBORS_CACHE.lock().await;
-        match cache.get("all") {
-            Some(res) => Some(res.clone()),
-            None => None,
-        }
-    };
-
-    match res {
-        Some(res) => Ok(res),
-        None => {
-            let protocols = birdc.show_protocols_all().await?;
-            let response = NeighborsResponse {
-                protocols,
-                ..Default::default()
-            };
-            let mut cache = NEIGHBORS_CACHE.lock().await;
-            cache.put("all", response.clone());
-            Ok(response)
-        }
-    }
 }
 
 /// List all routes received for a neighbor
@@ -154,4 +118,34 @@ pub async fn list_routes_noexport(
             Ok(response)
         }
     }
+}
+
+/// List all routes in a table
+pub async fn list_routes_table(
+    Path(table): Path<String>,
+) -> Result<RoutesResponse, Error> {
+    let birdc = Birdc::default();
+    let table = TableID::parse(&table)?;
+
+    let routes = birdc.show_route_all_table(&table).await?;
+    let response = RoutesResponse {
+        routes,
+        ..Default::default()
+    };
+    Ok(response)
+}
+
+/// List all routes in a table
+pub async fn list_routes_table_filtered(
+    Path(table): Path<String>,
+) -> Result<RoutesResponse, Error> {
+    let birdc = Birdc::default();
+    let table = TableID::parse(&table)?;
+    let routes = birdc.show_route_all_filtered_table(&table).await?;
+
+    let response = RoutesResponse {
+        routes,
+        ..Default::default()
+    };
+    Ok(response)
 }

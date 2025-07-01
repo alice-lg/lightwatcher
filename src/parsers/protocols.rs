@@ -5,7 +5,7 @@ use anyhow::Result;
 use lazy_static::lazy_static;
 
 use crate::{
-    bird::{Channel, Neighbor, RouteChangeStats, RoutesCount},
+    bird::{Channel, Protocol, RouteChangeStats, RoutesCount},
     parsers::{
         datetime,
         parser::{Block, BlockIterator, Parse},
@@ -16,7 +16,7 @@ lazy_static! {
     /// Regex for start neighbor
     static ref RE_NEIGHBOR_START: Regex = Regex::new(r"1002-").unwrap();
 
-    /// Regex: Neighbor header (protocol, state, uptime, ...)
+    /// Regex: Protocol header (protocol, state, uptime, ...)
     static ref RE_NEIGHBOR_HEADER: Regex = Regex::new(r"(?x)
         1002-(?P<protocol>\w+)   # protocol id
         \s+.*?\s+                # ignore this part
@@ -53,40 +53,40 @@ enum State {
     Done,
 }
 
-pub struct NeighborReader<R: BufRead> {
+pub struct ProtocolReader<R: BufRead> {
     iter: BlockIterator<R>,
 }
 
-impl<R: BufRead> NeighborReader<R> {
+impl<R: BufRead> ProtocolReader<R> {
     pub fn new(reader: R) -> Self {
         let iter = BlockIterator::new(reader, &RE_NEIGHBOR_START);
         Self { iter }
     }
 }
 
-impl<R: BufRead> Iterator for NeighborReader<R> {
-    type Item = Neighbor;
+impl<R: BufRead> Iterator for ProtocolReader<R> {
+    type Item = Protocol;
 
     fn next(&mut self) -> Option<Self::Item> {
         let block = self.iter.next()?;
-        match Neighbor::parse(block) {
+        match Protocol::parse(block) {
             Ok(neighbor) => Some(neighbor),
             Err(e) => {
                 tracing::error!(
                     error = e.to_string(),
                     "parsing neighbor failed"
                 );
-                Some(Neighbor::default())
+                Some(Protocol::default())
             }
         }
     }
 }
 
 /// Implement block parser for neighbor
-impl Parse<Block> for Neighbor {
+impl Parse<Block> for Protocol {
     /// Parse a block of lines into a neighbor
     fn parse(block: Block) -> Result<Self> {
-        let mut neighbor = Neighbor::default();
+        let mut neighbor = Protocol::default();
 
         // Parse lines in block
         let mut state = State::Start;
@@ -116,7 +116,7 @@ impl Parse<Block> for Neighbor {
 
 /// Parse input depending on the current state
 fn parse_line(
-    mut neighbor: &mut Neighbor,
+    mut neighbor: &mut Protocol,
     state: State,
     line: &str,
 ) -> Result<State> {
@@ -132,9 +132,9 @@ fn parse_line(
     Ok(state)
 }
 
-/// Parse Neighbor Header (name, state, uptime) and return next state
+/// Parse Protocol Header (name, state, uptime) and return next state
 fn parse_neighbor_header(
-    neighbor: &mut Neighbor,
+    neighbor: &mut Protocol,
     line: &str,
 ) -> Result<State> {
     // Does line match neighbor header
@@ -165,7 +165,7 @@ fn parse_neighbor_header(
 }
 
 /// Parse neighbor meta: Description,
-fn parse_neighbor_meta(neighbor: &mut Neighbor, line: &str) -> Result<State> {
+fn parse_neighbor_meta(neighbor: &mut Protocol, line: &str) -> Result<State> {
     // Parse description
     let caps = RE_KEY_VALUE.captures(line);
     if let Some(caps) = caps {
@@ -179,7 +179,7 @@ fn parse_neighbor_meta(neighbor: &mut Neighbor, line: &str) -> Result<State> {
 }
 
 /// ParseBGP State
-fn parse_bgp_state(neighbor: &mut Neighbor, line: &str) -> Result<State> {
+fn parse_bgp_state(neighbor: &mut Protocol, line: &str) -> Result<State> {
     // Check if we reached a channel section, so we can continue with
     // the next parser state:
     {
@@ -204,30 +204,9 @@ fn parse_bgp_state(neighbor: &mut Neighbor, line: &str) -> Result<State> {
     Ok(State::BgpState)
 }
 
-impl Parse<&str> for RoutesCount {
-    fn parse(row: &str) -> Result<RoutesCount> {
-        let parts = row.split(",");
-        let count: RoutesCount = parts
-            .map(|s| {
-                let s: Vec<&str> = s.trim().split_whitespace().collect();
-                if s.len() != 2 {
-                    tracing::error!("could not parse routes count");
-                }
-                if let Ok(val) = s[0].parse() {
-                    (s[1].into(), val)
-                } else {
-                    (s[1].into(), 0)
-                }
-            })
-            .collect();
-
-        Ok(count)
-    }
-}
-
 /// Parse per channel information
 fn parse_channel(
-    neighbor: &mut Neighbor,
+    neighbor: &mut Protocol,
     channel: String,
     section: ChannelSection,
     line: &str,
@@ -263,7 +242,7 @@ fn parse_change_stats_values(s: &str) -> Vec<Option<u32>> {
 /// Parse channel metadata like
 /// state, import, export, table, etc...
 fn parse_channel_meta(
-    neighbor: &mut Neighbor,
+    neighbor: &mut Protocol,
     channel: String,
     line: &str,
 ) -> Result<State> {
@@ -311,7 +290,7 @@ fn parse_channel_meta(
 
 /// Parse channel route change stats
 fn parse_channel_route_change_stats(
-    neighbor: &mut Neighbor,
+    neighbor: &mut Protocol,
     channel: String,
     fields: Vec<String>,
     line: &str,
@@ -361,7 +340,7 @@ fn parse_channel_route_change_stats(
 /// Finalize counts: As we accept routes through multiple channels
 /// e.g. IPv4 and IPv6 the global counter object `routes` has to
 /// be calculated after parsing the neighbor.
-fn finalize_counters(neighbor: &mut Neighbor) {
+fn finalize_counters(neighbor: &mut Protocol) {
     // We assume that the total number of routes received, filtered, preferred, ...
     // is the sum over all channels. TODO: validate.
     let mut total = RoutesCount::default();
@@ -385,7 +364,7 @@ mod tests {
     #[test]
     fn test_parse_neighbor_header() {
         let line = "1002-R194_42    BGP        ---        up     09:39:25.123  Established";
-        let mut neighbor = Neighbor::default();
+        let mut neighbor = Protocol::default();
         parse_neighbor_header(&mut neighbor, &line).unwrap();
 
         assert_eq!(neighbor.id, "R194_42");
@@ -396,7 +375,7 @@ mod tests {
     #[test]
     fn test_parse_neighbor_header_date() {
         let line = "1002-R194_42    BGP        ---        up     2025-05-27  Established";
-        let mut neighbor = Neighbor::default();
+        let mut neighbor = Protocol::default();
         parse_neighbor_header(&mut neighbor, &line).unwrap();
 
         assert_eq!(neighbor.id, "R194_42");
@@ -407,7 +386,7 @@ mod tests {
     #[test]
     fn test_parse_neighbor_header_down() {
         let line = "1002-R_bhac01   BGP        ---        down   2023-04-19 09:08:10  Error: No listening socket";
-        let mut neighbor = Neighbor::default();
+        let mut neighbor = Protocol::default();
         parse_neighbor_header(&mut neighbor, &line).unwrap();
 
         assert_eq!(neighbor.id, "R_bhac01");
@@ -418,28 +397,28 @@ mod tests {
     #[test]
     fn test_parse_neighbor_header_idle() {
         let line = "1002-R192_158   BGP        ---        start  2023-04-20 12:01:52  Idle          BGP Error: Bad peer AS";
-        let mut neighbor = Neighbor::default();
+        let mut neighbor = Protocol::default();
         parse_neighbor_header(&mut neighbor, &line).unwrap();
     }
 
     #[test]
     fn test_parse_neighbor_meta() {
         let line = "1006-  Description:    AnniNET Software Development";
-        let mut neighbor = Neighbor::default();
+        let mut neighbor = Protocol::default();
         parse_neighbor_meta(&mut neighbor, &line).unwrap();
         assert_eq!(neighbor.description, "AnniNET Software Development");
     }
 
     #[test]
     fn test_parse_neighbor_bgpstate() {
-        let mut neighbor = Neighbor::default();
+        let mut neighbor = Protocol::default();
         let line = "   BGP state:          Established ";
         let next = parse_bgp_state(&mut neighbor, &line).unwrap();
         assert_eq!(next, State::BgpState);
 
-        let line = "   Neighbor address: 172.31.194.42";
+        let line = "   Protocol address: 172.31.194.42";
         parse_bgp_state(&mut neighbor, &line).unwrap();
-        let line = "     Neighbor AS:      42";
+        let line = "     Protocol AS:      42";
         parse_bgp_state(&mut neighbor, &line).unwrap();
 
         assert_eq!(neighbor.address, "172.31.194.42");
@@ -472,10 +451,10 @@ mod tests {
             "1002-R194_42    BGP        ---        up     2023-04-19 09:39:25  Established".into(),
             "1006-  Description:    Packet Clearing House".into(),
             "   BGP state:          Established".into(),
-            "    Neighbor address: 172.31.194.42".into(),
-            "    Neighbor AS:      42".into(),
+            "    Protocol address: 172.31.194.42".into(),
+            "    Protocol AS:      42".into(),
         ];
-        let neighbor = Neighbor::parse(block).unwrap();
+        let neighbor = Protocol::parse(block).unwrap();
         assert_eq!(neighbor.id, "R194_42");
     }
 
@@ -483,8 +462,8 @@ mod tests {
     fn test_neighbor_reader() {
         let input = File::open("tests/birdc/show-protocols-all").unwrap();
         let buf = BufReader::new(input);
-        let reader = NeighborReader::new(buf);
-        let neighbors: Vec<Neighbor> =
+        let reader = ProtocolReader::new(buf);
+        let neighbors: Vec<Protocol> =
             reader.filter(|n| !n.id.is_empty()).collect();
 
         let neighbor = &neighbors[0];

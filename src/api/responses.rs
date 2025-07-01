@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     api::cache::CachedResponse,
-    bird::{BirdStatus, Neighbor, Route},
+    bird::{BirdStatus, Neighbor, Protocol, Route},
 };
 
 /// Cache Information
@@ -108,6 +108,44 @@ impl CachedResponse for StatusResponse {
 }
 
 impl IntoResponse for StatusResponse {
+    fn into_response(self) -> Response {
+        Json::from(self).into_response()
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct ProtocolsResponse {
+    pub api: ApiStatus,
+    pub cached_at: DateTime<Utc>,
+    pub protocols: HashMap<String, Protocol>,
+}
+
+impl Default for ProtocolsResponse {
+    fn default() -> Self {
+        ProtocolsResponse {
+            api: ApiStatus::default(),
+            cached_at: Utc::now(),
+            protocols: HashMap::new(),
+        }
+    }
+}
+
+impl CachedResponse for ProtocolsResponse {
+    fn mark_cached(&mut self) {
+        self.api.mark_cached();
+        self.cached_at = Utc::now();
+    }
+
+    fn get_cached_at(&self) -> DateTime<Utc> {
+        self.cached_at.clone()
+    }
+
+    fn is_expired(&self) -> bool {
+        self.api.is_expired()
+    }
+}
+
+impl IntoResponse for ProtocolsResponse {
     fn into_response(self) -> Response {
         Json::from(self).into_response()
     }

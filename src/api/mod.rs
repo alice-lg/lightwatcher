@@ -1,10 +1,10 @@
 mod error;
 use error::Error;
 
-mod neighbors;
+mod protocols;
 mod responses;
+mod routes;
 mod status;
-mod tables;
 
 pub mod cache;
 pub mod server;

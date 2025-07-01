@@ -4,7 +4,7 @@ use tokio::net::TcpListener;
 use tower_http::trace::TraceLayer;
 
 use crate::{
-    api::{neighbors, status, tables},
+    api::{protocols, routes, status},
     config,
 };
 
@@ -18,27 +18,28 @@ pub async fn start() -> Result<()> {
     let app = Router::new()
         .route("/", get(welcome))
         .route("/status", get(status::retrieve))
-        .route("/protocols/bgp", get(neighbors::list))
+        .route("/protocols", get(protocols::list))
+        .route("/protocols/bgp", get(protocols::list_bgp))
         .route(
             "/routes/received/:neighbor_id",
-            get(neighbors::list_routes_received),
+            get(routes::list_routes_received),
         )
         .route(
             "/routes/protocol/:neighbor_id",
-            get(neighbors::list_routes_received),
+            get(routes::list_routes_received),
         )
         .route(
             "/routes/filtered/:neighbor_id",
-            get(neighbors::list_routes_filtered),
+            get(routes::list_routes_filtered),
         )
         .route(
             "/routes/noexport/:neighbor_id",
-            get(neighbors::list_routes_noexport),
+            get(routes::list_routes_noexport),
         )
-        .route("/routes/table/:table", get(tables::list_routes))
+        .route("/routes/table/:table", get(routes::list_routes_table))
         .route(
             "/routes/table/:table/filtered",
-            get(tables::list_routes_filtered),
+            get(routes::list_routes_table_filtered),
         )
         .layer(TraceLayer::new_for_http());
 
