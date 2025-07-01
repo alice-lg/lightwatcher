@@ -61,8 +61,11 @@ fn validate_string(s: &str) -> Result<()> {
         .into());
     }
 
-    // Only allow [a-zA-Z0-9_]
-    if !s.chars().all(|c| c.is_ascii_alphanumeric() || c == '_') {
+    // Only allow [a-zA-Z0-9_.:]
+    if !s
+        .chars()
+        .all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '.' || c == ':')
+    {
         return Err(ValidationError {
             input: s.to_string(),
             reason: "contains invalid characters".to_string(),
@@ -73,13 +76,12 @@ fn validate_string(s: &str) -> Result<()> {
     Ok(())
 }
 
-// Request Types
+/// QueryValue represents a parameter that will be included
+/// in the query sent to bird.
+pub struct QueryValue(String);
 
-/// TableID represents a table name like master4
-pub struct TableID(String);
-
-impl TableID {
-    /// Parse a table id from a string. This will fail
+impl QueryValue {
+    /// Parse a query value from a string. This will fail
     /// if the input is invalid.
     pub fn parse(s: &str) -> Result<Self> {
         let table = s.to_string();
@@ -88,43 +90,21 @@ impl TableID {
         Ok(Self(table))
     }
 
-    /// Get the table id as string
+    /// Get the value as string
     pub fn as_str(&self) -> &str {
         &self.0
     }
 }
 
-impl Display for TableID {
+impl Display for QueryValue {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.0.fmt(f)
     }
 }
 
-/// ProtocolID represents a neighbor identifier.
-/// Valid characters are [a-zA-Z0-9_].
-pub struct ProtocolID(String);
-
-impl ProtocolID {
-    /// Parse a protocol id from a string. This will fail
-    /// if the input is invalid.
-    pub fn parse(s: &str) -> Result<Self> {
-        let protocol = s.to_string();
-        validate_string(&protocol)?;
-
-        Ok(Self(protocol))
-    }
-
-    /// Get the protocol id as string
-    pub fn as_str(&self) -> &str {
-        &self.0
-    }
-}
-
-impl Display for ProtocolID {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.0)
-    }
-}
+pub type ProtocolID = QueryValue;
+pub type TableID = QueryValue;
+pub type PeerID = QueryValue;
 
 /// Bird status
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
@@ -356,6 +336,20 @@ impl Birdc {
     ) -> Result<Vec<Route>> {
         // TODO: check command
         let cmd = format!("show route all noexport '{}'\n", protocol);
+        let routes = self.fetch_routes_cmd(&cmd).await?;
+        Ok(routes)
+    }
+
+    /// Get routes for table and peer
+    pub async fn show_route_all_table_peer(
+        &self,
+        table: &ProtocolID,
+        peer: &PeerID,
+    ) -> Result<Vec<Route>> {
+        let cmd = format!(
+            "show route all table '{}' where from=\"{}\"\n",
+            table, peer,
+        );
         let routes = self.fetch_routes_cmd(&cmd).await?;
         Ok(routes)
     }

@@ -89,17 +89,10 @@ impl RoutesWorkerPool {
 
 #[cfg(test)]
 mod tests {
-    use std::{
-        fs::File,
-        io::BufReader,
-    };
-    use regex::Regex;
-    use crate::{
-        parsers::parser::BlockIterator,
-        route_server::Route,
-    };
     use super::*;
-
+    use crate::{bird::Route, parsers::parser::BlockIterator};
+    use regex::Regex;
+    use std::{fs::File, io::BufReader};
 
     #[tokio::test]
     async fn test_routes_worker() {
