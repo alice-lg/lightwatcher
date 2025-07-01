@@ -16,6 +16,7 @@ lazy_static! {
     /// Regex: Protocol header (protocol, state, uptime, ...)
     static ref RE_PROTOCOL_HEADER: Regex = Regex::new(r"(?x)
         1002-(?P<protocol>\w+)   # protocol id
+        \s+(?P<type>\w+)         # type
         \s+.*?\s+                # ignore this part
         (?P<state>\w+)           # state (up / down)
         \s+
@@ -142,6 +143,7 @@ fn parse_protocol_header(
     let caps = RE_PROTOCOL_HEADER.captures(line);
     let next_state = if let Some(caps) = caps {
         protocol.id = caps["protocol"].to_string();
+        protocol.bird_protocol = caps["type"].to_string();
 
         // State
         protocol.state = caps["state"].to_string().to_lowercase();

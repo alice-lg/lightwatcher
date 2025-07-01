@@ -174,6 +174,7 @@ pub struct Neighbor {
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct Protocol {
     pub id: String,
+    pub bird_protocol: String,
     #[serde(rename = "neighbor_address")]
     pub address: String,
     #[serde(rename = "neighbor_as")]
