@@ -1,5 +1,4 @@
 use chrono::Duration;
-use tracing::info;
 
 /// The TTL and maximum number of entries can
 /// be set in the CacheConfig.

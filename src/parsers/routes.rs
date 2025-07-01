@@ -330,12 +330,12 @@ fn parse_route_bgp(route: &mut Route, line: &str) -> Result<State> {
             route.bgp.as_path = parse_as_path(&val)?;
         } else if key == "next_hop" {
             route.bgp.next_hop = val;
+        } else if key == "otc" {
+            route.bgp.otc = val;
         } else if key == "med" {
-            // route.bgp.med = val.parse()?;
             route.bgp.med = val;
         } else if key == "local_pref" {
             route.bgp.local_pref = val;
-            // route.bgp.local_pref = val.parse()?;
             // After this, we are interested in the communities
             return Ok(State::Communities(CommunityType::None));
         }

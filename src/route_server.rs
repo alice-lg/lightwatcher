@@ -14,30 +14,12 @@ pub struct BirdStatus {
     pub version: String,
 }
 
-// TODO: These should be options
-/*
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
-pub struct RoutesCount {
-    pub imported: u32,
-    pub filtered: u32,
-    pub exported: u32,
-    pub preferred: u32,
-}
-*/
+/// Routes count. This is a mapping of
+///   "received", "rejected", "filtered", ...
 pub type RoutesCount = HashMap<String, u32>;
 
-/*
-#[derive(Serialize, Deserialize, Clone, Debug, Default)]
-pub struct RouteChangeStats {
-    pub received: u32,
-    pub rejected: u32,
-    pub filtered: u32,
-    pub ignored: u32,
-    pub rx_limit: u32,
-    pub limit: u32,
-    pub accepted: u32,
-}
-*/
+/// Route change stats is a mapping of per channel stats
+/// for attributes: received, rejected, filtered, ignored, ...
 pub type RouteChangeStats = HashMap<String, Option<u32>>;
 
 /// Change stats
@@ -100,16 +82,14 @@ pub struct ExtCommunity(pub String, pub String, pub String);
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct BGPInfo {
     pub origin: String,
-    // pub as_path: Vec<u32>,
     pub as_path: Vec<String>,
     pub next_hop: String,
     pub communities: Vec<Community>,
     pub large_communities: Vec<LargeCommunity>,
     pub ext_communities: Vec<ExtCommunity>,
-    // pub local_pref: u32,
     pub local_pref: String,
-    // pub med: u32,
     pub med: String,
+    pub otc: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
