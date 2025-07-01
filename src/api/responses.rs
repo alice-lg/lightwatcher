@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     api::cache::CachedResponse,
-    route_server::{BirdStatus, Neighbor, Route},
+    bird::{BirdStatus, Neighbor, Route},
 };
 
 /// Cache Information

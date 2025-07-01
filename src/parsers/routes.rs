@@ -3,8 +3,8 @@ use lazy_static::lazy_static;
 use regex::Regex;
 
 use crate::{
+    bird::{Community, ExtCommunity, LargeCommunity, Route},
     parsers::parser::{Block, BlockGroup, Parse},
-    route_server::{Community, ExtCommunity, LargeCommunity, Route},
 };
 
 lazy_static! {

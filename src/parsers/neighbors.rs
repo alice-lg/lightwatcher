@@ -5,11 +5,11 @@ use anyhow::Result;
 use lazy_static::lazy_static;
 
 use crate::{
+    bird::{Channel, Neighbor, RouteChangeStats, RoutesCount},
     parsers::{
         datetime,
         parser::{Block, BlockIterator, Parse},
     },
-    route_server::{Channel, Neighbor, RouteChangeStats, RoutesCount},
 };
 
 lazy_static! {

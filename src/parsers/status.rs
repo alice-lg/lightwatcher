@@ -1,8 +1,8 @@
 use anyhow::Result;
 
 use crate::{
+    bird::BirdStatus,
     parsers::parser::{Block, Parse},
-    route_server::BirdStatus,
 };
 
 impl Parse<Block> for BirdStatus {
