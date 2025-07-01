@@ -23,9 +23,21 @@ impl From<&str> for CacheKey {
     }
 }
 
+impl From<String> for CacheKey {
+    fn from(s: String) -> Self {
+        CacheKey(s)
+    }
+}
+
 impl From<&ProtocolID> for CacheKey {
     fn from(p: &ProtocolID) -> Self {
         CacheKey(p.as_str().into())
+    }
+}
+
+impl From<&CacheKey> for CacheKey {
+    fn from(k: &CacheKey) -> Self {
+        k.clone()
     }
 }
 

@@ -198,9 +198,9 @@ fn parse_bgp_state(protocol: &mut Protocol, line: &str) -> Result<State> {
         let key = caps["key"].to_lowercase();
         let val = caps["value"].to_string();
 
-        if key == "protocol address" {
+        if key == "neighbor address" {
             protocol.address = val
-        } else if key == "protocol as" {
+        } else if key == "neighbor as" {
             protocol.asn = val.parse::<u32>()?;
         }
     }

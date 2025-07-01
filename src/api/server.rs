@@ -41,6 +41,10 @@ pub async fn start() -> Result<()> {
             "/routes/table/:table/filtered",
             get(routes::list_routes_table_filtered),
         )
+        .route(
+            "/routes/table/:table/peer/:peer",
+            get(routes::list_routes_table_peer),
+        )
         .layer(TraceLayer::new_for_http());
 
     let listen = config::get_listen_address();

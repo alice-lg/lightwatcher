@@ -383,10 +383,8 @@ impl Birdc {
         table: &ProtocolID,
         peer: &PeerID,
     ) -> Result<Vec<Route>> {
-        let cmd = format!(
-            "show route all table '{}' where from=\"{}\"\n",
-            table, peer,
-        );
+        let cmd =
+            format!("show route all table '{}' where from={}\n", table, peer,);
         let routes = self.fetch_routes_cmd(&cmd).await?;
         Ok(routes)
     }
