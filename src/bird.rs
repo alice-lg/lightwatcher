@@ -18,6 +18,7 @@ use crate::{
     parsers::{
         neighbors::NeighborReader,
         parser::{BlockIterator, Parse},
+        protocols::ProtocolReader,
         routes::RE_ROUTES_START,
         routes_worker::RoutesWorkerPool,
     },
@@ -181,10 +182,12 @@ pub struct Protocol {
     pub description: String,
     pub routes: RoutesCount,
     pub channels: ChannelMap,
-    pub uptime: f64, // seconds
-    pub since: DateTime<Utc>,
+    pub since: String,
     pub state_changed: String,
     pub last_error: String,
+    // Compat
+    pub table: String,
+    pub peer_table: String,
 }
 
 pub type ProtocolsMap = HashMap<String, Protocol>;
@@ -264,23 +267,23 @@ impl Birdc {
     }
 
     /// Get neighbors
-    pub async fn show_protocols_all(&self) -> Result<NeighborsMap> {
+    pub async fn show_protocols(&self) -> Result<ProtocolsMap> {
         let mut stream = UnixStream::connect(&self.socket)?;
         let cmd = format!("show protocols all\n");
         stream.write_all(&cmd.as_bytes())?;
 
         let buf = BufReader::new(stream);
-        let reader = NeighborReader::new(buf);
-        let neighbors: Vec<Neighbor> =
+        let reader = ProtocolReader::new(buf);
+        let protocols: Vec<Protocol> =
             reader.filter(|n| !n.id.is_empty()).collect();
 
-        let neighbors: NeighborsMap =
-            neighbors.into_iter().map(|n| (n.id.clone(), n)).collect();
+        let protocols: ProtocolsMap =
+            protocols.into_iter().map(|n| (n.id.clone(), n)).collect();
 
-        Ok(neighbors)
+        Ok(protocols)
     }
 
-    pub async fn show_protocols_bgp_all(&self) -> Result<NeighborsMap> {
+    pub async fn show_protocols_bgp(&self) -> Result<NeighborsMap> {
         let mut stream = UnixStream::connect(&self.socket)?;
         let cmd = format!("show protocols all\n");
         stream.write_all(&cmd.as_bytes())?;
