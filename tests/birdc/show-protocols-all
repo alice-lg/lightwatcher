@@ -107,13 +107,34 @@
        Action:       warn
      Export limit:   300000
        Action:       warn
-     Routes:         88 imported, 0 filtered, 295747 exported, 85 preferred
+     Routes:         100 imported, 0 filtered, 1000 exported, 10 preferred
      Route change stats:     received   rejected   filtered    ignored   accepted
        Import updates:             88          0          0          0         88
        Import withdraws:            0          0        ---          0          0
        Export updates:         435159        151     133526        ---     307687
        Export withdraws:            0        ---        ---        ---          0
      BGP Next hop:   111.111.193.157
+   Channel ipv6
+     State:          UP
+     Table:          master6
+     Preference:     100
+     Input filter:   receive_from_AS65530_1
+     Output filter:  announce_to_AS65530_1
+     Output filter:  (unnamed)
+     Receive limit:  40000
+       Action:       disable
+     Import limit:   5000
+       Action:       warn
+     Export limit:   300000
+       Action:       warn
+     Routes:         10 imported, 10 filtered, 10 exported, 10 preferred
+     Route change stats:     received   rejected   filtered    ignored   accepted
+       Import updates:             88          0          0          0         88
+       Import withdraws:            0          0        ---          0          0
+       Export updates:         435159        151     133526        ---     307687
+       Export withdraws:            0        ---        ---        ---          0
+     BGP Next hop:   2001:111:11:1::aa:1 fe80::eeee:eeee:efff:eeff
+
  
 1002-R195_42    BGP        ---        up     2023-04-19 09:24:12  Established   
 1006-  Description:    Packet Clearing House

@@ -154,23 +154,6 @@ pub struct Channel {
 pub type ChannelMap = HashMap<String, Channel>;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
-pub struct Neighbor {
-    pub id: String,
-    #[serde(rename = "neighbor_address")]
-    pub address: String,
-    #[serde(rename = "neighbor_as")]
-    pub asn: u32,
-    pub state: String,
-    pub description: String,
-    pub routes: RoutesCount,
-    pub channels: ChannelMap,
-    pub uptime: f64, // seconds
-    pub since: DateTime<Utc>,
-    pub state_changed: String,
-    pub last_error: String,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct Protocol {
     pub id: String,
     pub bird_protocol: String,
@@ -191,8 +174,6 @@ pub struct Protocol {
 }
 
 pub type ProtocolsMap = HashMap<String, Protocol>;
-
-pub type NeighborsMap = HashMap<String, Neighbor>;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct Community(pub u32, pub u32);

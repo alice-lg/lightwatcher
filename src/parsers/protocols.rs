@@ -72,7 +72,6 @@ enum State {
     Meta,
     BgpState,
     Channel(String, ChannelSection),
-    Done,
 }
 
 pub struct ProtocolReader<R: BufRead> {
@@ -111,7 +110,8 @@ impl<R: BufRead> Iterator for ProtocolReader<R> {
                     error = e.to_string(),
                     "parsing protocol failed"
                 );
-                Some(Protocol::default())
+                // Some(Protocol::default())
+                self.next()
             }
         }
     }
@@ -166,7 +166,6 @@ fn parse_line(
         State::Channel(ch, sec) => {
             parse_channel(&mut protocol, ch, sec, line)?
         }
-        State::Done => State::Done,
     };
     Ok(state)
 }
@@ -206,13 +205,19 @@ fn parse_protocol_header(
     Ok(next_state)
 }
 
+/// Check if the line marks the beginning of a new
+/// channel section.
+fn parse_channel_header(l: &str) -> Option<String> {
+    match RE_PROTOCOL_CHANNEL.captures(l) {
+        Some(caps) => Some(caps["channel"].to_string()),
+        None => None,
+    }
+}
+
 /// Parse protocol meta: Description,
 fn parse_protocol_meta(protocol: &mut Protocol, line: &str) -> Result<State> {
-    {
-        if let Some(caps) = RE_PROTOCOL_CHANNEL.captures(line) {
-            let channel = caps["channel"].to_string();
-            return Ok(State::Channel(channel, ChannelSection::Meta));
-        }
+    if let Some(channel) = parse_channel_header(line) {
+        return Ok(State::Channel(channel, ChannelSection::Meta));
     }
 
     // Parse description
@@ -231,11 +236,8 @@ fn parse_protocol_meta(protocol: &mut Protocol, line: &str) -> Result<State> {
 fn parse_bgp_state(protocol: &mut Protocol, line: &str) -> Result<State> {
     // Check if we reached a channel section, so we can continue with
     // the next parser state:
-    {
-        if let Some(caps) = RE_PROTOCOL_CHANNEL.captures(line) {
-            let channel = caps["channel"].to_string();
-            return Ok(State::Channel(channel, ChannelSection::Meta));
-        }
+    if let Some(channel) = parse_channel_header(line) {
+        return Ok(State::Channel(channel, ChannelSection::Meta));
     }
 
     // This is a collection of key value pairs.
@@ -260,6 +262,9 @@ fn parse_channel(
     section: ChannelSection,
     line: &str,
 ) -> Result<State> {
+    if let Some(next) = parse_channel_header(line) {
+        return Ok(State::Channel(next, ChannelSection::Meta));
+    }
     match section {
         ChannelSection::Meta => parse_channel_meta(protocol, channel, line),
         ChannelSection::RouteChangeStats(fields) => {
@@ -382,7 +387,7 @@ fn parse_channel_route_change_stats(
             ChannelSection::RouteChangeStats(fields),
         ))
     } else {
-        Ok(State::Done)
+        Ok(State::Meta)
     }
 }
 
@@ -509,8 +514,8 @@ mod tests {
             "1002-R194_42    BGP        ---        up     2023-04-19 09:39:25  Established".into(),
             "1006-  Description:    Packet Clearing House".into(),
             "   BGP state:          Established".into(),
-            "    neighbor address: 172.31.194.42".into(),
-            "    neighbor AS:      42".into(),
+            "    Neighbor address: 172.31.194.42".into(),
+            "    Neighbor AS:      42".into(),
         ];
         let protocol = Protocol::parse(block, false).unwrap();
         assert_eq!(protocol.id, "R194_42");
@@ -526,8 +531,13 @@ mod tests {
         let protocols: Vec<Protocol> =
             reader.filter(|n| !n.id.is_empty()).collect();
 
+        // Let's check the first BGP protocol
         let protocol = &protocols[0];
+        println!("PRO: {:?}", protocol);
         assert_eq!(protocol.id, "R194_42");
         assert_eq!(protocol.address, "111.111.194.42");
+
+        println!("ROUTES: {:?}", protocol.routes);
+        assert_eq!(protocol.routes["imported"], 110);
     }
 }

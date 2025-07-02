@@ -3,6 +3,7 @@ use axum::{routing::get, Router};
 use tokio::net::TcpListener;
 use tower_http::{
     compression::CompressionLayer,
+    normalize_path::NormalizePathLayer,
     trace::{DefaultOnResponse, TraceLayer},
 };
 use tracing::Level;
@@ -49,6 +50,7 @@ pub async fn start() -> Result<()> {
             "/routes/table/:table/peer/:peer",
             get(routes::list_routes_table_peer),
         )
+        .layer(NormalizePathLayer::trim_trailing_slash())
         .layer(CompressionLayer::new())
         .layer(
             TraceLayer::new_for_http()
