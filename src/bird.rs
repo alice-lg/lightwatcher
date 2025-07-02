@@ -175,13 +175,13 @@ pub struct Protocol {
 
 pub type ProtocolsMap = HashMap<String, Protocol>;
 
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
 pub struct Community(pub u32, pub u32);
 
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
 pub struct LargeCommunity(pub u32, pub u32, pub u32);
 
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
 pub struct ExtCommunity(pub String, pub String, pub String);
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]

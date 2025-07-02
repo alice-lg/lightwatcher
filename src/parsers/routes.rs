@@ -42,7 +42,7 @@ lazy_static! {
     ").unwrap();
 
     /// BGP Community Regex
-    static ref RE_BGP_COMMUNITY: Regex = Regex::new(r"\((.+), (\d+), (\d+)\)").unwrap();
+    static ref RE_BGP_COMMUNITY: Regex = Regex::new(r"\((.+?), (.+?), (.+?)\)\s?").unwrap();
 
     pub static ref RE_ROUTES_START: Regex = Regex::new(r"1007-\S").unwrap();
     static ref RE_ROUTE_START: Regex = Regex::new(r"1007-").unwrap();
@@ -236,9 +236,9 @@ fn parse_large_communities(s: &str) -> Result<Vec<LargeCommunity>> {
         .captures_iter(s)
         .map(|c| {
             LargeCommunity(
-                c[1].parse().unwrap_or(0),
-                c[2].parse().unwrap_or(0),
-                c[3].parse().unwrap_or(0),
+                c[1].parse().unwrap(),
+                c[2].parse().unwrap(),
+                c[3].parse().unwrap(),
             )
         })
         .collect();
@@ -384,9 +384,36 @@ mod tests {
 
     #[test]
     fn test_parse_large_communities() {
-        let line = "(57463, 0, 1120) (57463, 0, 5408) (57463, 0, 6461)";
+        let line = "(111, 0, 1120) (222, 0, 123) (333, 222, 333)";
         let communities = parse_large_communities(line).unwrap();
-        println!("{:?}", communities);
+
+        let expected = vec![
+            LargeCommunity(111, 0, 1120),
+            LargeCommunity(222, 0, 123),
+            LargeCommunity(333, 222, 333),
+        ];
+
+        for (i, e) in expected.iter().enumerate() {
+            assert_eq!(&communities[i], e);
+        }
+    }
+
+    #[test]
+    fn test_parse_ext_communities() {
+        let line = "BGP.ext_community: (rt, 64512, 21) (rt, 64512, 10) (rt, 64512, 41) (generic, 0x43000000, 0x1) (rt, 64512, 52)";
+        let communities = parse_ext_communities(line).expect("must parse");
+
+        let expected = vec![
+            ExtCommunity("rt".into(), "64512".into(), "21".into()),
+            ExtCommunity("rt".into(), "64512".into(), "10".into()),
+            ExtCommunity("rt".into(), "64512".into(), "41".into()),
+            ExtCommunity("generic".into(), "0x43000000".into(), "0x1".into()),
+            ExtCommunity("rt".into(), "64512".into(), "52".into()),
+        ];
+
+        for (i, e) in expected.iter().enumerate() {
+            assert_eq!(&communities[i], e);
+        }
     }
 
     #[test]
