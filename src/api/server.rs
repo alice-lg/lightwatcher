@@ -1,7 +1,11 @@
 use anyhow::Result;
 use axum::{routing::get, Router};
 use tokio::net::TcpListener;
-use tower_http::trace::TraceLayer;
+use tower_http::{
+    compression::CompressionLayer,
+    trace::{DefaultOnResponse, TraceLayer},
+};
+use tracing::Level;
 
 use crate::{
     api::{protocols, routes, status},
@@ -45,7 +49,12 @@ pub async fn start() -> Result<()> {
             "/routes/table/:table/peer/:peer",
             get(routes::list_routes_table_peer),
         )
-        .layer(TraceLayer::new_for_http());
+        .layer(CompressionLayer::new())
+        .layer(
+            TraceLayer::new_for_http()
+                .on_request(())
+                .on_response(DefaultOnResponse::new().level(Level::INFO)),
+        );
 
     let listen = config::get_listen_address();
     let listener = TcpListener::bind(&listen).await?;
