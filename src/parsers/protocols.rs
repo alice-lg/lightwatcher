@@ -37,6 +37,27 @@ lazy_static! {
     ").unwrap();
 }
 
+impl Parse<&str> for RoutesCount {
+    fn parse(row: &str) -> Result<RoutesCount> {
+        let parts = row.split(",");
+        let count: RoutesCount = parts
+            .map(|s| {
+                let s: Vec<&str> = s.trim().split_whitespace().collect();
+                if s.len() != 2 {
+                    tracing::error!("could not parse routes count");
+                }
+                if let Ok(val) = s[0].parse() {
+                    (s[1].into(), val)
+                } else {
+                    (s[1].into(), 0)
+                }
+            })
+            .collect();
+
+        Ok(count)
+    }
+}
+
 /// Channel sections
 #[derive(Debug, PartialEq, Clone)]
 enum ChannelSection {
@@ -56,12 +77,25 @@ enum State {
 
 pub struct ProtocolReader<R: BufRead> {
     iter: BlockIterator<R>,
+    filter_bgp: bool,
 }
 
 impl<R: BufRead> ProtocolReader<R> {
     pub fn new(reader: R) -> Self {
         let iter = BlockIterator::new(reader, &RE_PROTOCOL_START);
-        Self { iter }
+        Self {
+            iter,
+            filter_bgp: false,
+        }
+    }
+
+    /// Setting the filter bgp flag will skip all non 'BGP'
+    /// protocols.
+    pub fn with_filter_bgp(self) -> Self {
+        Self {
+            filter_bgp: true,
+            ..self
+        }
     }
 }
 
@@ -70,7 +104,7 @@ impl<R: BufRead> Iterator for ProtocolReader<R> {
 
     fn next(&mut self) -> Option<Self::Item> {
         let block = self.iter.next()?;
-        match Protocol::parse(block) {
+        match Protocol::parse(block, self.filter_bgp) {
             Ok(protocol) => Some(protocol),
             Err(e) => {
                 tracing::error!(
@@ -84,15 +118,15 @@ impl<R: BufRead> Iterator for ProtocolReader<R> {
 }
 
 /// Implement block parser for protocol
-impl Parse<Block> for Protocol {
+impl Protocol {
     /// Parse a block of lines into a protocol
-    fn parse(block: Block) -> Result<Self> {
+    fn parse(block: Block, filter_bgp: bool) -> Result<Self> {
         let mut protocol = Protocol::default();
 
         // Parse lines in block
         let mut state = State::Start;
         for line in block.iter() {
-            match parse_line(&mut protocol, state.clone(), &line) {
+            match parse_line(&mut protocol, state.clone(), &line, filter_bgp) {
                 Ok(next_state) => state = next_state,
                 Err(e) => {
                     tracing::error!(
@@ -121,9 +155,12 @@ fn parse_line(
     mut protocol: &mut Protocol,
     state: State,
     line: &str,
+    filter_bgp: bool,
 ) -> Result<State> {
     let state = match state {
-        State::Start => parse_protocol_header(&mut protocol, line)?,
+        State::Start => {
+            parse_protocol_header(&mut protocol, line, filter_bgp)?
+        }
         State::Meta => parse_protocol_meta(&mut protocol, line)?,
         State::BgpState => parse_bgp_state(&mut protocol, line)?,
         State::Channel(ch, sec) => {
@@ -138,7 +175,12 @@ fn parse_line(
 fn parse_protocol_header(
     protocol: &mut Protocol,
     line: &str,
+    filter_bgp: bool,
 ) -> Result<State> {
+    if filter_bgp && !line.contains("BGP") {
+        return Ok(State::Start);
+    }
+
     // Parse protocol header line using regex match
     let caps = RE_PROTOCOL_HEADER.captures(line);
     let next_state = if let Some(caps) = caps {
@@ -152,8 +194,9 @@ fn parse_protocol_header(
         }
 
         // Uptime
-        protocol.since = caps["uptime"].trim().into();
-        protocol.state_changed = caps["uptime"].trim().into();
+        let uptime = caps["uptime"].trim();
+        protocol.since = uptime.into();
+        protocol.state_changed = uptime.into();
 
         State::Meta
     } else {
@@ -370,5 +413,121 @@ fn finalize_attributes(protocol: &mut Protocol) {
         protocol.table = attrs.table.clone();
         protocol.peer_table = attrs.peer_table.clone();
         break;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::{fs::File, io::BufReader};
+
+    #[test]
+    fn test_parse_protocol_header() {
+        let line = "1002-R194_42    BGP        ---        up     09:39:25.123  Established";
+        let mut protocol = Protocol::default();
+        parse_protocol_header(&mut protocol, &line, false).unwrap();
+
+        assert_eq!(protocol.id, "R194_42");
+        assert_eq!(protocol.state, "up");
+    }
+
+    #[test]
+    fn test_parse_protocol_header_date() {
+        let line = "1002-R194_42    BGP        ---        up     2025-05-27  Established";
+        let mut protocol = Protocol::default();
+        parse_protocol_header(&mut protocol, &line, false).unwrap();
+
+        assert_eq!(protocol.id, "R194_42");
+        assert_eq!(protocol.state, "up");
+    }
+
+    #[test]
+    fn test_parse_protocol_header_down() {
+        let line = "1002-R_bhac01   BGP        ---        down   2023-04-19 09:08:10  Error: No listening socket";
+        let mut protocol = Protocol::default();
+        parse_protocol_header(&mut protocol, &line, false).unwrap();
+
+        assert_eq!(protocol.id, "R_bhac01");
+        assert_eq!(protocol.state, "down");
+        assert_eq!(protocol.last_error, "Error: No listening socket");
+    }
+
+    #[test]
+    fn test_parse_protocol_header_idle() {
+        let line = "1002-R192_158   BGP        ---        start  2023-04-20 12:01:52  Idle          BGP Error: Bad peer AS";
+        let mut protocol = Protocol::default();
+        parse_protocol_header(&mut protocol, &line, false).unwrap();
+    }
+
+    #[test]
+    fn test_parse_protocol_meta() {
+        let line = "1006-  Description:    AnniNET Software Development";
+        let mut protocol = Protocol::default();
+        parse_protocol_meta(&mut protocol, &line).unwrap();
+        assert_eq!(protocol.description, "AnniNET Software Development");
+    }
+
+    #[test]
+    fn test_parse_protocol_bgpstate() {
+        let mut protocol = Protocol::default();
+        let line = "   BGP state:          Established ";
+        let next = parse_bgp_state(&mut protocol, &line).unwrap();
+        assert_eq!(next, State::BgpState);
+
+        let line = "   neighbor address: 172.31.194.42";
+        parse_bgp_state(&mut protocol, &line).unwrap();
+        let line = "     neighbor AS:      42";
+        parse_bgp_state(&mut protocol, &line).unwrap();
+
+        assert_eq!(protocol.address, "172.31.194.42");
+        assert_eq!(protocol.asn, 42);
+    }
+
+    #[test]
+    fn test_parse_change_stats_fields() {
+        let s = "     received   rejected   filtered    ignored   RX limit      limit   accepted";
+        let fields = parse_change_stats_fields(s);
+
+        assert_eq!(fields[0], "received");
+        assert_eq!(fields[4], "rx_limit");
+        assert_eq!(fields[5], "limit");
+    }
+
+    #[test]
+    fn test_parse_change_stats_values() {
+        let s = "            471         47         12          0        ---          0        412";
+        let values = parse_change_stats_values(s);
+        assert_eq!(values[0], Some(471));
+        assert_eq!(values[1], Some(47));
+        assert_eq!(values[4], None);
+        assert_eq!(values[6], Some(412));
+    }
+
+    #[test]
+    fn test_protocol_parse() {
+        let block: Block = vec![
+            "1002-R194_42    BGP        ---        up     2023-04-19 09:39:25  Established".into(),
+            "1006-  Description:    Packet Clearing House".into(),
+            "   BGP state:          Established".into(),
+            "    neighbor address: 172.31.194.42".into(),
+            "    neighbor AS:      42".into(),
+        ];
+        let protocol = Protocol::parse(block, false).unwrap();
+        assert_eq!(protocol.id, "R194_42");
+        assert_eq!(protocol.address, "172.31.194.42");
+        assert_eq!(protocol.asn, 42);
+    }
+
+    #[test]
+    fn test_protocol_reader() {
+        let input = File::open("tests/birdc/show-protocols-all").unwrap();
+        let buf = BufReader::new(input);
+        let reader = ProtocolReader::new(buf).with_filter_bgp();
+        let protocols: Vec<Protocol> =
+            reader.filter(|n| !n.id.is_empty()).collect();
+
+        let protocol = &protocols[0];
+        assert_eq!(protocol.id, "R194_42");
+        assert_eq!(protocol.address, "111.111.194.42");
     }
 }

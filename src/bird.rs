@@ -16,7 +16,6 @@ use tokio::task;
 use crate::{
     config,
     parsers::{
-        neighbors::NeighborReader,
         parser::{BlockIterator, Parse},
         protocols::ProtocolReader,
         routes::RE_ROUTES_START,
@@ -284,20 +283,20 @@ impl Birdc {
         Ok(protocols)
     }
 
-    pub async fn show_protocols_bgp(&self) -> Result<NeighborsMap> {
+    pub async fn show_protocols_bgp(&self) -> Result<ProtocolsMap> {
         let mut stream = UnixStream::connect(&self.socket)?;
         let cmd = format!("show protocols all\n");
         stream.write_all(&cmd.as_bytes())?;
 
         let buf = BufReader::new(stream);
-        let reader = NeighborReader::new(buf);
-        let neighbors: Vec<Neighbor> =
+        let reader = ProtocolReader::new(buf).with_filter_bgp();
+        let protocols: Vec<Protocol> =
             reader.filter(|n| !n.id.is_empty()).collect();
 
-        let neighbors: NeighborsMap =
-            neighbors.into_iter().map(|n| (n.id.clone(), n)).collect();
+        let protocols: ProtocolsMap =
+            protocols.into_iter().map(|n| (n.id.clone(), n)).collect();
 
-        Ok(neighbors)
+        Ok(protocols)
     }
 
     /// Send the command to the birdc socket and parse the response.
