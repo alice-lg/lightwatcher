@@ -6,7 +6,6 @@ use std::{
 };
 
 use anyhow::Result;
-use chrono::{DateTime, Utc};
 use lazy_static::lazy_static;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
@@ -17,7 +16,7 @@ use crate::{
     config,
     parsers::{
         parser::{BlockIterator, Parse},
-        protocols::ProtocolReader,
+        protocols::{ProtocolReceiver, ProtocolReader},
         routes::RE_ROUTES_START,
         routes_worker::RoutesWorkerPool,
     },
@@ -255,11 +254,26 @@ impl Birdc {
 
         let buf = BufReader::new(stream);
         let reader = ProtocolReader::new(buf);
+
         let protocols: Vec<Protocol> =
             reader.filter(|n| !n.id.is_empty()).collect();
 
         let protocols: ProtocolsMap =
             protocols.into_iter().map(|n| (n.id.clone(), n)).collect();
+
+        Ok(protocols)
+    }
+
+    pub async fn show_protocols_stream(&self) -> Result<ProtocolReceiver> {
+
+        let mut stream = UnixStream::connect(&self.socket)?;
+        let cmd = format!("show protocols all\n");
+        stream.write_all(&cmd.as_bytes())?;
+
+        let buf = BufReader::new(stream);
+        let reader = ProtocolReader::new(buf);
+
+        let protocols = reader.stream();
 
         Ok(protocols)
     }

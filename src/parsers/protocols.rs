@@ -3,6 +3,7 @@ use std::io::BufRead;
 
 use anyhow::Result;
 use lazy_static::lazy_static;
+use tokio::sync::mpsc::{self, Receiver, Sender};
 
 use crate::{
     bird::{Channel, Protocol, RouteChangeStats, RoutesCount},
@@ -114,6 +115,37 @@ impl<R: BufRead> Iterator for ProtocolReader<R> {
                 self.next()
             }
         }
+    }
+}
+
+/// Receiver for Protocols
+pub type ProtocolReceiver = Receiver<Protocol>;
+
+impl<R: BufRead + Send + 'static> ProtocolReader<R> {
+    pub fn stream(self) -> ProtocolReceiver { 
+        let (tx, rx) = mpsc::channel(10);
+
+        tokio::spawn(async move {
+            for block in self.iter {
+                match Protocol::parse(block, self.filter_bgp) {
+                    Ok(protocol) => {
+                        if let Err(_) = tx.send(protocol).await {
+                            tracing::error!("parse protocol stream receiver dropped");
+                            return;
+                        };
+                    }
+                    Err(e) => {
+                        tracing::error!(
+                            error = e.to_string(),
+                            "parsing protocol failed"
+                        );
+                        continue;
+                    }
+                };
+            }
+        });
+
+        rx
     }
 }
 

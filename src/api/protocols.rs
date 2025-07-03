@@ -3,10 +3,12 @@ use std::sync::Arc;
 use anyhow::Result;
 use lazy_static::lazy_static;
 use tokio::sync::Mutex;
+use axum::extract::Query;
 
 use crate::{
     api::{cache::ResponseCache, responses::ProtocolsResponse, Error},
-    bird::Birdc,
+    parsers::protocols::{ProtocolReceiver},
+    bird::{ProtocolsMap, Birdc},
     config,
 };
 
@@ -38,9 +40,17 @@ pub async fn list() -> Result<ProtocolsResponse, Error> {
     match res {
         Some(res) => Ok(res),
         None => {
-            let protocols = birdc.show_protocols().await?;
+            let mut protocols = birdc.show_protocols_stream().await?;
+            let mut mapping = ProtocolsMap::new();
+            while let Some(protocol) = protocols.recv().await {
+                if protocol.id.is_empty() {
+                    continue
+                }
+                mapping.insert(protocol.id.clone(), protocol);
+            }
+
             let response = ProtocolsResponse {
-                protocols,
+                protocols: mapping,
                 ..Default::default()
             };
             let mut cache = PROTOCOLS_CACHE.lock().await;
