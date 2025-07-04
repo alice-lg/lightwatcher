@@ -29,10 +29,7 @@ pub async fn retrieve() -> Result<StatusResponse, Error> {
 
     let res = {
         let cache = STATUS_CACHE.lock().await;
-        match cache.get("status") {
-            Some(res) => Some(res.clone()),
-            None => None,
-        }
+        cache.get("status").cloned()
     };
 
     match res {

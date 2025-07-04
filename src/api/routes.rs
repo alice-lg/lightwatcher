@@ -53,10 +53,7 @@ pub async fn list_routes_received(
 
     let res = {
         let cache = ROUTES_RECEIVED_CACHE.lock().await;
-        match cache.get(&protocol) {
-            Some(res) => Some(res.clone()),
-            None => None,
-        }
+        cache.get(&protocol).cloned()
     };
 
     match res {
@@ -92,10 +89,7 @@ pub async fn list_routes_filtered(
 
     let res = {
         let cache = ROUTES_FILTERED_CACHE.lock().await;
-        match cache.get(&protocol) {
-            Some(res) => Some(res.clone()),
-            None => None,
-        }
+        cache.get(&protocol).cloned()
     };
 
     match res {
@@ -132,10 +126,7 @@ pub async fn list_routes_noexport(
 
     let res = {
         let cache = ROUTES_NO_EXPORT_CACHE.lock().await;
-        match cache.get(&protocol) {
-            Some(res) => Some(res.clone()),
-            None => None,
-        }
+        cache.get(&protocol).cloned()
     };
 
     match res {
@@ -172,10 +163,7 @@ pub async fn list_routes_table(
 
     let res = {
         let cache = ROUTES_TABLE_CACHE.lock().await;
-        match cache.get(&table) {
-            Some(res) => Some(res.clone()),
-            None => None,
-        }
+        cache.get(&table).cloned()
     };
 
     match res {
@@ -213,10 +201,7 @@ pub async fn list_routes_table_peer(
 
     let res = {
         let cache = ROUTES_TABLE_PEER_CACHE.lock().await;
-        match cache.get(&key) {
-            Some(res) => Some(res.clone()),
-            None => None,
-        }
+        cache.get(&key).cloned()
     };
 
     match res {
@@ -255,10 +240,7 @@ pub async fn list_routes_table_filtered(
 
     let res = {
         let cache = ROUTES_TABLE_FILTERED_CACHE.lock().await;
-        match cache.get(&table) {
-            Some(res) => Some(res.clone()),
-            None => None,
-        }
+        cache.get(&table).cloned()
     };
 
     match res {

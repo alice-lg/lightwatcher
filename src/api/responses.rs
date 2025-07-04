@@ -68,7 +68,7 @@ impl CachedResponse for ApiStatus {
 
     fn get_cached_at(&self) -> DateTime<Utc> {
         let cached_at = &self.cache_status.cached_at.date;
-        cached_at.clone()
+        *cached_at
     }
 }
 
@@ -103,7 +103,7 @@ impl CachedResponse for StatusResponse {
     }
 
     fn get_cached_at(&self) -> DateTime<Utc> {
-        self.cached_at.clone()
+        self.cached_at
     }
 }
 
@@ -137,7 +137,7 @@ impl CachedResponse for ProtocolsResponse {
     }
 
     fn get_cached_at(&self) -> DateTime<Utc> {
-        self.cached_at.clone()
+        self.cached_at
     }
 
     fn is_expired(&self) -> bool {
@@ -179,7 +179,7 @@ impl CachedResponse for RoutesResponse {
     }
 
     fn get_cached_at(&self) -> DateTime<Utc> {
-        self.cached_at.clone()
+        self.cached_at
     }
 }
 

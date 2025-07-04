@@ -12,8 +12,7 @@ pub struct CacheConfig {
 
 /// Get a string or default from env
 fn string_from_env(key: &str, default: &str) -> String {
-    let value = std::env::var(key).unwrap_or(default.to_string());
-    value
+    std::env::var(key).unwrap_or(default.to_string())
 }
 
 /// Get the routes worker parallelism
@@ -59,16 +58,14 @@ pub fn get_routes_cache_config() -> CacheConfig {
 /// Get the birdc socket path from the environment
 /// or use the default value.
 pub fn get_birdc_socket() -> String {
-    let socket = std::env::var("LIGHTWATCHER_BIRDC")
-        .unwrap_or("/var/run/bird/bird.ctl".to_string());
-    socket
+    std::env::var("LIGHTWATCHER_BIRDC")
+        .unwrap_or("/var/run/bird/bird.ctl".to_string())
 }
 
 /// Where to bind the socket
 pub fn get_listen_address() -> String {
-    let listen = std::env::var("LIGHTWATCHER_LISTEN")
-        .unwrap_or("127.0.0.1:8181".to_string());
-    listen
+    std::env::var("LIGHTWATCHER_LISTEN")
+        .unwrap_or("127.0.0.1:8181".to_string())
 }
 
 /// Dump the current environment into the log.

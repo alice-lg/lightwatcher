@@ -6,7 +6,7 @@ use lazy_static::lazy_static;
 use tokio::sync::mpsc::{self, Receiver};
 
 use crate::{
-    bird::{Channel, Protocol, RouteChangeStats, RoutesCount},
+    bird::{Protocol, RouteChangeStats, RoutesCount},
     parsers::parser::{Block, BlockIterator, Parse},
 };
 
@@ -43,7 +43,7 @@ impl Parse<&str> for RoutesCount {
         let parts = row.split(",");
         let count: RoutesCount = parts
             .map(|s| {
-                let s: Vec<&str> = s.trim().split_whitespace().collect();
+                let s: Vec<&str> = s.split_whitespace().collect();
                 if s.len() != 2 {
                     tracing::error!("could not parse routes count");
                 }
@@ -71,7 +71,7 @@ enum ChannelSection {
 enum State {
     Start,
     Meta,
-    BgpState,
+    BGPStatus,
     Channel(String, ChannelSection),
 }
 
@@ -133,7 +133,7 @@ impl<R: BufRead + Send + 'static> ProtocolReader<R> {
                         if protocol.id.is_empty() {
                             continue;
                         }
-                        if let Err(_) = tx.blocking_send(protocol) {
+                        if tx.blocking_send(protocol).is_err() {
                             tracing::error!(
                                 "parse protocol stream receiver dropped"
                             );
@@ -164,7 +164,7 @@ impl Protocol {
         // Parse lines in block
         let mut state = State::Start;
         for line in block.iter() {
-            match parse_line(&mut protocol, state.clone(), &line, filter_bgp) {
+            match parse_line(&mut protocol, state.clone(), line, filter_bgp) {
                 Ok(next_state) => state = next_state,
                 Err(e) => {
                     tracing::error!(
@@ -190,20 +190,16 @@ impl Protocol {
 
 /// Parse input depending on the current state
 fn parse_line(
-    mut protocol: &mut Protocol,
+    protocol: &mut Protocol,
     state: State,
     line: &str,
     filter_bgp: bool,
 ) -> Result<State> {
     let state = match state {
-        State::Start => {
-            parse_protocol_header(&mut protocol, line, filter_bgp)?
-        }
-        State::Meta => parse_protocol_meta(&mut protocol, line)?,
-        State::BgpState => parse_bgp_state(&mut protocol, line)?,
-        State::Channel(ch, sec) => {
-            parse_channel(&mut protocol, ch, sec, line)?
-        }
+        State::Start => parse_protocol_header(protocol, line, filter_bgp)?,
+        State::Meta => parse_protocol_meta(protocol, line)?,
+        State::BGPStatus => parse_bgp_state(protocol, line)?,
+        State::Channel(ch, sec) => parse_channel(protocol, ch, sec, line)?,
     };
     Ok(state)
 }
@@ -246,10 +242,9 @@ fn parse_protocol_header(
 /// Check if the line marks the beginning of a new
 /// channel section.
 fn parse_channel_header(l: &str) -> Option<String> {
-    match RE_PROTOCOL_CHANNEL.captures(l) {
-        Some(caps) => Some(caps["channel"].to_string()),
-        None => None,
-    }
+    RE_PROTOCOL_CHANNEL
+        .captures(l)
+        .map(|c| c["channel"].to_string())
 }
 
 /// Parse protocol meta: Description,
@@ -267,7 +262,7 @@ fn parse_protocol_meta(protocol: &mut Protocol, line: &str) -> Result<State> {
         }
     }
 
-    Ok(State::BgpState)
+    Ok(State::BGPStatus)
 }
 
 /// ParseBGP State
@@ -290,7 +285,7 @@ fn parse_bgp_state(protocol: &mut Protocol, line: &str) -> Result<State> {
         }
     }
 
-    Ok(State::BgpState)
+    Ok(State::BGPStatus)
 }
 
 /// Parse per channel information
@@ -315,8 +310,8 @@ fn parse_channel(
 fn parse_change_stats_fields(s: &str) -> Vec<String> {
     s.split("  ")
         .filter_map(|f| {
-            if f != "" {
-                let f = f.trim().to_lowercase().replace(" ", "_").into();
+            if !f.is_empty() {
+                let f = f.trim().to_lowercase().replace(" ", "_");
                 return Some(f);
             }
             None
@@ -338,12 +333,9 @@ fn parse_channel_meta(
     channel: String,
     line: &str,
 ) -> Result<State> {
-    let chan = protocol
-        .channels
-        .entry(channel.clone())
-        .or_insert(Channel::default());
+    let chan = protocol.channels.entry(channel.clone()).or_default();
 
-    if let Some(caps) = RE_KEY_VALUE.captures(&line) {
+    if let Some(caps) = RE_KEY_VALUE.captures(line) {
         let key = caps["key"].to_lowercase().to_string();
         let val = caps["value"].to_string();
 
@@ -387,10 +379,7 @@ fn parse_channel_route_change_stats(
     fields: Vec<String>,
     line: &str,
 ) -> Result<State> {
-    let chan = protocol
-        .channels
-        .entry(channel.clone())
-        .or_insert(Channel::default());
+    let chan = protocol.channels.entry(channel.clone()).or_default();
 
     let line = line.to_lowercase();
     if let Some(caps) = RE_KEY_VALUE.captures(&line) {
@@ -408,7 +397,7 @@ fn parse_channel_route_change_stats(
 
         let values = parse_change_stats_values(val);
         let stats: RouteChangeStats =
-            fields.clone().into_iter().zip(values.into_iter()).collect();
+            fields.clone().into_iter().zip(values).collect();
 
         if key == "import updates" {
             chan.route_change_stats.import_updates = stats;
@@ -436,12 +425,12 @@ fn finalize_counters(protocol: &mut Protocol) {
     // We assume that the total number of routes received, filtered, preferred, ...
     // is the sum over all channels. TODO: validate.
     let mut total = RoutesCount::default();
-    for (_, chan) in protocol.channels.iter() {
+    for chan in protocol.channels.values() {
         for (key, count) in &chan.routes_count {
             total
                 .entry(key.into())
                 .and_modify(|c| *c += count)
-                .or_insert(count.clone());
+                .or_insert(*count);
         }
     }
 
@@ -452,10 +441,9 @@ fn finalize_counters(protocol: &mut Protocol) {
 /// root level of the parsed protocol.
 fn finalize_attributes(protocol: &mut Protocol) {
     // Get compatibility attributes from first channel
-    for (_, attrs) in protocol.channels.iter() {
+    if let Some((_, attrs)) = &protocol.channels.iter().next() {
         protocol.table = attrs.table.clone();
         protocol.peer_table = attrs.peer_table.clone();
-        break;
     }
 }
 
@@ -515,7 +503,7 @@ mod tests {
         let mut protocol = Protocol::default();
         let line = "   BGP state:          Established ";
         let next = parse_bgp_state(&mut protocol, &line).unwrap();
-        assert_eq!(next, State::BgpState);
+        assert_eq!(next, State::BGPStatus);
 
         let line = "   neighbor address: 172.31.194.42";
         parse_bgp_state(&mut protocol, &line).unwrap();

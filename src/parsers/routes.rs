@@ -61,7 +61,7 @@ enum CommunityType {
 enum State {
     Start,
     Meta,
-    BGP,
+    Bgp,
     Communities(CommunityType),
     End,
 }
@@ -73,15 +73,15 @@ pub type PrefixGroup = Vec<Route>;
 impl Parse<Block> for PrefixGroup {
     fn parse(block: Block) -> Result<Self> {
         let mut routes: PrefixGroup = Vec::new();
-        let mut iter = BlockGroup::new(block, &RE_ROUTE_START);
+        let iter = BlockGroup::new(block, &RE_ROUTE_START);
         let mut prefix: String = String::new(); // Current prefix
 
-        while let Some(block) = iter.next() {
+        for block in iter {
             if block[0].starts_with("0001") {
                 continue;
             }
             let mut route = Route::parse(block)?;
-            if route.network == "" {
+            if route.network.is_empty() {
                 route.network = prefix.clone();
             } else {
                 prefix = route.network.clone();
@@ -103,7 +103,7 @@ impl Parse<Block> for Route {
         let mut route = Route::default();
         let mut state = State::Start;
         for line in block.iter() {
-            match parse_line(&mut route, state, &line) {
+            match parse_line(&mut route, state, line) {
                 Ok(next_state) => state = next_state,
                 Err(e) => {
                     tracing::error!(
@@ -124,7 +124,7 @@ fn parse_line(route: &mut Route, state: State, line: &str) -> Result<State> {
     match state {
         State::Start => parse_route_header(route, line),
         State::Meta => parse_route_meta(route, line),
-        State::BGP => parse_route_bgp(route, line),
+        State::Bgp => parse_route_bgp(route, line),
         State::Communities(community_type) => {
             parse_route_communities(route, community_type, line)
         }
@@ -143,7 +143,7 @@ fn parse_route_header(route: &mut Route, line: &str) -> Result<State> {
             // route.age = datetime::parse_duration_sec(age.as_str())?;
             route.age = age.as_str().to_string();
         }
-        if let Some(_) = caps.name("primary") {
+        if caps.name("primary").is_some() {
             route.primary = true;
         }
         if let Some(metric) = caps.name("metric") {
@@ -192,7 +192,7 @@ fn parse_route_meta(route: &mut Route, line: &str) -> Result<State> {
         }
     }
 
-    Ok(State::BGP)
+    Ok(State::Bgp)
 }
 
 /// Parse AS path
@@ -317,16 +317,14 @@ fn parse_route_bgp(route: &mut Route, line: &str) -> Result<State> {
         let val = caps["value"].to_string();
 
         if !key.starts_with("bgp") {
-            return Ok(State::BGP);
+            return Ok(State::Bgp);
         }
         let key = &key[4..];
 
         if key == "origin" {
             // bgp.origin or bgp_origin
             route.bgp.origin = val;
-        } else if key == "as_path" {
-            route.bgp.as_path = parse_as_path(&val)?;
-        } else if key == "path" {
+        } else if key == "as_path" || key == "path" {
             route.bgp.as_path = parse_as_path(&val)?;
         } else if key == "next_hop" {
             route.bgp.next_hop = val;
@@ -341,7 +339,7 @@ fn parse_route_bgp(route: &mut Route, line: &str) -> Result<State> {
         }
     }
 
-    Ok(State::BGP)
+    Ok(State::Bgp)
 }
 
 #[cfg(test)]
@@ -376,7 +374,7 @@ mod tests {
         assert_eq!(state, State::Meta);
         let line = "1008-   Type: BGP univ";
         let state = parse_route_meta(&mut route, line).unwrap();
-        assert_eq!(state, State::BGP);
+        assert_eq!(state, State::Bgp);
 
         assert_eq!(route.gateway, "172.31.195.39");
         assert_eq!(route.interface, "vx0");

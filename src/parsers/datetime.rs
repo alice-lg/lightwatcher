@@ -12,12 +12,8 @@ pub enum Error {
 /// date format YYYY-MM-DD.
 fn is_date(s: &str) -> bool {
     let parts: Vec<&str> = s.split("-").collect();
-    match parts.len() {
-        3 => true,
-        _ => false
-    }
+    matches!(parts.len(), 3)
 }
-
 
 /// Parse date time string.
 /// TODO: A timezone should be specified as a parameter.
@@ -35,7 +31,7 @@ pub fn parse(s: &str) -> Result<DateTime<Utc>> {
     let parts = time.split('.').collect::<Vec<&str>>();
     let time = parts[0];
 
-    let datetime =  if is_date(time) {
+    let datetime = if is_date(time) {
         format!("{} 00:00:00", time)
     } else {
         format!("{} {}", date, time)

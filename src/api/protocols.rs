@@ -29,10 +29,7 @@ pub async fn list() -> Result<ProtocolsResponse, Error> {
 
     let res = {
         let cache = PROTOCOLS_CACHE.lock().await;
-        match cache.get("all") {
-            Some(res) => Some(res.clone()),
-            None => None,
-        }
+        cache.get("all").cloned()
     };
 
     match res {
@@ -61,10 +58,7 @@ pub async fn list_bgp() -> Result<ProtocolsResponse, Error> {
 
     let res = {
         let cache = BGP_PROTOCOLS_CACHE.lock().await;
-        match cache.get("all") {
-            Some(res) => Some(res.clone()),
-            None => None,
-        }
+        cache.get("all").cloned()
     };
 
     match res {

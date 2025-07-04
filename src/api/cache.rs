@@ -54,7 +54,7 @@ where
 {
     pub fn new(config: CacheConfig) -> Self {
         Self {
-            config: config,
+            config,
             responses: HashMap::new(),
         }
     }

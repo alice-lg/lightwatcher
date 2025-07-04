@@ -31,7 +31,7 @@ impl RoutesWorker {
                     }
                     // Do heavy lifting.
                     let routes = PrefixGroup::parse(block);
-                    if let Err(_) = results.blocking_send(routes) {
+                    if results.blocking_send(routes).is_err() {
                         tracing::warn!(
                             "routes parse job results receiver dropped"
                         );

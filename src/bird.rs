@@ -234,8 +234,8 @@ impl Birdc {
     pub async fn show_status(&self) -> Result<BirdStatus> {
         let mut stream = UnixStream::connect(&self.socket)?;
 
-        let cmd = format!("show status\n");
-        stream.write_all(&cmd.as_bytes())?;
+        let cmd = "show status\n";
+        stream.write_all(cmd.as_bytes())?;
 
         let reader = BufReader::new(stream);
         let mut iter = BlockIterator::new(reader, &RE_STATUS_START)
@@ -249,8 +249,8 @@ impl Birdc {
     /// Get neighbors
     pub async fn show_protocols(&self) -> Result<ProtocolsMap> {
         let mut stream = UnixStream::connect(&self.socket)?;
-        let cmd = format!("show protocols all\n");
-        stream.write_all(&cmd.as_bytes())?;
+        let cmd = "show protocols all\n";
+        stream.write_all(cmd.as_bytes())?;
 
         let buf = BufReader::new(stream);
         let reader = ProtocolReader::new(buf);
@@ -266,8 +266,8 @@ impl Birdc {
 
     pub async fn show_protocols_stream(&self) -> Result<ProtocolReceiver> {
         let mut stream = UnixStream::connect(&self.socket)?;
-        let cmd = format!("show protocols all\n");
-        stream.write_all(&cmd.as_bytes())?;
+        let cmd = "show protocols all\n";
+        stream.write_all(cmd.as_bytes())?;
 
         let buf = BufReader::new(stream);
         let reader = ProtocolReader::new(buf);
@@ -278,8 +278,8 @@ impl Birdc {
 
     pub async fn show_protocols_bgp(&self) -> Result<ProtocolsMap> {
         let mut stream = UnixStream::connect(&self.socket)?;
-        let cmd = format!("show protocols all\n");
-        stream.write_all(&cmd.as_bytes())?;
+        let cmd = "show protocols all\n";
+        stream.write_all(cmd.as_bytes())?;
 
         let buf = BufReader::new(stream);
         let reader = ProtocolReader::new(buf).with_filter_bgp();
@@ -294,8 +294,8 @@ impl Birdc {
 
     pub async fn show_protocols_bgp_stream(&self) -> Result<ProtocolReceiver> {
         let mut stream = UnixStream::connect(&self.socket)?;
-        let cmd = format!("show protocols all\n");
-        stream.write_all(&cmd.as_bytes())?;
+        let cmd = "show protocols all\n";
+        stream.write_all(cmd.as_bytes())?;
 
         let buf = BufReader::new(stream);
         let reader = ProtocolReader::new(buf).with_filter_bgp();
@@ -313,7 +313,7 @@ impl Birdc {
         cmd: &str,
     ) -> Result<RoutesResultsReceiver> {
         let mut stream = UnixStream::connect(&self.socket)?;
-        stream.write_all(&cmd.as_bytes())?;
+        stream.write_all(cmd.as_bytes())?;
         let buf = BufReader::new(stream);
 
         let blocks = BlockIterator::new(buf, &RE_ROUTES_START);
@@ -342,7 +342,7 @@ impl Birdc {
     /// Get all routes
     pub async fn show_route_all(&self) -> Result<RoutesResultsReceiver> {
         let cmd = "show route all";
-        let results = self.fetch_routes_cmd(&cmd).await?;
+        let results = self.fetch_routes_cmd(cmd).await?;
         Ok(results)
     }
 
