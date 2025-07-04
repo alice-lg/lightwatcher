@@ -1,3 +1,5 @@
+use std::{num::NonZeroUsize, thread};
+
 use chrono::Duration;
 
 /// The TTL and maximum number of entries can
@@ -12,6 +14,19 @@ pub struct CacheConfig {
 fn string_from_env(key: &str, default: &str) -> String {
     let value = std::env::var(key).unwrap_or(default.to_string());
     value
+}
+
+/// Get the routes worker parallelism
+pub fn get_routes_worker_pool_size() -> usize {
+    let tap = thread::available_parallelism()
+        .unwrap_or(NonZeroUsize::new(1).unwrap());
+
+    match std::env::var("LIGHTWATCHER_ROUTES_WORKER_POOL_SIZE") {
+        Err(_) => tap.get(),
+        Ok(v) => v
+            .parse()
+            .expect("route workers pool size needs to be a valid number"),
+    }
 }
 
 /// New cache config with ttl and max entries.
@@ -53,4 +68,26 @@ pub fn get_listen_address() -> String {
     let listen = std::env::var("LIGHTWATCHER_LISTEN")
         .unwrap_or("127.0.0.1:8181".to_string());
     listen
+}
+
+/// Dump the current environment into the log.
+pub fn log_env() {
+    tracing::info!(LIGHTWATCHER_LISTEN = get_listen_address(), "env");
+    tracing::info!(LIGHTWATCHER_BIRDC = get_birdc_socket(), "env");
+    let cache = get_neighbors_cache_config();
+    tracing::info!(
+        LIGHTWATCHER_NEIGHBORS_CACHE_MAX_ENTRIES = cache.max_entries,
+        LIGHTWATCHER_NEIGHBORS_CACHE_TTL = cache.ttl.num_seconds(),
+        "env"
+    );
+    let cache = get_routes_cache_config();
+    tracing::info!(
+        LIGHTWATCHER_ROUTES_CACHE_MAX_ENTRIES = cache.max_entries,
+        LIGHTWATCHER_ROUTES_CACHE_TTL = cache.ttl.num_seconds(),
+        "env"
+    );
+    tracing::info!(
+        LIGHTWATCHER_ROUTES_WORKER_POOL_SIZE = get_routes_worker_pool_size(),
+        "env"
+    );
 }

@@ -1,90 +1,138 @@
-use std::{
-    num::NonZeroUsize,
-    sync::{Arc, Mutex},
-    thread,
-};
-
 use anyhow::Result;
-use tokio::sync::mpsc::{
-    error::TryRecvError, unbounded_channel, UnboundedReceiver, UnboundedSender,
-};
+use lazy_static::lazy_static;
+use tokio::sync::mpsc::{self, Receiver, Sender};
 
-use crate::parsers::{
-    parser::{Block, Parse},
-    routes::PrefixGroup,
+use crate::{
+    config,
+    parsers::{
+        parser::{Block, Parse},
+        routes::PrefixGroup,
+    },
 };
-
-type BlockQueue = Arc<Mutex<UnboundedReceiver<Block>>>;
-type ResultsQueue = UnboundedSender<Result<PrefixGroup>>;
 
 pub struct RoutesWorker {
-    id: usize,
+    jobs: RouteBlockSender,
 }
 
 impl RoutesWorker {
     /// Create new routes parser worker
-    pub fn new(id: usize) -> Self {
-        Self { id }
-    }
+    pub fn spawn() -> Self {
+        let (jobs_tx, mut jobs_rx) = mpsc::channel::<RouteBlockParseJob>(64);
 
-    /// Spawn a new routes worker and create a response and
-    /// request channel.
-    pub fn spawn(&self, block_queue: BlockQueue, results_queue: ResultsQueue) {
-        tracing::debug!("routes worker {} started.", self.id);
-        thread::spawn(move || loop {
-            let block = {
-                let mut queue = block_queue.lock().unwrap();
-                queue.try_recv()
-            };
-            match block {
-                Ok(block) => {
+        // Parsing is quite CPU bound, so this is spawned
+        // on a thread.
+        tokio::task::spawn_blocking(move || loop {
+            match jobs_rx.blocking_recv() {
+                None => break, // channel closed
+                Some(job) => {
+                    let RouteBlockParseJob { block, results } = job;
+                    if results.is_closed() {
+                        continue; // next job
+                    }
+                    // Do heavy lifting.
                     let routes = PrefixGroup::parse(block);
-                    results_queue.send(routes).unwrap();
-                }
-                Err(TryRecvError::Empty) => {
-                    continue;
-                }
-                Err(TryRecvError::Disconnected) => {
-                    break;
+                    if let Err(_) = results.blocking_send(routes) {
+                        tracing::warn!(
+                            "routes parse job results receiver dropped"
+                        );
+                        continue;
+                    }
                 }
             }
         });
+
+        Self { jobs: jobs_tx }
+    }
+
+    pub fn accept(&self, job: RouteBlockParseJob) -> Result<()> {
+        self.jobs.blocking_send(job)?;
+        Ok(())
     }
 }
 
+pub type RoutesResultsSender = Sender<Result<PrefixGroup>>;
+
+pub type RoutesResultsReceiver = Receiver<Result<PrefixGroup>>;
+
+pub struct RouteBlockParseJob {
+    block: Block,
+    results: RoutesResultsSender,
+}
+
+impl RouteBlockParseJob {
+    pub fn new(block: Block, results: RoutesResultsSender) -> Self {
+        Self { block, results }
+    }
+}
+
+pub type RouteBlockSender = Sender<RouteBlockParseJob>;
+
+pub type RouteBlockReceiver = Receiver<RouteBlockParseJob>;
+
 /// A routes worker pool has a collection of workers
 /// and a queue of blocks to be parsed.
-pub struct RoutesWorkerPool {}
+pub struct RoutesWorkerPool {
+    jobs: RouteBlockSender,
+}
 
 impl RoutesWorkerPool {
-    /// Create new worker pool and spawn workers
-    pub fn spawn() -> (
-        UnboundedSender<Block>,
-        UnboundedReceiver<Result<PrefixGroup>>,
-    ) {
-        let (blocks_tx, blocks_rx) = unbounded_channel::<Block>();
-        let (results_tx, results_rx) =
-            unbounded_channel::<Result<PrefixGroup>>();
-
-        let blocks_queue = Arc::new(Mutex::new(blocks_rx));
+    /// Start a new workerpool
+    pub fn start() -> Self {
+        let (jobs_tx, mut jobs_rx) = mpsc::channel::<RouteBlockParseJob>(64);
 
         // Determine the number of workers
-        let parallelism = std::thread::available_parallelism()
-            .unwrap_or(NonZeroUsize::new(1).unwrap());
-        let num_workers = parallelism.get();
+        let num_workers = config::get_routes_worker_pool_size();
         tracing::info!(
-            "Starting routes worker pool with {} workers.",
+            "starting global routes worker pool with {} workers.",
             num_workers
         );
 
         // Start workers
-        for id in 0..num_workers {
-            let worker = RoutesWorker::new(id);
-            worker.spawn(blocks_queue.clone(), results_tx.clone());
+        let mut workers = vec![];
+        for _ in 0..num_workers {
+            let w = RoutesWorker::spawn();
+            workers.push(w);
         }
 
-        (blocks_tx, results_rx)
+        // Feed workers
+        let mut next_worker: usize = 0;
+        tokio::task::spawn_blocking(move || loop {
+            match jobs_rx.blocking_recv() {
+                None => break,
+                Some(job) => {
+                    // round robin fanout
+                    next_worker = (next_worker + 1) % num_workers;
+                    if let Err(e) = workers[next_worker].accept(job) {
+                        tracing::error!("worker stopped: {}", e);
+                        panic!();
+                    }
+                }
+            }
+        });
+
+        Self { jobs: jobs_tx }
     }
+
+    pub async fn accept(&self, job: RouteBlockParseJob) -> Result<()> {
+        self.jobs.send(job).await?;
+        Ok(())
+    }
+}
+
+lazy_static! {
+    static ref ROUTES_WORKER_POOL: RoutesWorkerPool =
+        RoutesWorkerPool::start();
+}
+
+/// Accept a block for parsing. Creates a job and submits
+/// it to the the worker pool.
+pub async fn accept_block(
+    block: Block,
+    results: RoutesResultsSender,
+) -> Result<()> {
+    let job = RouteBlockParseJob { block, results };
+    ROUTES_WORKER_POOL.accept(job).await?;
+    Ok(())
 }
 
 #[cfg(test)]
@@ -98,7 +146,8 @@ mod tests {
     async fn test_routes_worker() {
         let file =
             File::open("tests/birdc/show-route-all-protocol-R1").unwrap();
-        // let file: File =             File::open("tests/birdc/show-route-all-table-master4").unwrap();
+        /* let file: File =
+        File::open("tests/birdc/show-route-all-table-master4").unwrap(); */
         let reader = BufReader::new(file);
         let re_routes_start = Regex::new(r"1007-\S").unwrap();
 
@@ -106,16 +155,22 @@ mod tests {
 
         let mut routes: Vec<Route> = vec![];
 
-        // Spawn workers
-        let (blocks_tx, mut results_rx) = RoutesWorkerPool::spawn();
+        let pool = RoutesWorkerPool::start();
 
-        thread::spawn(move || {
+        // Spawn workers
+        let (results_tx, mut results) = mpsc::channel(64);
+        tokio::spawn(async move {
             for block in blocks {
-                blocks_tx.send(block).unwrap();
+                let job = RouteBlockParseJob {
+                    block,
+                    results: results_tx.clone(),
+                };
+                pool.accept(job).await.unwrap();
             }
+            println!("done feeding");
         });
 
-        while let Some(result) = results_rx.recv().await {
+        while let Some(result) = results.recv().await {
             let result = result.unwrap();
             routes.extend(result);
         }

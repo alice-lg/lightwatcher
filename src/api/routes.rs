@@ -62,7 +62,16 @@ pub async fn list_routes_received(
     match res {
         Some(res) => Ok(res),
         None => {
-            let routes = birdc.show_route_all_protocol(&protocol).await?;
+            let mut results = birdc.show_route_all_protocol(&protocol).await?;
+            let mut routes = vec![];
+            while let Some(result) = results.recv().await {
+                match result {
+                    Ok(prefix_group) => routes.extend(prefix_group),
+                    Err(e) => {
+                        tracing::error!("error decoding routes block: {}", e);
+                    }
+                }
+            }
             let response = RoutesResponse {
                 routes,
                 ..Default::default()
@@ -92,8 +101,17 @@ pub async fn list_routes_filtered(
     match res {
         Some(res) => Ok(res),
         None => {
-            let routes =
+            let mut results =
                 birdc.show_route_all_filtered_protocol(&protocol).await?;
+            let mut routes = vec![];
+            while let Some(result) = results.recv().await {
+                match result {
+                    Ok(prefix_group) => routes.extend(prefix_group),
+                    Err(e) => {
+                        tracing::error!("error decoding routes block: {}", e);
+                    }
+                }
+            }
             let response = RoutesResponse {
                 routes,
                 ..Default::default()
@@ -123,8 +141,17 @@ pub async fn list_routes_noexport(
     match res {
         Some(res) => Ok(res),
         None => {
-            let routes =
+            let mut results =
                 birdc.show_route_all_noexport_protocol(&protocol).await?;
+            let mut routes = vec![];
+            while let Some(result) = results.recv().await {
+                match result {
+                    Ok(prefix_group) => routes.extend(prefix_group),
+                    Err(e) => {
+                        tracing::error!("error decoding routes block: {}", e);
+                    }
+                }
+            }
             let response = RoutesResponse {
                 routes,
                 ..Default::default()
@@ -154,7 +181,16 @@ pub async fn list_routes_table(
     match res {
         Some(res) => Ok(res),
         None => {
-            let routes = birdc.show_route_all_table(&table).await?;
+            let mut results = birdc.show_route_all_table(&table).await?;
+            let mut routes = vec![];
+            while let Some(result) = results.recv().await {
+                match result {
+                    Ok(prefix_group) => routes.extend(prefix_group),
+                    Err(e) => {
+                        tracing::error!("error decoding routes block: {}", e);
+                    }
+                }
+            }
             let response = RoutesResponse {
                 routes,
                 ..Default::default()
@@ -186,8 +222,19 @@ pub async fn list_routes_table_peer(
     match res {
         Some(res) => Ok(res),
         None => {
-            let routes =
+            let mut results =
                 birdc.show_route_all_table_peer(&table, &peer).await?;
+
+            let mut routes = vec![];
+            while let Some(result) = results.recv().await {
+                match result {
+                    Ok(prefix_group) => routes.extend(prefix_group),
+                    Err(e) => {
+                        tracing::error!("error decoding routes block: {}", e);
+                    }
+                }
+            }
+
             let response = RoutesResponse {
                 routes,
                 ..Default::default()
@@ -217,7 +264,17 @@ pub async fn list_routes_table_filtered(
     match res {
         Some(res) => Ok(res),
         None => {
-            let routes = birdc.show_route_all_filtered_table(&table).await?;
+            let mut results =
+                birdc.show_route_all_filtered_table(&table).await?;
+            let mut routes = vec![];
+            while let Some(result) = results.recv().await {
+                match result {
+                    Ok(prefix_group) => routes.extend(prefix_group),
+                    Err(e) => {
+                        tracing::error!("error decoding routes block: {}", e);
+                    }
+                }
+            }
             let response = RoutesResponse {
                 routes,
                 ..Default::default()

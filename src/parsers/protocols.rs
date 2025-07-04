@@ -125,14 +125,15 @@ impl<R: BufRead + Send + 'static> ProtocolReader<R> {
     pub fn stream(self) -> ProtocolReceiver {
         let (tx, rx) = mpsc::channel(64);
 
-        tokio::spawn(async move {
+        // This is a rather CPU bound task
+        tokio::task::spawn_blocking(move || {
             for block in self.iter {
                 match Protocol::parse(block, self.filter_bgp) {
                     Ok(protocol) => {
                         if protocol.id.is_empty() {
                             continue;
                         }
-                        if let Err(_) = tx.send(protocol).await {
+                        if let Err(_) = tx.blocking_send(protocol) {
                             tracing::error!(
                                 "parse protocol stream receiver dropped"
                             );

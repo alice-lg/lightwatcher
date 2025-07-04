@@ -1,7 +1,6 @@
 use std::sync::Arc;
 
 use anyhow::Result;
-use axum::extract::Query;
 use lazy_static::lazy_static;
 use tokio::sync::Mutex;
 
@@ -9,7 +8,6 @@ use crate::{
     api::{cache::ResponseCache, responses::ProtocolsResponse, Error},
     bird::{Birdc, ProtocolsMap},
     config,
-    parsers::protocols::ProtocolReceiver,
 };
 
 type ProtocolsCache = Arc<Mutex<ResponseCache<ProtocolsResponse>>>;

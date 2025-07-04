@@ -10,7 +10,7 @@ use lazy_static::lazy_static;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
-use tokio::task;
+use tokio::sync::mpsc;
 
 use crate::{
     config,
@@ -18,7 +18,7 @@ use crate::{
         parser::{BlockIterator, Parse},
         protocols::{ProtocolReader, ProtocolReceiver},
         routes::RE_ROUTES_START,
-        routes_worker::RoutesWorkerPool,
+        routes_worker::{self, RoutesResultsReceiver},
     },
 };
 
@@ -304,38 +304,53 @@ impl Birdc {
         Ok(protocols)
     }
 
-    /// Send the command to the birdc socket and parse the response.
+    /// Send the command to the birdc socket and parse the response
+    /// using the worker pool.
+    ///
     /// Please note that only show route commands can be used here.
-    async fn fetch_routes_cmd(&self, cmd: &str) -> Result<Vec<Route>> {
+    async fn fetch_routes_cmd(
+        &self,
+        cmd: &str,
+    ) -> Result<RoutesResultsReceiver> {
         let mut stream = UnixStream::connect(&self.socket)?;
         stream.write_all(&cmd.as_bytes())?;
         let buf = BufReader::new(stream);
 
         let blocks = BlockIterator::new(buf, &RE_ROUTES_START);
-        let mut routes: Vec<Route> = vec![];
 
         // Spawn workers and fill queue
-        let (blocks_tx, mut results_rx) = RoutesWorkerPool::spawn();
-        task::spawn_blocking(move || {
+        let (results_tx, results) = mpsc::channel(64);
+
+        tokio::spawn(async move {
             for block in blocks {
-                blocks_tx.send(block).unwrap();
+                if let Err(e) =
+                    routes_worker::accept_block(block, results_tx.clone())
+                        .await
+                {
+                    tracing::error!(
+                        "routes worker failed accepting block: {}",
+                        e
+                    );
+                    panic!();
+                }
             }
         });
 
-        // Collect results
-        while let Some(result) = results_rx.recv().await {
-            let result = result?;
-            routes.extend(result);
-        }
+        Ok(results)
+    }
 
-        Ok(routes)
+    /// Get all routes
+    pub async fn show_route_all(&self) -> Result<RoutesResultsReceiver> {
+        let cmd = "show route all";
+        let results = self.fetch_routes_cmd(&cmd).await?;
+        Ok(results)
     }
 
     /// Get routes for a table
     pub async fn show_route_all_table(
         &self,
         table: &TableID,
-    ) -> Result<Vec<Route>> {
+    ) -> Result<RoutesResultsReceiver> {
         let cmd = format!("show route all table '{}'\n", table);
         let routes = self.fetch_routes_cmd(&cmd).await?;
         Ok(routes)
@@ -345,7 +360,7 @@ impl Birdc {
     pub async fn show_route_all_filtered_table(
         &self,
         table: &TableID,
-    ) -> Result<Vec<Route>> {
+    ) -> Result<RoutesResultsReceiver> {
         let cmd = format!("show route all filtered table '{}'\n", table);
         let routes = self.fetch_routes_cmd(&cmd).await?;
         Ok(routes)
@@ -355,7 +370,7 @@ impl Birdc {
     pub async fn show_route_all_protocol(
         &self,
         protocol: &ProtocolID,
-    ) -> Result<Vec<Route>> {
+    ) -> Result<RoutesResultsReceiver> {
         let cmd = format!("show route all protocol '{}'\n", protocol);
         let routes = self.fetch_routes_cmd(&cmd).await?;
         Ok(routes)
@@ -365,7 +380,7 @@ impl Birdc {
     pub async fn show_route_all_filtered_protocol(
         &self,
         protocol: &ProtocolID,
-    ) -> Result<Vec<Route>> {
+    ) -> Result<RoutesResultsReceiver> {
         let cmd = format!("show route all filtered protocol '{}'\n", protocol);
         let routes = self.fetch_routes_cmd(&cmd).await?;
         Ok(routes)
@@ -375,7 +390,7 @@ impl Birdc {
     pub async fn show_route_all_noexport_protocol(
         &self,
         protocol: &ProtocolID,
-    ) -> Result<Vec<Route>> {
+    ) -> Result<RoutesResultsReceiver> {
         // TODO: check command
         let cmd = format!("show route all noexport '{}'\n", protocol);
         let routes = self.fetch_routes_cmd(&cmd).await?;
@@ -387,7 +402,7 @@ impl Birdc {
         &self,
         table: &ProtocolID,
         peer: &PeerID,
-    ) -> Result<Vec<Route>> {
+    ) -> Result<RoutesResultsReceiver> {
         let cmd =
             format!("show route all table '{}' where from={}\n", table, peer,);
         let routes = self.fetch_routes_cmd(&cmd).await?;
