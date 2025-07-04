@@ -72,20 +72,31 @@ pub fn get_listen_address() -> String {
 
 /// Dump the current environment into the log.
 pub fn log_env() {
+    // Server
     tracing::info!(LIGHTWATCHER_LISTEN = get_listen_address(), "env");
     tracing::info!(LIGHTWATCHER_BIRDC = get_birdc_socket(), "env");
+
+    // Caches
     let cache = get_neighbors_cache_config();
     tracing::info!(
         LIGHTWATCHER_NEIGHBORS_CACHE_MAX_ENTRIES = cache.max_entries,
+        "env"
+    );
+    tracing::info!(
         LIGHTWATCHER_NEIGHBORS_CACHE_TTL = cache.ttl.num_seconds(),
         "env"
     );
     let cache = get_routes_cache_config();
     tracing::info!(
         LIGHTWATCHER_ROUTES_CACHE_MAX_ENTRIES = cache.max_entries,
+        "env"
+    );
+    tracing::info!(
         LIGHTWATCHER_ROUTES_CACHE_TTL = cache.ttl.num_seconds(),
         "env"
     );
+
+    // Parser pool
     tracing::info!(
         LIGHTWATCHER_ROUTES_WORKER_POOL_SIZE = get_routes_worker_pool_size(),
         "env"
