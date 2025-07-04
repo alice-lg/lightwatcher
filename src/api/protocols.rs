@@ -1,15 +1,15 @@
 use std::sync::Arc;
 
 use anyhow::Result;
+use axum::extract::Query;
 use lazy_static::lazy_static;
 use tokio::sync::Mutex;
-use axum::extract::Query;
 
 use crate::{
     api::{cache::ResponseCache, responses::ProtocolsResponse, Error},
-    parsers::protocols::{ProtocolReceiver},
-    bird::{ProtocolsMap, Birdc},
+    bird::{Birdc, ProtocolsMap},
     config,
+    parsers::protocols::ProtocolReceiver,
 };
 
 type ProtocolsCache = Arc<Mutex<ResponseCache<ProtocolsResponse>>>;
@@ -43,9 +43,6 @@ pub async fn list() -> Result<ProtocolsResponse, Error> {
             let mut protocols = birdc.show_protocols_stream().await?;
             let mut mapping = ProtocolsMap::new();
             while let Some(protocol) = protocols.recv().await {
-                if protocol.id.is_empty() {
-                    continue
-                }
                 mapping.insert(protocol.id.clone(), protocol);
             }
 
@@ -75,9 +72,14 @@ pub async fn list_bgp() -> Result<ProtocolsResponse, Error> {
     match res {
         Some(res) => Ok(res),
         None => {
-            let protocols = birdc.show_protocols_bgp().await?;
+            let mut protocols = birdc.show_protocols_bgp_stream().await?;
+            let mut mapping = ProtocolsMap::new();
+            while let Some(protocol) = protocols.recv().await {
+                mapping.insert(protocol.id.clone(), protocol);
+            }
+
             let response = ProtocolsResponse {
-                protocols,
+                protocols: mapping,
                 ..Default::default()
             };
             let mut cache = BGP_PROTOCOLS_CACHE.lock().await;

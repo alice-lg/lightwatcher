@@ -16,7 +16,7 @@ use crate::{
     config,
     parsers::{
         parser::{BlockIterator, Parse},
-        protocols::{ProtocolReceiver, ProtocolReader},
+        protocols::{ProtocolReader, ProtocolReceiver},
         routes::RE_ROUTES_START,
         routes_worker::RoutesWorkerPool,
     },
@@ -265,7 +265,6 @@ impl Birdc {
     }
 
     pub async fn show_protocols_stream(&self) -> Result<ProtocolReceiver> {
-
         let mut stream = UnixStream::connect(&self.socket)?;
         let cmd = format!("show protocols all\n");
         stream.write_all(&cmd.as_bytes())?;
@@ -274,7 +273,6 @@ impl Birdc {
         let reader = ProtocolReader::new(buf);
 
         let protocols = reader.stream();
-
         Ok(protocols)
     }
 
@@ -291,6 +289,18 @@ impl Birdc {
         let protocols: ProtocolsMap =
             protocols.into_iter().map(|n| (n.id.clone(), n)).collect();
 
+        Ok(protocols)
+    }
+
+    pub async fn show_protocols_bgp_stream(&self) -> Result<ProtocolReceiver> {
+        let mut stream = UnixStream::connect(&self.socket)?;
+        let cmd = format!("show protocols all\n");
+        stream.write_all(&cmd.as_bytes())?;
+
+        let buf = BufReader::new(stream);
+        let reader = ProtocolReader::new(buf).with_filter_bgp();
+
+        let protocols = reader.stream();
         Ok(protocols)
     }
 
