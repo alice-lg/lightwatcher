@@ -1,4 +1,4 @@
-# Birdwatcher 2.0.0
+# Birdwatcher 3.0.0
 
 [![Build and Test](https://github.com/alice-lg/lightwatcher/actions/workflows/rust.yml/badge.svg)](https://github.com/alice-lg/lightwatcher/actions/workflows/rust.yml)
 
