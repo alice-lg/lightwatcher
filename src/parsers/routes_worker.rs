@@ -50,23 +50,22 @@ impl RoutesWorker {
     }
 }
 
+/// Publish Routes parsing results here
 pub type RoutesResultsSender = Sender<Result<PrefixGroup>>;
 
+/// Receive parsing results
 pub type RoutesResultsReceiver = Receiver<Result<PrefixGroup>>;
 
+/// A routes block parsing job
 pub struct RouteBlockParseJob {
     block: Block,
     results: RoutesResultsSender,
 }
 
-impl RouteBlockParseJob {
-    pub fn new(block: Block, results: RoutesResultsSender) -> Self {
-        Self { block, results }
-    }
-}
-
+/// Parsing Job Sender
 pub type RouteBlockSender = Sender<RouteBlockParseJob>;
 
+/// Parsing Job Receiver
 pub type RouteBlockReceiver = Receiver<RouteBlockParseJob>;
 
 /// A routes worker pool has a collection of workers
