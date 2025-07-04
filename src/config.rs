@@ -64,6 +64,7 @@ pub fn get_birdc_socket() -> String {
     socket
 }
 
+/// Where to bind the socket
 pub fn get_listen_address() -> String {
     let listen = std::env::var("LIGHTWATCHER_LISTEN")
         .unwrap_or("127.0.0.1:8181".to_string());
