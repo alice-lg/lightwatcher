@@ -307,7 +307,10 @@ impl ConnectionPool {
 lazy_static! {
     /// A global connection pool is used to limit the amount
     /// of concurrent connections to the daemon.
-    static ref BIRD_CONNECTION_POOL: ConnectionPool = ConnectionPool::start(10);
+    static ref BIRD_CONNECTION_POOL: ConnectionPool = {
+        let limit = config::get_birdc_connection_pool_size();
+        ConnectionPool::start(limit)
+    };
 }
 
 pub struct Birdc {

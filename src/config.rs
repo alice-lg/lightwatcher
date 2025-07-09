@@ -55,6 +55,13 @@ pub fn get_routes_cache_config() -> CacheConfig {
     make_cache_config(max_entries, ttl)
 }
 
+/// Get birdc connection pool size
+pub fn get_birdc_connection_pool_size() -> usize {
+    let size =
+        string_from_env("LIGHTWATCHER_BIRDC_CONNECTION_POOL_SIZE", "10");
+    size.parse().unwrap_or(1)
+}
+
 /// Get the birdc socket path from the environment
 /// or use the default value.
 pub fn get_birdc_socket() -> String {
@@ -73,6 +80,12 @@ pub fn log_env() {
     // Server
     tracing::info!(LIGHTWATCHER_LISTEN = get_listen_address(), "env");
     tracing::info!(LIGHTWATCHER_BIRDC = get_birdc_socket(), "env");
+
+    tracing::info!(
+        LIGHTWATCHER_BIRDC_CONNECTION_POOL_SIZE =
+            get_birdc_connection_pool_size(),
+        "env"
+    );
 
     // Caches
     let cache = get_neighbors_cache_config();
