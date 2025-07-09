@@ -10,7 +10,7 @@ use lazy_static::lazy_static;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
-use tokio::sync::mpsc;
+use tokio::sync::{mpsc, oneshot};
 
 use crate::{
     config,
@@ -23,7 +23,7 @@ use crate::{
 };
 
 lazy_static! {
-    /// Regex for start / stop status. TODO: refactor.
+    /// Regex for start / stop status.
     static ref RE_STATUS_START: Regex = Regex::new(r"EOF").unwrap();
     static ref RE_STATUS_STOP: Regex = Regex::new(r"0013\s").unwrap();
 }
@@ -212,6 +212,105 @@ pub struct Route {
     pub learnt_from: Option<String>,
 }
 
+/// A connection wraps a socket address and will produce
+/// a socket connection of type UnixStream.
+pub struct Connection {
+    lock: mpsc::Sender<()>,
+}
+
+impl Connection {
+    pub fn open(&self, addr: &str) -> Result<UnixStream> {
+        let stream = UnixStream::connect(addr)?;
+        Ok(stream)
+    }
+}
+
+impl Drop for Connection {
+    fn drop(&mut self) {
+        let lock = self.lock.clone();
+        tokio::spawn(async move {
+            if let Err(e) = lock.send(()).await {
+                panic!("send failed: {}", e);
+            }
+        });
+    }
+}
+
+/// A ConnectionRequest is issued to the pool and will be
+/// fulfilled if free slots are available.
+type ConnectionRequest = oneshot::Sender<Connection>;
+
+
+/// The ConnectionPool limits the amount of concurrent conncetions to the bird daemon. The
+/// UnixStream connections are not reused in order to establish new sessions with the daemon.
+#[derive(Clone)]
+pub struct ConnectionPool {
+    requests: mpsc::Sender<ConnectionRequest>,
+}
+
+impl ConnectionPool {
+
+    /// Start a new connection pool
+    pub fn start(limit: usize) -> Self {
+        let (lock_tx, mut lock_rx) = mpsc::channel(limit);
+        let (req_tx, mut req_rx) = mpsc::channel::<ConnectionRequest>(limit);
+
+        tracing::info!(limit = limit, "starting bird connection pool");
+
+        tokio::spawn(async move {
+            let mut size = 0;
+            while let Some(conn_tx) = req_rx.recv().await {
+
+                if size > limit {
+                    if let Some(_) = lock_rx.recv().await {
+                        size -= 1;
+                    } else {
+                        panic!("pool lock dropped");
+                    }
+
+                    // Drain pending
+                    loop {
+                        match lock_rx.try_recv() {
+                            Ok(_) => {
+                                size -= 1;
+                            },
+                            Err(_) => { 
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                println!("allocated connection");
+                let conn = Connection{
+                    lock: lock_tx.clone(),
+                };
+                size += 1;
+
+                if let Err(_) = conn_tx.send(conn) {
+                    tracing::warn!("connection request dropped")
+                }
+            }
+        });
+
+        ConnectionPool {
+            requests: req_tx,
+        }
+    }
+
+    pub async fn acquire(&self) -> Connection {
+        let (conn_tx, conn_rx) = oneshot::channel();
+        self.requests.send(conn_tx).await.expect("must work");
+        conn_rx.await.expect("this must work second")
+    }
+
+}
+
+lazy_static! {
+    /// Regex for start / stop status.
+    static ref BIRD_CONNECTION_POOL: ConnectionPool = ConnectionPool::start(10);
+}
+
 pub struct Birdc {
     socket: String,
 }
@@ -232,7 +331,7 @@ impl Birdc {
 
     /// Get the daemon status.
     pub async fn show_status(&self) -> Result<BirdStatus> {
-        let mut stream = UnixStream::connect(&self.socket)?;
+        let mut stream = BIRD_CONNECTION_POOL.acquire().await.open(&self.socket)?;
 
         let cmd = "show status\n";
         stream.write_all(cmd.as_bytes())?;
@@ -248,7 +347,8 @@ impl Birdc {
 
     /// Get neighbors
     pub async fn show_protocols(&self) -> Result<ProtocolsMap> {
-        let mut stream = UnixStream::connect(&self.socket)?;
+        let mut stream = BIRD_CONNECTION_POOL.acquire().await.open(&self.socket)?;
+
         let cmd = "show protocols all\n";
         stream.write_all(cmd.as_bytes())?;
 
@@ -265,7 +365,8 @@ impl Birdc {
     }
 
     pub async fn show_protocols_stream(&self) -> Result<ProtocolReceiver> {
-        let mut stream = UnixStream::connect(&self.socket)?;
+        let mut stream = BIRD_CONNECTION_POOL.acquire().await.open(&self.socket)?;
+
         let cmd = "show protocols all\n";
         stream.write_all(cmd.as_bytes())?;
 
@@ -277,7 +378,8 @@ impl Birdc {
     }
 
     pub async fn show_protocols_bgp(&self) -> Result<ProtocolsMap> {
-        let mut stream = UnixStream::connect(&self.socket)?;
+        let mut stream = BIRD_CONNECTION_POOL.acquire().await.open(&self.socket)?;
+
         let cmd = "show protocols all\n";
         stream.write_all(cmd.as_bytes())?;
 
@@ -293,7 +395,7 @@ impl Birdc {
     }
 
     pub async fn show_protocols_bgp_stream(&self) -> Result<ProtocolReceiver> {
-        let mut stream = UnixStream::connect(&self.socket)?;
+        let mut stream = BIRD_CONNECTION_POOL.acquire().await.open(&self.socket)?;
         let cmd = "show protocols all\n";
         stream.write_all(cmd.as_bytes())?;
 
@@ -312,7 +414,7 @@ impl Birdc {
         &self,
         cmd: &str,
     ) -> Result<RoutesResultsReceiver> {
-        let mut stream = UnixStream::connect(&self.socket)?;
+        let mut stream = BIRD_CONNECTION_POOL.acquire().await.open(&self.socket)?;
         stream.write_all(cmd.as_bytes())?;
         let buf = BufReader::new(stream);
 
