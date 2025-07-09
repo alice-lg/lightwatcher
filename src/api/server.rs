@@ -26,28 +26,28 @@ pub async fn start() -> Result<()> {
         .route("/protocols", get(protocols::list))
         .route("/protocols/bgp", get(protocols::list_bgp))
         .route(
-            "/routes/received/:neighbor_id",
+            "/routes/received/{neighbor_id}",
             get(routes::list_routes_received),
         )
         .route(
-            "/routes/protocol/:neighbor_id",
+            "/routes/protocol/{neighbor_id}",
             get(routes::list_routes_received),
         )
         .route(
-            "/routes/filtered/:neighbor_id",
+            "/routes/filtered/{neighbor_id}",
             get(routes::list_routes_filtered),
         )
         .route(
-            "/routes/noexport/:neighbor_id",
+            "/routes/noexport/{neighbor_id}",
             get(routes::list_routes_noexport),
         )
-        .route("/routes/table/:table", get(routes::list_routes_table))
+        .route("/routes/table/{table}", get(routes::list_routes_table))
         .route(
-            "/routes/table/:table/filtered",
+            "/routes/table/{table}/filtered",
             get(routes::list_routes_table_filtered),
         )
         .route(
-            "/routes/table/:table/peer/:peer",
+            "/routes/table/{table}/peer/{peer}",
             get(routes::list_routes_table_peer),
         )
         .layer(NormalizePathLayer::trim_trailing_slash())

@@ -240,7 +240,6 @@ impl Drop for Connection {
 /// fulfilled if free slots are available.
 type ConnectionRequest = oneshot::Sender<Connection>;
 
-
 /// The ConnectionPool limits the amount of concurrent conncetions to the bird daemon. The
 /// UnixStream connections are not reused in order to establish new sessions with the daemon.
 #[derive(Clone)]
@@ -249,7 +248,6 @@ pub struct ConnectionPool {
 }
 
 impl ConnectionPool {
-
     /// Start a new connection pool
     pub fn start(limit: usize) -> Self {
         let (lock_tx, mut lock_rx) = mpsc::channel(limit);
@@ -260,54 +258,55 @@ impl ConnectionPool {
         tokio::spawn(async move {
             let mut size = 0;
             while let Some(conn_tx) = req_rx.recv().await {
-
                 if size > limit {
+                    // Wait until a new connection slot is available.
                     if let Some(_) = lock_rx.recv().await {
                         size -= 1;
                     } else {
                         panic!("pool lock dropped");
                     }
 
-                    // Drain pending
+                    // Drain pending closed connection.
                     loop {
                         match lock_rx.try_recv() {
                             Ok(_) => {
                                 size -= 1;
-                            },
-                            Err(_) => { 
+                            }
+                            Err(_) => {
                                 break;
                             }
                         }
                     }
                 }
 
-                println!("allocated connection");
-                let conn = Connection{
+                let conn = Connection {
                     lock: lock_tx.clone(),
                 };
-                size += 1;
 
                 if let Err(_) = conn_tx.send(conn) {
-                    tracing::warn!("connection request dropped")
+                    tracing::warn!("connection request dropped");
+                    continue;
                 }
+
+                size += 1;
             }
         });
 
-        ConnectionPool {
-            requests: req_tx,
-        }
+        ConnectionPool { requests: req_tx }
     }
 
+    /// Try to acquire a new connection. This will block / await until
+    /// a free slot is available.
     pub async fn acquire(&self) -> Connection {
         let (conn_tx, conn_rx) = oneshot::channel();
         self.requests.send(conn_tx).await.expect("must work");
         conn_rx.await.expect("this must work second")
     }
-
 }
 
 lazy_static! {
-    /// Regex for start / stop status.
+    /// A global connection pool is used to limit the amount
+    /// of concurrent connections to the daemon.
     static ref BIRD_CONNECTION_POOL: ConnectionPool = ConnectionPool::start(10);
 }
 
@@ -331,7 +330,8 @@ impl Birdc {
 
     /// Get the daemon status.
     pub async fn show_status(&self) -> Result<BirdStatus> {
-        let mut stream = BIRD_CONNECTION_POOL.acquire().await.open(&self.socket)?;
+        let mut stream =
+            BIRD_CONNECTION_POOL.acquire().await.open(&self.socket)?;
 
         let cmd = "show status\n";
         stream.write_all(cmd.as_bytes())?;
@@ -347,7 +347,8 @@ impl Birdc {
 
     /// Get neighbors
     pub async fn show_protocols(&self) -> Result<ProtocolsMap> {
-        let mut stream = BIRD_CONNECTION_POOL.acquire().await.open(&self.socket)?;
+        let mut stream =
+            BIRD_CONNECTION_POOL.acquire().await.open(&self.socket)?;
 
         let cmd = "show protocols all\n";
         stream.write_all(cmd.as_bytes())?;
@@ -365,7 +366,8 @@ impl Birdc {
     }
 
     pub async fn show_protocols_stream(&self) -> Result<ProtocolReceiver> {
-        let mut stream = BIRD_CONNECTION_POOL.acquire().await.open(&self.socket)?;
+        let mut stream =
+            BIRD_CONNECTION_POOL.acquire().await.open(&self.socket)?;
 
         let cmd = "show protocols all\n";
         stream.write_all(cmd.as_bytes())?;
@@ -378,7 +380,8 @@ impl Birdc {
     }
 
     pub async fn show_protocols_bgp(&self) -> Result<ProtocolsMap> {
-        let mut stream = BIRD_CONNECTION_POOL.acquire().await.open(&self.socket)?;
+        let mut stream =
+            BIRD_CONNECTION_POOL.acquire().await.open(&self.socket)?;
 
         let cmd = "show protocols all\n";
         stream.write_all(cmd.as_bytes())?;
@@ -395,7 +398,8 @@ impl Birdc {
     }
 
     pub async fn show_protocols_bgp_stream(&self) -> Result<ProtocolReceiver> {
-        let mut stream = BIRD_CONNECTION_POOL.acquire().await.open(&self.socket)?;
+        let mut stream =
+            BIRD_CONNECTION_POOL.acquire().await.open(&self.socket)?;
         let cmd = "show protocols all\n";
         stream.write_all(cmd.as_bytes())?;
 
@@ -414,7 +418,8 @@ impl Birdc {
         &self,
         cmd: &str,
     ) -> Result<RoutesResultsReceiver> {
-        let mut stream = BIRD_CONNECTION_POOL.acquire().await.open(&self.socket)?;
+        let mut stream =
+            BIRD_CONNECTION_POOL.acquire().await.open(&self.socket)?;
         stream.write_all(cmd.as_bytes())?;
         let buf = BufReader::new(stream);
 
