@@ -10,6 +10,13 @@ pub struct CacheConfig {
     pub ttl: Duration,
 }
 
+/// Rate limiting configuration
+#[derive(Debug, Clone)]
+pub struct RateLimitConfig {
+    pub requests: u64,
+    pub window_secs: u64,
+}
+
 /// Get a string or default from env
 fn string_from_env(key: &str, default: &str) -> String {
     std::env::var(key).unwrap_or(default.to_string())
@@ -75,6 +82,25 @@ pub fn get_listen_address() -> String {
         .unwrap_or("127.0.0.1:8181".to_string())
 }
 
+/// Get rate limiting configuration
+pub fn get_rate_limit_config() -> RateLimitConfig {
+    let requests = string_from_env("LIGHTWATCHER_RATE_LIMIT_REQUESTS", "100");
+    let window_secs =
+        string_from_env("LIGHTWATCHER_RATE_LIMIT_WINDOW_SECS", "60");
+
+    let requests: u64 = requests
+        .parse()
+        .expect("rate limit requests must be a valid number");
+    let window_secs: u64 = window_secs
+        .parse()
+        .expect("rate limit window must be a valid number");
+
+    RateLimitConfig {
+        requests,
+        window_secs,
+    }
+}
+
 /// Dump the current environment into the log.
 pub fn log_env() {
     // Server
@@ -110,6 +136,17 @@ pub fn log_env() {
     // Parser pool
     tracing::info!(
         LIGHTWATCHER_ROUTES_WORKER_POOL_SIZE = get_routes_worker_pool_size(),
+        "env"
+    );
+
+    // Rate limiting
+    let rate_limit = get_rate_limit_config();
+    tracing::info!(
+        LIGHTWATCHER_RATE_LIMIT_REQUESTS = rate_limit.requests,
+        "env"
+    );
+    tracing::info!(
+        LIGHTWATCHER_RATE_LIMIT_WINDOW_SECS = rate_limit.window_secs,
         "env"
     );
 }

@@ -1,5 +1,5 @@
 use anyhow::Result;
-use axum::{routing::get, Router};
+use axum::{middleware, routing::get, Extension, Router};
 use tokio::net::TcpListener;
 use tower_http::{
     compression::CompressionLayer,
@@ -9,7 +9,7 @@ use tower_http::{
 use tracing::Level;
 
 use crate::{
-    api::{protocols, routes, status},
+    api::{protocols, rate_limit, routes, status},
     config,
 };
 
@@ -20,6 +20,10 @@ async fn welcome() -> String {
 
 /// Start the API http server
 pub async fn start() -> Result<()> {
+    // Create rate limiter
+    let rate_limit_config = config::get_rate_limit_config();
+    let rate_limiter = rate_limit::RateLimiter::new(rate_limit_config);
+
     let app = Router::new()
         .route("/", get(welcome))
         .route("/status", get(status::retrieve))
@@ -52,14 +56,20 @@ pub async fn start() -> Result<()> {
         )
         .layer(NormalizePathLayer::trim_trailing_slash())
         .layer(CompressionLayer::new())
+        .layer(middleware::from_fn(rate_limit::rate_limit_middleware))
         .layer(
             TraceLayer::new_for_http()
                 .on_request(())
                 .on_response(DefaultOnResponse::new().level(Level::INFO)),
-        );
+        )
+        .layer(Extension(rate_limiter));
 
     let listen = config::get_listen_address();
     let listener = TcpListener::bind(&listen).await?;
-    axum::serve(listener, app).await?;
+    axum::serve(
+        listener,
+        app.into_make_service_with_connect_info::<std::net::SocketAddr>(),
+    )
+    .await?;
     Ok(())
 }

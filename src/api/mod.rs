@@ -7,4 +7,5 @@ mod routes;
 mod status;
 
 pub mod cache;
+pub mod rate_limit;
 pub mod server;
