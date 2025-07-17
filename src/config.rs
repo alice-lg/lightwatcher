@@ -65,14 +65,14 @@ pub fn get_routes_cache_config() -> CacheConfig {
 /// Get birdc connection pool size
 pub fn get_birdc_connection_pool_size() -> usize {
     let size =
-        string_from_env("LIGHTWATCHER_BIRDC_CONNECTION_POOL_SIZE", "10");
+        string_from_env("LIGHTWATCHER_BIRD_CONNECTION_POOL_SIZE", "10");
     size.parse().unwrap_or(1)
 }
 
 /// Get the birdc socket path from the environment
 /// or use the default value.
 pub fn get_birdc_socket() -> String {
-    std::env::var("LIGHTWATCHER_BIRDC")
+    std::env::var("LIGHTWATCHER_BIRD_CTL")
         .unwrap_or("/var/run/bird/bird.ctl".to_string())
 }
 
@@ -106,10 +106,10 @@ pub fn get_rate_limit_config() -> RateLimitConfig {
 pub fn log_env() {
     // Server
     tracing::info!(LIGHTWATCHER_LISTEN = get_listen_address(), "env");
-    tracing::info!(LIGHTWATCHER_BIRDC = get_birdc_socket(), "env");
+    tracing::info!(LIGHTWATCHER_BIRD_CTL = get_birdc_socket(), "env");
 
     tracing::info!(
-        LIGHTWATCHER_BIRDC_CONNECTION_POOL_SIZE =
+        LIGHTWATCHER_BIRD_CONNECTION_POOL_SIZE =
             get_birdc_connection_pool_size(),
         "env"
     );

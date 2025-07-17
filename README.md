@@ -15,7 +15,7 @@ The is configured entirely using the following environment variables:
 
 `LIGHTWATCHER_LISTEN` (default: `127.0.0.1:8181`)
 
-`LIGHTWATCHER_BIRDC`  (default: `/var/run/bird/bird.ctl`)
+`LIGHTWATCHER_BIRD_CTL`  (default: `/var/run/bird/bird.ctl`)
 
 `LIGHTWATCHER_ROUTES_CACHE_MAX_ENTRIES` (default: `25`)
 
