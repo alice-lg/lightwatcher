@@ -2,9 +2,9 @@ use std::{
     collections::HashMap,
     net::SocketAddr,
     sync::Arc,
-    time::{Duration, Instant},
 };
 
+use chrono::{DateTime, Utc};
 use axum::{
     extract::{ConnectInfo, Request},
     http::StatusCode,
@@ -17,57 +17,58 @@ use tokio::sync::Mutex;
 use crate::config::RateLimitConfig;
 
 #[derive(Clone)]
-struct RateLimitEntry {
+struct RateLimitBucket {
     count: u64,
-    window_start: Instant,
+    window_start: DateTime<Utc>,
+}
+
+impl RateLimitBucket {
+    fn reset(&mut self) {
+        self.count = 0;
+        self.window_start = Utc::now();
+    }
+}
+
+impl Default for RateLimitBucket {
+    fn default() -> Self {
+        Self{
+            count: 0,
+            window_start: Utc::now(),
+        }
+    }
 }
 
 #[derive(Clone)]
 pub struct RateLimiter {
     config: RateLimitConfig,
-    entries: Arc<Mutex<HashMap<String, RateLimitEntry>>>,
+    buckets: Arc<Mutex<HashMap<String, RateLimitBucket>>>,
 }
 
 impl RateLimiter {
+    /// New rate limiter
     pub fn new(config: RateLimitConfig) -> Self {
         Self {
             config,
-            entries: Arc::new(Mutex::new(HashMap::new())),
+            buckets: Arc::new(Mutex::new(HashMap::new())),
         }
     }
 
     /// Check if the request runs into a limit. 
-    async fn is_allowed(&self, key: String) -> bool {
-        let mut entries = self.entries.lock().await;
-        let now = Instant::now();
-        let window = Duration::from_secs(self.config.window_secs);
+    async fn check_rate_limit(&self, key: &str) -> bool {
+        let mut buckets = self.buckets.lock().await;
+        let bucket = buckets.entry(key.into()).or_default();
 
-        match entries.get_mut(&key) {
-            Some(entry) => {
-                if now.duration_since(entry.window_start) > window {
-                    // Reset window
-                    entry.count = 1;
-                    entry.window_start = now;
-                    true
-                } else if entry.count < self.config.requests {
-                    entry.count += 1;
-                    true
-                } else {
-                    false
-                }
-            }
-            None => {
-                entries.insert(
-                    key,
-                    RateLimitEntry {
-                        count: 1,
-                        window_start: now,
-                    },
-                );
-                true
-            }
+        if Utc::now().signed_duration_since(bucket.window_start) > self.config.window {
+            bucket.reset();
+            true
+        } else if bucket.count < self.config.requests {
+            bucket.count += 1;
+            true
+        } else {
+            false
         }
     }
+
 }
 
 pub async fn rate_limit_middleware(
@@ -78,9 +79,10 @@ pub async fn rate_limit_middleware(
 ) -> Result<Response, StatusCode> {
     // Use IP address as key...
     let key = addr.ip().to_string();
-    if limiter.is_allowed(key).await {
+    if limiter.check_rate_limit(&key).await {
         Ok(next.run(request).await)
     } else {
+        tracing::warn!(client = key, "rate limit reached");
         Err(StatusCode::TOO_MANY_REQUESTS)
     }
 }

@@ -14,7 +14,7 @@ pub struct CacheConfig {
 #[derive(Debug, Clone)]
 pub struct RateLimitConfig {
     pub requests: u64,
-    pub window_secs: u64,
+    pub window: Duration,
 }
 
 /// Get a string or default from env
@@ -85,19 +85,20 @@ pub fn get_listen_address() -> String {
 /// Get rate limiting configuration
 pub fn get_rate_limit_config() -> RateLimitConfig {
     let requests = string_from_env("LIGHTWATCHER_RATE_LIMIT_REQUESTS", "100");
-    let window_secs =
-        string_from_env("LIGHTWATCHER_RATE_LIMIT_WINDOW_SECS", "60");
+    let window =
+        string_from_env("LIGHTWATCHER_RATE_LIMIT_WINDOW", "60");
 
     let requests: u64 = requests
         .parse()
         .expect("rate limit requests must be a valid number");
-    let window_secs: u64 = window_secs
+    let window: i64 = window
         .parse()
         .expect("rate limit window must be a valid number");
+    let window = Duration::new(window, 0).expect("must be valid");
 
     RateLimitConfig {
         requests,
-        window_secs,
+        window,
     }
 }
 
@@ -146,7 +147,7 @@ pub fn log_env() {
         "env"
     );
     tracing::info!(
-        LIGHTWATCHER_RATE_LIMIT_WINDOW_SECS = rate_limit.window_secs,
+        LIGHTWATCHER_RATE_LIMIT_WINDOW = rate_limit.window.num_seconds(),
         "env"
     );
 }
