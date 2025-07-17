@@ -2,7 +2,6 @@
 
 pkgs.rustPlatform.buildRustPackage rec {
   pname = "lightwatcher";
-  version = "3.0.0";
   
   src = ./.;
   
