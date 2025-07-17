@@ -1,2 +1,7 @@
 /target
 /tests/birdc/show-route-all-table-master4
+
+# Nix
+result
+result-*
+.direnv/
