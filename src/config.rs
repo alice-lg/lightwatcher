@@ -84,7 +84,7 @@ pub fn get_listen_address() -> String {
 
 /// Get rate limiting configuration
 pub fn get_rate_limit_config() -> RateLimitConfig {
-    let requests = string_from_env("LIGHTWATCHER_RATE_LIMIT_REQUESTS", "100");
+    let requests = string_from_env("LIGHTWATCHER_RATE_LIMIT_REQUESTS", "512");
     let window =
         string_from_env("LIGHTWATCHER_RATE_LIMIT_WINDOW", "60");
 
