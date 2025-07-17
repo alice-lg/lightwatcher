@@ -92,3 +92,54 @@ pub async fn rate_limit_middleware(
         Err(StatusCode::TOO_MANY_REQUESTS)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use chrono::Duration;
+
+    #[tokio::test]
+    async fn test_check_rate_limit_blocks_after_limit() {
+        let config = RateLimitConfig {
+            requests: 2,
+            window: Duration::minutes(1),
+        };
+        let limiter = RateLimiter::new(config);
+
+        assert!(limiter.check_rate_limit("test_key").await);
+        assert!(limiter.check_rate_limit("test_key").await);
+        assert!(!limiter.check_rate_limit("test_key").await);
+    }
+
+    #[tokio::test]
+    async fn test_check_rate_limit_different_keys() {
+        let config = RateLimitConfig {
+            requests: 1,
+            window: Duration::minutes(1),
+        };
+        let limiter = RateLimiter::new(config);
+
+        assert!(limiter.check_rate_limit("key1").await);
+        assert!(limiter.check_rate_limit("key2").await);
+        assert!(!limiter.check_rate_limit("key1").await);
+        assert!(!limiter.check_rate_limit("key2").await);
+    }
+
+    #[tokio::test]
+    async fn test_check_rate_limit_window_reset() {
+        let config = RateLimitConfig {
+            requests: 1,
+            window: Duration::milliseconds(10),
+        };
+        let limiter = RateLimiter::new(config);
+
+        assert!(limiter.check_rate_limit("test_key").await);
+        assert!(!limiter.check_rate_limit("test_key").await);
+
+        // No idea how else to test this...
+        // but I guess this sleep time is sufficiently short.
+        tokio::time::sleep(tokio::time::Duration::from_millis(15)).await;
+
+        assert!(limiter.check_rate_limit("test_key").await);
+    }
+}
