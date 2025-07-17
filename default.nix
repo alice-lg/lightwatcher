@@ -13,6 +13,5 @@ pkgs.rustPlatform.buildRustPackage rec {
   meta = with pkgs.lib; {
     description = "A lightweight clone of birdwatcher";
     homepage = "https://github.com/alice-lg/lightwatcher";
-    license = licenses.mit;
   };
 }

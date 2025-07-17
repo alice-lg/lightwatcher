@@ -27,7 +27,7 @@
             bacon
             
             # For testing with BIRD
-            bird
+            bird3
           ];
           
           RUST_LOG = "info";
