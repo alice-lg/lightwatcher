@@ -193,7 +193,7 @@ pub struct BGPInfo {
     pub ext_communities: Vec<ExtCommunity>,
     pub local_pref: String,
     pub med: String,
-    pub otc: String,
+    pub otc: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]

@@ -329,7 +329,7 @@ fn parse_route_bgp(route: &mut Route, line: &str) -> Result<State> {
         } else if key == "next_hop" {
             route.bgp.next_hop = val;
         } else if key == "otc" {
-            route.bgp.otc = val;
+            route.bgp.otc = Some(val);
         } else if key == "med" {
             route.bgp.med = val;
         } else if key == "local_pref" {
