@@ -1,6 +1,7 @@
 mod error;
 use error::Error;
 
+mod health;
 mod protocols;
 mod responses;
 mod routes;

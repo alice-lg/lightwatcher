@@ -188,3 +188,24 @@ impl IntoResponse for RoutesResponse {
         Json::from(self).into_response()
     }
 }
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct HealthResponse {
+    pub status: String,
+    pub version: String,
+    pub bird_socket: String,
+    pub bird_status: Option<BirdStatus>,
+    pub error: Option<String>,
+    pub bird_error: Option<String>,
+}
+
+impl IntoResponse for HealthResponse {
+    fn into_response(self) -> Response {
+        let status_code = if self.status == "ok" {
+            axum::http::StatusCode::OK
+        } else {
+            axum::http::StatusCode::SERVICE_UNAVAILABLE
+        };
+        (status_code, Json(self)).into_response()
+    }
+}

@@ -9,7 +9,7 @@ use tower_http::{
 use tracing::Level;
 
 use crate::{
-    api::{protocols, rate_limit, routes, status},
+    api::{health, protocols, rate_limit, routes, status},
     config,
 };
 
@@ -26,6 +26,7 @@ pub async fn start() -> Result<()> {
 
     let app = Router::new()
         .route("/", get(welcome))
+        .route("/health", get(health::retrieve))
         .route("/status", get(status::retrieve))
         .route("/protocols", get(protocols::list))
         .route("/protocols/bgp", get(protocols::list_bgp))
