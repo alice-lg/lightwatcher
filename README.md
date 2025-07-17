@@ -27,9 +27,9 @@ The is configured entirely using the following environment variables:
 
 `LIGHTWATCHER_ROUTES_WORKER_POOL_SIZE` (default: `<cpu cores>`)
 
-`LIGHTWATCHER_RATE_LIMIT_REQUESTS` (default: `50`)
+`LIGHTWATCHER_RATE_LIMIT_REQUESTS` (default: `512`)
 
-`LIGHTWATCHER_RATE_LIMIT_WINDOW`  (default: `30` seconds)
+`LIGHTWATCHER_RATE_LIMIT_WINDOW`  (default: `60` seconds)
 
 
 ## Contributing
