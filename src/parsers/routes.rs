@@ -48,7 +48,6 @@ lazy_static! {
     static ref RE_ROUTE_START: Regex = Regex::new(r"1007-").unwrap();
 }
 
-
 #[derive(Debug, PartialEq)]
 enum BGPCommunities {
     Regular,
@@ -74,7 +73,6 @@ enum State {
     Meta,
     BGP(BGPState),
 }
-
 
 /// A routes group that shares the same prefix. However while parsing
 /// only the first route has a prefix.
@@ -203,12 +201,6 @@ fn parse_route_meta(route: &mut Route, line: &str) -> Result<State> {
 
 /// Parse AS path
 fn parse_as_path(s: &str) -> Result<Vec<String>> {
-    /*
-    let mut as_path: Vec<String> = vec![];
-    for asn in s.split(" ") {
-        as_path.push(asn);
-    }
-    */
     // To keep this backwards compatible this needs to
     // be stringly typed. Sigh.
     let as_path: Vec<String> = s.split(" ").map(|p| p.to_string()).collect();
@@ -266,26 +258,27 @@ fn parse_large_communities(s: &str) -> Result<Vec<LargeCommunity>> {
     Ok(communities)
 }
 
-
 fn parse_route_bgp_communities(
     route: &mut Route,
     ctype: BGPCommunities,
     line: &str,
 ) -> Result<State> {
-    let mut line = line.trim_start().to_lowercase();
+    let mut line = line;
 
     // Strip everything before the colon
     if let Some(index) = line.find(':') {
-        line = (&line[index + 1..]).to_string();
+        line = &line[index + 1..];
+    }
+    line = line.trim_start();
+
+    if line.is_empty() {
+        return Ok(State::BGP(BGPState::Attributes));
     }
 
     // Append to existing list of communities
     match ctype {
         BGPCommunities::Regular => {
-            route
-                .bgp
-                .communities
-                .append(&mut parse_communities(&line)?);
+            route.bgp.communities.append(&mut parse_communities(&line)?);
         }
         BGPCommunities::Large => {
             route
@@ -304,10 +297,12 @@ fn parse_route_bgp_communities(
     Ok(State::BGP(BGPState::Communities(ctype)))
 }
 
-
 /// Parse route BGP
-fn parse_route_bgp(route: &mut Route, state: BGPState, line: &str) -> Result<State> {
-
+fn parse_route_bgp(
+    route: &mut Route,
+    state: BGPState,
+    line: &str,
+) -> Result<State> {
     // Parse key value info
     if let Some(caps) = RE_KEY_VALUE.captures(line) {
         let key = caps["key"].to_lowercase();
@@ -331,19 +326,33 @@ fn parse_route_bgp(route: &mut Route, state: BGPState, line: &str) -> Result<Sta
         } else if key == "local_pref" {
             route.bgp.local_pref = val;
         } else if key == "community" {
-            return parse_route_bgp_communities(route, BGPCommunities::Regular, line); 
+            return parse_route_bgp_communities(
+                route,
+                BGPCommunities::Regular,
+                line,
+            );
         } else if key == "large_community" {
-            return parse_route_bgp_communities(route, BGPCommunities::Large, line);
+            return parse_route_bgp_communities(
+                route,
+                BGPCommunities::Large,
+                line,
+            );
         } else if key == "ext_community" {
-            return parse_route_bgp_communities(route, BGPCommunities::Extended, line);
+            return parse_route_bgp_communities(
+                route,
+                BGPCommunities::Extended,
+                line,
+            );
         }
 
         Ok(State::BGP(BGPState::Attributes))
     } else {
         // We might be in a communities continuation.
         match state {
-            BGPState::Communities(ctype) => parse_route_bgp_communities(route, ctype, line),
-            BGPState::Attributes => Ok(State::BGP(BGPState::Attributes))
+            BGPState::Communities(ctype) => {
+                parse_route_bgp_communities(route, ctype, line)
+            }
+            BGPState::Attributes => Ok(State::BGP(BGPState::Attributes)),
         }
     }
 }
