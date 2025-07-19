@@ -1,0 +1,12 @@
+1007-Table master4:
+ 185.44.108.0/22      unicast [pb_0232_as62193 2025-07-18 08:25:42] * (100) [AS62193i]
+        via 2001:7f8:19:1::f2f1:2 on eth1
+1008-   Type: BGP univ   
+1012-   BGP.origin: IGP  
+        BGP.as_path: 62193
+        BGP.next_hop: 2001:7f8:19:1::f2f1:2 fe80::7a4f:9b00:64a7:84c3
+        BGP.local_pref: 100
+        BGP.aggregator: 185.44.108.3 AS62193
+        BGP.large_community: (16374, 1000, 2) (16374, 1001, 1)
+        BGP.otc: 213973
+0000
