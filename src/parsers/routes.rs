@@ -278,19 +278,16 @@ fn parse_route_bgp_communities(
     // Append to existing list of communities
     match ctype {
         BGPCommunities::Regular => {
-            route.bgp.communities.append(&mut parse_communities(&line)?);
+            let mut comms = parse_communities(&line)?;
+            route.bgp.communities.append(&mut comms);
         }
         BGPCommunities::Large => {
-            route
-                .bgp
-                .large_communities
-                .append(&mut parse_large_communities(&line)?);
+            let mut comms = parse_large_communities(&line)?;
+            route.bgp.large_communities.append(&mut comms);
         }
         BGPCommunities::Extended => {
-            route
-                .bgp
-                .ext_communities
-                .append(&mut parse_ext_communities(&line)?);
+            let mut comms = parse_ext_communities(&line)?;
+            route.bgp.ext_communities.append(&mut comms);
         }
     }
 
