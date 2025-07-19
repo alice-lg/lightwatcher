@@ -175,5 +175,6 @@ mod tests {
         }
 
         println!("collected routes: {}", routes.len());
+        assert_eq!(routes.len(), 194);
     }
 }
