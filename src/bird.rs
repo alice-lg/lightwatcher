@@ -260,22 +260,15 @@ impl ConnectionPool {
             while let Some(conn_tx) = req_rx.recv().await {
                 if size > limit {
                     // Wait until a new connection slot is available.
-                    if let Some(_) = lock_rx.recv().await {
+                    if lock_rx.recv().await.is_some() {
                         size -= 1;
                     } else {
                         panic!("pool lock dropped");
                     }
 
                     // Drain pending closed connection.
-                    loop {
-                        match lock_rx.try_recv() {
-                            Ok(_) => {
-                                size -= 1;
-                            }
-                            Err(_) => {
-                                break;
-                            }
-                        }
+                    while lock_rx.try_recv().is_ok() {
+                        size -= 1;
                     }
                 }
 
@@ -283,7 +276,7 @@ impl ConnectionPool {
                     lock: lock_tx.clone(),
                 };
 
-                if let Err(_) = conn_tx.send(conn) {
+                if conn_tx.send(conn).is_err() {
                     tracing::warn!("connection request dropped");
                     continue;
                 }

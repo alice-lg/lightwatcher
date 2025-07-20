@@ -13,7 +13,7 @@ pub async fn retrieve() -> Result<HealthResponse, Error> {
         Ok(bird_status) => Ok(HealthResponse {
             status: "ok".to_string(),
             version,
-            bird_socket: bird_socket,
+            bird_socket,
             bird_status: Some(bird_status),
             error: None,
             bird_error: None,
@@ -21,7 +21,7 @@ pub async fn retrieve() -> Result<HealthResponse, Error> {
         Err(e) => Ok(HealthResponse {
             status: "error".to_string(),
             version,
-            bird_socket: bird_socket,
+            bird_socket,
             bird_status: None,
             error: Some("Could not connect to bird daemon".to_string()),
             bird_error: Some(e.to_string()),

@@ -456,7 +456,7 @@ mod tests {
     fn test_parse_protocol_header() {
         let line = "1002-R194_42    BGP        ---        up     09:39:25.123  Established";
         let mut protocol = Protocol::default();
-        parse_protocol_header(&mut protocol, &line, false).unwrap();
+        parse_protocol_header(&mut protocol, line, false).unwrap();
 
         assert_eq!(protocol.id, "R194_42");
         assert_eq!(protocol.state, "up");
@@ -466,7 +466,7 @@ mod tests {
     fn test_parse_protocol_header_date() {
         let line = "1002-R194_42    BGP        ---        up     2025-05-27  Established";
         let mut protocol = Protocol::default();
-        parse_protocol_header(&mut protocol, &line, false).unwrap();
+        parse_protocol_header(&mut protocol, line, false).unwrap();
 
         assert_eq!(protocol.id, "R194_42");
         assert_eq!(protocol.state, "up");
@@ -476,7 +476,7 @@ mod tests {
     fn test_parse_protocol_header_down() {
         let line = "1002-R_bhac01   BGP        ---        down   2023-04-19 09:08:10  Error: No listening socket";
         let mut protocol = Protocol::default();
-        parse_protocol_header(&mut protocol, &line, false).unwrap();
+        parse_protocol_header(&mut protocol, line, false).unwrap();
 
         assert_eq!(protocol.id, "R_bhac01");
         assert_eq!(protocol.state, "down");
@@ -487,14 +487,14 @@ mod tests {
     fn test_parse_protocol_header_idle() {
         let line = "1002-R192_158   BGP        ---        start  2023-04-20 12:01:52  Idle          BGP Error: Bad peer AS";
         let mut protocol = Protocol::default();
-        parse_protocol_header(&mut protocol, &line, false).unwrap();
+        parse_protocol_header(&mut protocol, line, false).unwrap();
     }
 
     #[test]
     fn test_parse_protocol_meta() {
         let line = "1006-  Description:    AnniNET Software Development";
         let mut protocol = Protocol::default();
-        parse_protocol_meta(&mut protocol, &line).unwrap();
+        parse_protocol_meta(&mut protocol, line).unwrap();
         assert_eq!(protocol.description, "AnniNET Software Development");
     }
 
@@ -502,13 +502,13 @@ mod tests {
     fn test_parse_protocol_bgpstate() {
         let mut protocol = Protocol::default();
         let line = "   BGP state:          Established ";
-        let next = parse_bgp_state(&mut protocol, &line).unwrap();
+        let next = parse_bgp_state(&mut protocol, line).unwrap();
         assert_eq!(next, State::BGPStatus);
 
         let line = "   neighbor address: 172.31.194.42";
-        parse_bgp_state(&mut protocol, &line).unwrap();
+        parse_bgp_state(&mut protocol, line).unwrap();
         let line = "     neighbor AS:      42";
-        parse_bgp_state(&mut protocol, &line).unwrap();
+        parse_bgp_state(&mut protocol, line).unwrap();
 
         assert_eq!(protocol.address, "172.31.194.42");
         assert_eq!(protocol.asn, 42);

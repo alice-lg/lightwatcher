@@ -149,6 +149,6 @@ mod tests {
         cache.put("res", res.clone());
 
         let res = cache.get("res").unwrap();
-        assert_eq!(res.api.result_from_cache, true)
+        assert!(res.api.result_from_cache)
     }
 }

@@ -49,7 +49,7 @@ lazy_static! {
 }
 
 #[derive(Debug, PartialEq)]
-enum BGPCommunities {
+enum BgpCommunities {
     Regular,
     Large,
     Extended,
@@ -61,9 +61,9 @@ enum BGPCommunities {
 /// We need to keep track of the current state as the
 /// communities may span multiple lines.
 #[derive(Debug, PartialEq)]
-enum BGPState {
+enum BgpState {
     Attributes,
-    Communities(BGPCommunities),
+    Communities(BgpCommunities),
 }
 
 /// Route Parser State
@@ -71,7 +71,7 @@ enum BGPState {
 enum State {
     Start,
     Meta,
-    BGP(BGPState),
+    Bgp(BgpState),
 }
 
 /// A routes group that shares the same prefix. However while parsing
@@ -132,7 +132,7 @@ fn parse_line(route: &mut Route, state: State, line: &str) -> Result<State> {
     match state {
         State::Start => parse_route_header(route, line),
         State::Meta => parse_route_meta(route, line),
-        State::BGP(bgp_state) => parse_route_bgp(route, bgp_state, line),
+        State::Bgp(bgp_state) => parse_route_bgp(route, bgp_state, line),
     }
 }
 
@@ -196,7 +196,7 @@ fn parse_route_meta(route: &mut Route, line: &str) -> Result<State> {
         }
     }
 
-    Ok(State::BGP(BGPState::Attributes))
+    Ok(State::Bgp(BgpState::Attributes))
 }
 
 /// Parse AS path
@@ -260,7 +260,7 @@ fn parse_large_communities(s: &str) -> Result<Vec<LargeCommunity>> {
 
 fn parse_route_bgp_communities(
     route: &mut Route,
-    ctype: BGPCommunities,
+    ctype: BgpCommunities,
     line: &str,
 ) -> Result<State> {
     let mut line = line;
@@ -272,32 +272,32 @@ fn parse_route_bgp_communities(
     line = line.trim_start();
 
     if line.is_empty() {
-        return Ok(State::BGP(BGPState::Attributes));
+        return Ok(State::Bgp(BgpState::Attributes));
     }
 
     // Append to existing list of communities
     match ctype {
-        BGPCommunities::Regular => {
-            let mut comms = parse_communities(&line)?;
+        BgpCommunities::Regular => {
+            let mut comms = parse_communities(line)?;
             route.bgp.communities.append(&mut comms);
         }
-        BGPCommunities::Large => {
-            let mut comms = parse_large_communities(&line)?;
+        BgpCommunities::Large => {
+            let mut comms = parse_large_communities(line)?;
             route.bgp.large_communities.append(&mut comms);
         }
-        BGPCommunities::Extended => {
-            let mut comms = parse_ext_communities(&line)?;
+        BgpCommunities::Extended => {
+            let mut comms = parse_ext_communities(line)?;
             route.bgp.ext_communities.append(&mut comms);
         }
     }
 
-    Ok(State::BGP(BGPState::Communities(ctype)))
+    Ok(State::Bgp(BgpState::Communities(ctype)))
 }
 
 /// Parse route BGP
 fn parse_route_bgp(
     route: &mut Route,
-    state: BGPState,
+    state: BgpState,
     line: &str,
 ) -> Result<State> {
     // Parse key value info
@@ -306,7 +306,7 @@ fn parse_route_bgp(
         let val = caps["value"].to_string();
 
         if !key.starts_with("bgp") {
-            return Ok(State::BGP(BGPState::Attributes));
+            return Ok(State::Bgp(BgpState::Attributes));
         }
         let key = &key[4..];
 
@@ -325,31 +325,31 @@ fn parse_route_bgp(
         } else if key == "community" {
             return parse_route_bgp_communities(
                 route,
-                BGPCommunities::Regular,
+                BgpCommunities::Regular,
                 line,
             );
         } else if key == "large_community" {
             return parse_route_bgp_communities(
                 route,
-                BGPCommunities::Large,
+                BgpCommunities::Large,
                 line,
             );
         } else if key == "ext_community" {
             return parse_route_bgp_communities(
                 route,
-                BGPCommunities::Extended,
+                BgpCommunities::Extended,
                 line,
             );
         }
 
-        Ok(State::BGP(BGPState::Attributes))
+        Ok(State::Bgp(BgpState::Attributes))
     } else {
         // We might be in a communities continuation.
         match state {
-            BGPState::Communities(ctype) => {
+            BgpState::Communities(ctype) => {
                 parse_route_bgp_communities(route, ctype, line)
             }
-            BGPState::Attributes => Ok(State::BGP(BGPState::Attributes)),
+            BgpState::Attributes => Ok(State::Bgp(BgpState::Attributes)),
         }
     }
 }
@@ -386,7 +386,7 @@ mod tests {
         assert_eq!(state, State::Meta);
         let line = "1008-   Type: BGP univ";
         let state = parse_route_meta(&mut route, line).unwrap();
-        assert_eq!(state, State::BGP(BGPState::Attributes));
+        assert_eq!(state, State::Bgp(BgpState::Attributes));
 
         assert_eq!(route.gateway, "172.31.195.39");
         assert_eq!(route.interface, "vx0");
@@ -397,7 +397,7 @@ mod tests {
         let line = "(111, 0, 1120) (222, 0, 123) (333, 222, 333)";
         let communities = parse_large_communities(line).unwrap();
 
-        let expected = vec![
+        let expected = [
             LargeCommunity(111, 0, 1120),
             LargeCommunity(222, 0, 123),
             LargeCommunity(333, 222, 333),
