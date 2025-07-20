@@ -17,40 +17,40 @@ Lightwatcher is configured entirely using environment variables:
 ### Server Settings
 
 `LIGHTWATCHER_LISTEN` (default: `127.0.0.1:8181`)
-Address and port where the HTTP server listens.
+ * Address and port where the HTTP server listens.
 
 `LIGHTWATCHER_BIRD_CTL` (default: `/var/run/bird/bird.ctl`)
-Path to BIRD control socket.
+ * Path to BIRD control socket.
 
 `LIGHTWATCHER_BIRD_CONNECTION_POOL_SIZE` (default: `10`)
-Number of concurrent BIRD connections.
+ * Number of concurrent BIRD connections.
 
 ### Cache Settings
 
 `LIGHTWATCHER_ROUTES_CACHE_MAX_ENTRIES` (default: `25`)
-Maximum number of cached route queries.
+ * Maximum number of cached route queries.
 
 `LIGHTWATCHER_ROUTES_CACHE_TTL` (default: `300`)
-Route cache lifetime in seconds.
+ * Route cache lifetime in seconds.
 
 `LIGHTWATCHER_NEIGHBORS_CACHE_MAX_ENTRIES` (default: `1`)
-Maximum number of cached neighbor queries.
+ * Maximum number of cached neighbor queries.
 
 `LIGHTWATCHER_NEIGHBORS_CACHE_TTL` (default: `300`)
-Neighbor cache lifetime in seconds.
+ * Neighbor cache lifetime in seconds.
 
 ### Performance Settings
 
 `LIGHTWATCHER_ROUTES_WORKER_POOL_SIZE` (default: `<cpu cores>`)
-Number of worker threads for route parsing.
+ * Number of worker threads for route parsing.
 
 ### Rate Limiting
 
 `LIGHTWATCHER_RATE_LIMIT_REQUESTS` (default: `512`)
-Maximum requests allowed per window.
+ * Maximum requests allowed per window.
 
 `LIGHTWATCHER_RATE_LIMIT_WINDOW` (default: `60`)
-Rate limit window duration in seconds.
+ * Rate limit window duration in seconds.
 
 ## BIRD Configuration
 
@@ -64,8 +64,10 @@ timeformat route        iso long;
 
 ### Tagging filtered routes
 If you want to make use of the filtered route reasons in [Alice-LG](https://github.com/alice-lg/alice-lg), you need
-to make sure that you are using BIRD 1.6.3 or up as you will need Large BGP Communities
+to make sure that you are using BIRD 1.6.3 or up (2.x, 3.x) as you will need Large BGP Communities
 (http://largebgpcommunities.net/) support.
+
+Also please note that BIRD 1.x is end of life!
 
 You need to add a Large BGP Community just before you filter a route, for example:
 
@@ -97,6 +99,12 @@ You need to add a Large BGP Community just before you filter a route, for exampl
         accept;
     }
 
+
+## Monitoring
+
+An enpoint for monitoring the service available under `/health`
+and contains information about the current version and the
+connection to the BIRD daemon.
 
 ## Troubleshooting
 
