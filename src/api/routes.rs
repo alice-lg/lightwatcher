@@ -4,6 +4,7 @@ use anyhow::Result;
 use axum::extract::Path;
 use lazy_static::lazy_static;
 use tokio::sync::Mutex;
+use tracing::{error, warn};
 
 use crate::{
     api::{
@@ -51,6 +52,8 @@ pub async fn list_routes_received(
     let birdc = Birdc::default();
     let protocol = ProtocolID::parse(&id)?;
 
+    let cutoff = config::get_routes_protocol_cutoff();
+
     let res = {
         let cache = ROUTES_RECEIVED_CACHE.lock().await;
         cache.get(&protocol).cloned()
@@ -65,7 +68,20 @@ pub async fn list_routes_received(
                 match result {
                     Ok(prefix_group) => routes.extend(prefix_group),
                     Err(e) => {
-                        tracing::error!("error decoding routes block: {}", e);
+                        error!("error decoding routes block: {}", e);
+                    }
+                }
+
+                // If we have a resource limit and are over the
+                // cutoff, break. This also stops the parsing.
+                if let Some(cutoff) = cutoff {
+                    if cutoff > routes.len() {
+                        warn!(
+                            protocol = id,
+                            routes = routes.len(),
+                            cutoff = cutoff,
+                            "cutting off routes parser as max routes received reached");
+                        break;
                     }
                 }
             }
@@ -86,6 +102,7 @@ pub async fn list_routes_filtered(
 ) -> Result<RoutesResponse, Error> {
     let birdc = Birdc::default();
     let protocol = ProtocolID::parse(&id)?;
+    let cutoff = config::get_routes_protocol_cutoff();
 
     let res = {
         let cache = ROUTES_FILTERED_CACHE.lock().await;
@@ -102,7 +119,19 @@ pub async fn list_routes_filtered(
                 match result {
                     Ok(prefix_group) => routes.extend(prefix_group),
                     Err(e) => {
-                        tracing::error!("error decoding routes block: {}", e);
+                        error!("error decoding routes block: {}", e);
+                    }
+                }
+
+                // Apply resource limit (cutoff)
+                if let Some(cutoff) = cutoff {
+                    if cutoff > routes.len() {
+                        warn!(
+                            protocol = id,
+                            routes = routes.len(),
+                            cutoff = cutoff,
+                            "cutting off routes parser as max routes filtered reached");
+                        break;
                     }
                 }
             }
@@ -123,6 +152,7 @@ pub async fn list_routes_noexport(
 ) -> Result<RoutesResponse, Error> {
     let birdc = Birdc::default();
     let protocol = ProtocolID::parse(&id)?;
+    let cutoff = config::get_routes_protocol_cutoff();
 
     let res = {
         let cache = ROUTES_NO_EXPORT_CACHE.lock().await;
@@ -136,10 +166,22 @@ pub async fn list_routes_noexport(
                 birdc.show_route_all_noexport_protocol(&protocol).await?;
             let mut routes = vec![];
             while let Some(result) = results.recv().await {
+                // Extend routes
                 match result {
                     Ok(prefix_group) => routes.extend(prefix_group),
                     Err(e) => {
-                        tracing::error!("error decoding routes block: {}", e);
+                        error!("error decoding routes block: {}", e);
+                    }
+                }
+                // Apply resource limit (cutoff)
+                if let Some(cutoff) = cutoff {
+                    if cutoff > routes.len() {
+                        warn!(
+                            protocol = id,
+                            routes = routes.len(),
+                            cutoff = cutoff,
+                            "cutting off routes parser as max routes filtered reached");
+                        break;
                     }
                 }
             }
@@ -175,7 +217,7 @@ pub async fn list_routes_table(
                 match result {
                     Ok(prefix_group) => routes.extend(prefix_group),
                     Err(e) => {
-                        tracing::error!("error decoding routes block: {}", e);
+                        error!("error decoding routes block: {}", e);
                     }
                 }
             }
@@ -215,7 +257,7 @@ pub async fn list_routes_table_peer(
                 match result {
                     Ok(prefix_group) => routes.extend(prefix_group),
                     Err(e) => {
-                        tracing::error!("error decoding routes block: {}", e);
+                        error!("error decoding routes block: {}", e);
                     }
                 }
             }
@@ -253,7 +295,7 @@ pub async fn list_routes_table_filtered(
                 match result {
                     Ok(prefix_group) => routes.extend(prefix_group),
                     Err(e) => {
-                        tracing::error!("error decoding routes block: {}", e);
+                        error!("error decoding routes block: {}", e);
                     }
                 }
             }

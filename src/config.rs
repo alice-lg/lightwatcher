@@ -1,6 +1,7 @@
 use std::{num::NonZeroUsize, thread};
 
 use chrono::Duration;
+use tracing::{error, info};
 
 /// The TTL and maximum number of entries can
 /// be set in the CacheConfig.
@@ -36,7 +37,7 @@ pub fn get_routes_worker_pool_size() -> usize {
 }
 
 /// New cache config with ttl and max entries.
-fn make_cache_config(max_entries: String, ttl: String) -> CacheConfig {
+fn make_cache_config(max_entries: &str, ttl: &str) -> CacheConfig {
     let max_entries: usize = max_entries
         .parse()
         .expect("max entries must be a valid number");
@@ -48,10 +49,8 @@ fn make_cache_config(max_entries: String, ttl: String) -> CacheConfig {
 
 /// Get the configuration for the neighbors cache
 pub fn get_neighbors_cache_config() -> CacheConfig {
-    let max_entries =
-        string_from_env("LIGHTWATCHER_NEIGHBORS_CACHE_MAX_ENTRIES", "1");
     let ttl = string_from_env("LIGHTWATCHER_NEIGHBORS_CACHE_TTL", "300");
-    make_cache_config(max_entries, ttl)
+    make_cache_config("1", &ttl) // There can only be one entry "all"
 }
 
 /// Get the configuration for the routes cache
@@ -59,13 +58,30 @@ pub fn get_routes_cache_config() -> CacheConfig {
     let max_entries =
         string_from_env("LIGHTWATCHER_ROUTES_CACHE_MAX_ENTRIES", "25");
     let ttl = string_from_env("LIGHTWATCHER_ROUTES_CACHE_TTL", "300");
-    make_cache_config(max_entries, ttl)
+    make_cache_config(&max_entries, &ttl)
+}
+
+/// Get the cutoff point for routes decoded from a protocol.
+/// This limits the amount of total returned routes.
+///
+/// WARNING: Experimental
+pub fn get_routes_protocol_cutoff() -> Option<usize> {
+    let cutoff = string_from_env("LIGHTWATCHER_ROUTES_PROTOCOL_CUTOFF", "");
+    if cutoff.is_empty() {
+        return None;
+    }
+    match cutoff.parse::<usize>() {
+        Ok(v) => Some(v),
+        Err(err) => {
+            error!(error = %err, "could not parse protocol cutoff");
+            None
+        }
+    }
 }
 
 /// Get birdc connection pool size
 pub fn get_birdc_connection_pool_size() -> usize {
-    let size =
-        string_from_env("LIGHTWATCHER_BIRD_CONNECTION_POOL_SIZE", "10");
+    let size = string_from_env("LIGHTWATCHER_BIRD_CONNECTION_POOL_SIZE", "10");
     size.parse().unwrap_or(1)
 }
 
@@ -85,8 +101,7 @@ pub fn get_listen_address() -> String {
 /// Get rate limiting configuration
 pub fn get_rate_limit_config() -> RateLimitConfig {
     let requests = string_from_env("LIGHTWATCHER_RATE_LIMIT_REQUESTS", "512");
-    let window =
-        string_from_env("LIGHTWATCHER_RATE_LIMIT_WINDOW", "60");
+    let window = string_from_env("LIGHTWATCHER_RATE_LIMIT_WINDOW", "60");
 
     let requests: u64 = requests
         .parse()
@@ -96,19 +111,16 @@ pub fn get_rate_limit_config() -> RateLimitConfig {
         .expect("rate limit window must be a valid number");
     let window = Duration::new(window, 0).expect("must be valid");
 
-    RateLimitConfig {
-        requests,
-        window,
-    }
+    RateLimitConfig { requests, window }
 }
 
 /// Dump the current environment into the log.
 pub fn log_env() {
     // Server
-    tracing::info!(LIGHTWATCHER_LISTEN = get_listen_address(), "env");
-    tracing::info!(LIGHTWATCHER_BIRD_CTL = get_birdc_socket(), "env");
+    info!(LIGHTWATCHER_LISTEN = get_listen_address(), "env");
+    info!(LIGHTWATCHER_BIRD_CTL = get_birdc_socket(), "env");
 
-    tracing::info!(
+    info!(
         LIGHTWATCHER_BIRD_CONNECTION_POOL_SIZE =
             get_birdc_connection_pool_size(),
         "env"
@@ -116,38 +128,41 @@ pub fn log_env() {
 
     // Caches
     let cache = get_neighbors_cache_config();
-    tracing::info!(
-        LIGHTWATCHER_NEIGHBORS_CACHE_MAX_ENTRIES = cache.max_entries,
-        "env"
-    );
-    tracing::info!(
+    info!(
         LIGHTWATCHER_NEIGHBORS_CACHE_TTL = cache.ttl.num_seconds(),
         "env"
     );
     let cache = get_routes_cache_config();
-    tracing::info!(
+    info!(
         LIGHTWATCHER_ROUTES_CACHE_MAX_ENTRIES = cache.max_entries,
         "env"
     );
-    tracing::info!(
+    info!(
         LIGHTWATCHER_ROUTES_CACHE_TTL = cache.ttl.num_seconds(),
         "env"
     );
 
     // Parser pool
-    tracing::info!(
+    info!(
         LIGHTWATCHER_ROUTES_WORKER_POOL_SIZE = get_routes_worker_pool_size(),
         "env"
     );
 
     // Rate limiting
     let rate_limit = get_rate_limit_config();
-    tracing::info!(
+    info!(
         LIGHTWATCHER_RATE_LIMIT_REQUESTS = rate_limit.requests,
         "env"
     );
-    tracing::info!(
+    info!(
         LIGHTWATCHER_RATE_LIMIT_WINDOW = rate_limit.window.num_seconds(),
+        "env"
+    );
+
+    // Resource limits
+    let cutoff = get_routes_protocol_cutoff();
+    info!(
+        LIGHTWATCHER_ROUTES_PROTOCOL_CUTOFF = format!("{:?}", cutoff),
         "env"
     );
 }

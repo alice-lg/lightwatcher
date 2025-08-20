@@ -410,6 +410,7 @@ impl Birdc {
     /// using the worker pool.
     ///
     /// Please note that only show route commands can be used here.
+    #[cfg(not(test))]
     async fn fetch_routes_cmd(
         &self,
         cmd: &str,
@@ -510,6 +511,50 @@ impl Birdc {
             format!("show route all table '{}' where from={}\n", table, peer,);
         let routes = self.fetch_routes_cmd(&cmd).await?;
         Ok(routes)
+    }
+}
+
+#[cfg(test)]
+impl Birdc {
+    /// Test fetch_routes_cmd uses local fixtures for
+    /// testing.
+    async fn fetch_routes_cmd(
+        &self,
+        cmd: &str,
+    ) -> Result<RoutesResultsReceiver> {
+        use std::fs::File;
+
+        let mut stream =
+            BIRD_CONNECTION_POOL.acquire().await.open(&self.socket)?;
+        stream.write_all(cmd.as_bytes())?;
+        let buf = BufReader::new(stream);
+
+        let file =
+            File::open("tests/birdc/show-route-all-protocol-R1").unwrap();
+        /* let file: File =
+        File::open("tests/birdc/show-route-all-table-master4").unwrap(); */
+        let reader = BufReader::new(file);
+        let blocks = BlockIterator::new(reader, &RE_ROUTES_START);
+
+        // Spawn workers and fill queue
+        let (results_tx, results) = mpsc::channel(64);
+
+        tokio::spawn(async move {
+            for block in blocks {
+                if let Err(e) =
+                    routes_worker::accept_block(block, results_tx.clone())
+                        .await
+                {
+                    tracing::error!(
+                        "routes worker failed accepting block: {}",
+                        e
+                    );
+                    panic!();
+                }
+            }
+        });
+
+        Ok(results)
     }
 }
 
