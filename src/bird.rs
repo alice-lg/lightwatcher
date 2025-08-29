@@ -18,9 +18,12 @@ use crate::{
         parser::{BlockIterator, Parse},
         protocols::{ProtocolReader, ProtocolReceiver},
         routes::RE_ROUTES_START,
-        routes_worker::{self, RoutesResultsReceiver},
+        routes_worker::RoutesResultsReceiver,
     },
 };
+
+#[cfg(not(test))]
+use crate::parsers::routes_worker;
 
 lazy_static! {
     /// Regex for start / stop status.
@@ -522,35 +525,33 @@ impl Birdc {
         &self,
         cmd: &str,
     ) -> Result<RoutesResultsReceiver> {
+        use crate::parsers::routes_worker::{
+            RouteBlockParseJob, RoutesWorkerPool,
+        };
         use std::fs::File;
 
-        let mut stream =
-            BIRD_CONNECTION_POOL.acquire().await.open(&self.socket)?;
-        stream.write_all(cmd.as_bytes())?;
-        let buf = BufReader::new(stream);
+        let filename =
+            cmd.replace("'", "").replace(" ", "-").replace("\n", "");
 
-        let file =
-            File::open("tests/birdc/show-route-all-protocol-R1").unwrap();
-        /* let file: File =
-        File::open("tests/birdc/show-route-all-table-master4").unwrap(); */
+        let testfile = format!("tests/birdc/{}", filename);
+        println!("using captured response: {}", testfile);
+
+        let file = File::open(testfile).unwrap();
+
         let reader = BufReader::new(file);
         let blocks = BlockIterator::new(reader, &RE_ROUTES_START);
 
         // Spawn workers and fill queue
-        let (results_tx, results) = mpsc::channel(64);
+        let (results_tx, results) = mpsc::channel(23);
+        let pool = RoutesWorkerPool::start();
 
         tokio::spawn(async move {
             for block in blocks {
-                if let Err(e) =
-                    routes_worker::accept_block(block, results_tx.clone())
-                        .await
-                {
-                    tracing::error!(
-                        "routes worker failed accepting block: {}",
-                        e
-                    );
-                    panic!();
-                }
+                let job = RouteBlockParseJob {
+                    block,
+                    results: results_tx.clone(),
+                };
+                pool.accept(job).await.unwrap();
             }
         });
 

@@ -12,6 +12,7 @@ struct ErrorResponse {
 }
 
 /// Wrapped Anyhow Error
+#[derive(Debug)]
 pub struct Error(anyhow::Error);
 
 /// Implement error conversion
@@ -33,10 +34,7 @@ impl IntoResponse for Error {
             error: format!("{}", self.0),
         };
         let body = serde_json::to_string(&err).unwrap();
-        (
-            code,
-            [(header::CONTENT_TYPE, "application/json")],
-            body,
-        ).into_response()
+        (code, [(header::CONTENT_TYPE, "application/json")], body)
+            .into_response()
     }
 }

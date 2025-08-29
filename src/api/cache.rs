@@ -118,6 +118,11 @@ where
 
         self.responses.remove(&remove_key);
     }
+
+    /// Reset cache
+    pub fn clear(&mut self) {
+        self.responses = HashMap::new();
+    }
 }
 
 #[cfg(test)]

@@ -52,8 +52,6 @@ pub async fn list_routes_received(
     let birdc = Birdc::default();
     let protocol = ProtocolID::parse(&id)?;
 
-    let cutoff = config::get_routes_protocol_cutoff();
-
     let res = {
         let cache = ROUTES_RECEIVED_CACHE.lock().await;
         cache.get(&protocol).cloned()
@@ -62,6 +60,7 @@ pub async fn list_routes_received(
     match res {
         Some(res) => Ok(res),
         None => {
+            let cutoff = config::get_routes_protocol_cutoff();
             let mut results = birdc.show_route_all_protocol(&protocol).await?;
             let mut routes = vec![];
             while let Some(result) = results.recv().await {
@@ -73,9 +72,9 @@ pub async fn list_routes_received(
                 }
 
                 // If we have a resource limit and are over the
-                // cutoff, break. This also stops the parsing.
+                // cutoff limit stop the parsing.
                 if let Some(cutoff) = cutoff {
-                    if cutoff > routes.len() {
+                    if routes.len() >= cutoff {
                         warn!(
                             protocol = id,
                             routes = routes.len(),
@@ -102,7 +101,6 @@ pub async fn list_routes_filtered(
 ) -> Result<RoutesResponse, Error> {
     let birdc = Birdc::default();
     let protocol = ProtocolID::parse(&id)?;
-    let cutoff = config::get_routes_protocol_cutoff();
 
     let res = {
         let cache = ROUTES_FILTERED_CACHE.lock().await;
@@ -112,6 +110,7 @@ pub async fn list_routes_filtered(
     match res {
         Some(res) => Ok(res),
         None => {
+            let cutoff = config::get_routes_protocol_cutoff();
             let mut results =
                 birdc.show_route_all_filtered_protocol(&protocol).await?;
             let mut routes = vec![];
@@ -125,7 +124,7 @@ pub async fn list_routes_filtered(
 
                 // Apply resource limit (cutoff)
                 if let Some(cutoff) = cutoff {
-                    if cutoff > routes.len() {
+                    if routes.len() >= cutoff {
                         warn!(
                             protocol = id,
                             routes = routes.len(),
@@ -152,7 +151,6 @@ pub async fn list_routes_noexport(
 ) -> Result<RoutesResponse, Error> {
     let birdc = Birdc::default();
     let protocol = ProtocolID::parse(&id)?;
-    let cutoff = config::get_routes_protocol_cutoff();
 
     let res = {
         let cache = ROUTES_NO_EXPORT_CACHE.lock().await;
@@ -162,6 +160,7 @@ pub async fn list_routes_noexport(
     match res {
         Some(res) => Ok(res),
         None => {
+            let cutoff = config::get_routes_protocol_cutoff();
             let mut results =
                 birdc.show_route_all_noexport_protocol(&protocol).await?;
             let mut routes = vec![];
@@ -175,7 +174,7 @@ pub async fn list_routes_noexport(
                 }
                 // Apply resource limit (cutoff)
                 if let Some(cutoff) = cutoff {
-                    if cutoff > routes.len() {
+                    if routes.len() >= cutoff {
                         warn!(
                             protocol = id,
                             routes = routes.len(),
@@ -307,5 +306,39 @@ pub async fn list_routes_table_filtered(
             cache.put(&table, response.clone());
             Ok(response)
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use axum::extract::Path;
+    use std::env;
+
+    #[tokio::test]
+    async fn test_list_routes_received_cutoff() {
+        // Set cutoff to 5
+        env::set_var("LIGHTWATCHER_ROUTES_PROTOCOL_CUTOFF", "5");
+
+        let cutoff = config::get_routes_protocol_cutoff();
+        assert_eq!(cutoff, Some(5));
+
+        let id = "R1";
+        let result = list_routes_received(Path(id.into())).await;
+        let result = result.expect("must be ok");
+
+        assert!(result.routes.len() <= 5);
+
+        // Reset cutoff and cache
+        env::remove_var("LIGHTWATCHER_ROUTES_PROTOCOL_CUTOFF");
+        {
+            let mut cache = ROUTES_RECEIVED_CACHE.lock().await;
+            cache.clear();
+        }
+
+        let result = list_routes_received(Path(id.into())).await;
+        let result = result.expect("must be ok");
+
+        assert!(result.routes.len() > 5);
     }
 }

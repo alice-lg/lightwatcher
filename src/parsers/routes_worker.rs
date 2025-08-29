@@ -58,8 +58,8 @@ pub type RoutesResultsReceiver = Receiver<Result<PrefixGroup>>;
 
 /// A routes block parsing job
 pub struct RouteBlockParseJob {
-    block: Block,
-    results: RoutesResultsSender,
+    pub block: Block,
+    pub results: RoutesResultsSender,
 }
 
 /// Parsing Job Sender
