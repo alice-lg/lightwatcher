@@ -1,0 +1,1943 @@
+0001 BIRD 2.0.10 ready.
+1007-Table master4:
+ 192.44.19.0/24       unicast [R192_175 2023-04-19 09:29:13] (100) [AS60824i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 60824
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (553,1281) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.196.64.0/18      unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,120) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-157.180.228.0/22     unicast [R192_175 2023-04-19 09:29:13] (100) [AS58069i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 34878 58069
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-153.96.28.0/22       unicast [R192_175 2023-04-19 09:29:13] (100) [AS60824i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 60824
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (553,1281) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.196.32.0/20      unicast [R192_175 2023-04-19 09:29:13] (100) [AS34878i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 34878
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (34878,9) (34878,10100) (34878,10200) (34878,10300) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.197.180.0/22     unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,120) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-129.233.255.0/24     unicast [R192_175 2023-04-19 09:29:13] (100) [AS5501i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 5501
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-195.39.222.0/23      unicast [R192_175 2023-04-19 09:29:13] (100) [AS29010i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 29010
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-44.130.112.0/24      unicast [R192_175 2023-04-19 09:29:13] (100) [AS202113i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 202113
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-134.108.0.0/16       unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-192.67.208.0/24      unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,100) (553,600) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-141.37.0.0/16        unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,100) (553,600) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-153.96.128.0/22      unicast [R192_175 2023-04-19 09:29:13] (100) [AS60824i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 60824
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (553,1281) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.196.166.0/23     unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,100) (553,600) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.197.112.0/22     unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,120) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-192.42.63.0/24       unicast [R192_175 2023-04-19 09:29:13] (100) [AS5501i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 5501
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.197.149.0/24     unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-45.90.132.0/22       unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-192.42.64.0/24       unicast [R192_175 2023-04-19 09:29:13] (100) [AS5501i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 5501
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.196.132.0/22     unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,120) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-192.44.22.0/24       unicast [R192_175 2023-04-19 09:29:13] (100) [AS60824i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 60824
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (553,1281) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-141.69.0.0/16        unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,120) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-45.12.200.0/24       unicast [R192_175 2023-04-19 09:29:13] (100) [AS202539i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 204680 202539 202539
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (204680, 100, 202539) (6695, 1000, 1)
+1007-192.108.46.0/23      unicast [R192_175 2023-04-19 09:29:13] (100) [AS58069i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 34878 58069
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-153.97.11.0/24       unicast [R192_175 2023-04-19 09:29:13] (100) [AS5501i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 5501
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-192.52.48.0/23       unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: (rt, 553, 200)
+ 	BGP.large_community: (6695, 1000, 1)
+1007-2.21.21.0/24         unicast [R192_175 2023-04-19 09:29:13] (100) [AS20940i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 212522 20940 20940
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (212522, 3000, 0) (212522, 3000, 20940) (212522, 3003, 0) (6695, 1000, 2) (6695, 1001, 1)
+1007-157.180.232.0/22     unicast [R192_175 2023-04-19 09:29:13] (100) [AS58069i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 34878 58069
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-194.0.10.0/24        unicast [R192_175 2023-04-19 09:29:13] (100) [AS49488i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 49488 49488
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-141.10.0.0/16        unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,100) (553,600) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-141.18.0.0/16        unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,120) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-172.68.253.0/24      unicast [R192_175 2023-04-19 09:29:13] (100) [AS13335i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 212522 13335
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (13335,10627) (13335,19020) (13335,20510) (13335,20520) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (212522, 3000, 0) (212522, 3000, 13335) (6695, 1000, 1)
+1007-192.107.235.0/24     unicast [R192_175 2023-04-19 09:29:13] (100) [AS60824i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 60824
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (553,1281) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-134.105.0.0/16       unicast [R192_175 2023-04-19 09:29:13] (100) [AS42873i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 42873
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-192.44.16.0/24       unicast [R192_175 2023-04-19 09:29:13] (100) [AS60824i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 60824
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (553,1281) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.196.165.0/24     unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,100) (553,600) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-195.60.186.0/23      unicast [R192_175 2023-04-19 09:29:13] (100) [AS39100i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 39100
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-153.96.32.0/21       unicast [R192_175 2023-04-19 09:29:13] (100) [AS60824i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 60824
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (553,1281) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-129.143.0.0/16       unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,100) (553,600) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-192.107.236.0/24     unicast [R192_175 2023-04-19 09:29:13] (100) [AS60824i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 60824
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (553,1281) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-153.96.60.0/24       unicast [R192_175 2023-04-19 09:29:13] (100) [AS60824i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 60824
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (553,1281) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-129.233.252.0/24     unicast [R192_175 2023-04-19 09:29:13] (100) [AS5501i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 5501
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-192.52.50.0/24       unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: (rt, 553, 200)
+ 	BGP.large_community: (6695, 1000, 1)
+1007-192.44.17.0/24       unicast [R192_175 2023-04-19 09:29:13] (100) [AS5501i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 5501
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.197.212.0/24     unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,120) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-141.58.0.0/16        unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: (rt, 553, 200)
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-193.196.0.0/21       unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,100) (553,600) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.196.168.0/21     unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,120) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-129.233.253.0/24     unicast [R192_175 2023-04-19 09:29:13] (100) [AS5501i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 5501
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.196.136.0/21     unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,120) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.197.80.0/22      unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,120) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-129.233.254.0/24     unicast [R192_175 2023-04-19 09:29:13] (100) [AS5501i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 5501
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-141.3.0.0/16         unicast [R192_175 2023-04-19 09:29:13] (100) [AS34878i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 34878
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (34878,9) (34878,10100) (34878,10200) (34878,10300) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-141.72.128.0/18      unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,120) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-193.197.4.0/23       unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,120) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-141.19.0.0/16        unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,120) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-153.96.220.0/22      unicast [R192_175 2023-04-19 09:29:13] (100) [AS5501i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 5501
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-23.0.0.0/24          unicast [R192_175 2023-04-19 09:29:13] (100) [AS20940i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 212522 20940 20940
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (212522, 3000, 0) (212522, 3000, 20940) (212522, 3003, 0) (6695, 1000, 2) (6695, 1001, 1)
+1007-192.108.40.0/22      unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-141.58.0.0/15        unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,100) (553,600) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-193.196.192.0/18     unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-129.69.0.0/16        unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: (rt, 553, 200)
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-141.59.0.0/16        unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,120) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-45.140.180.0/22      unicast [R192_175 2023-04-19 09:29:13] (100) [AS208854i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 204680 208854 208854
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (204680, 100, 208854) (6695, 1000, 1)
+1007-192.108.44.0/24      unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-193.197.168.0/21     unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,100) (553,600) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.196.129.0/24     unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-141.18.0.0/15        unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,100) (553,600) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-193.197.136.0/21     unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-192.44.14.0/24       unicast [R192_175 2023-04-19 09:29:13] (100) [AS60824i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 60824
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (553,1281) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.197.68.0/23      unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,120) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-153.96.24.0/24       unicast [R192_175 2023-04-19 09:29:13] (100) [AS5501i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 5501
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-192.102.171.0/24     unicast [R192_175 2023-04-19 09:29:13] (100) [AS5501i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 5501
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.196.0.0/15       unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,100) (553,600) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-91.205.76.0/22       unicast [R192_175 2023-04-19 09:29:13] (100) [AS50964i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 50964
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-192.108.45.0/24      unicast [R192_175 2023-04-19 09:29:13] (100) [AS58069i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 34878 58069
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.196.156.0/22     unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,100) (553,600) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.197.0.0/24       unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,120) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-192.44.7.0/24        unicast [R192_175 2023-04-19 09:29:13] (100) [AS60824i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 60824
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (553,1281) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-194.59.37.0/24       unicast [R192_175 2023-04-19 09:29:13] (100) [AS50964i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 50964
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.197.8.0/22       unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,100) (553,600) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-134.103.0.0/16       unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,120) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-178.132.70.0/24      unicast [R192_175 2023-04-19 09:29:13] (100) [AS212522i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 212522
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-185.134.84.0/22      unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-194.59.38.0/24       unicast [R192_175 2023-04-19 09:29:13] (100) [AS50964i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 50964
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-45.140.180.0/24      unicast [R192_175 2023-04-19 09:29:13] (100) [AS208854i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 204680 208854 208854
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (204680, 100, 208854) (6695, 1000, 1)
+1007-153.96.18.0/24       unicast [R192_175 2023-04-19 09:29:13] (100) [AS5501i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 5501
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-153.96.253.0/24      unicast [R192_175 2023-04-19 09:29:13] (100) [AS5501i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 5501
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-153.97.0.0/21        unicast [R192_175 2023-04-19 09:29:13] (100) [AS5501i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 5501
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-147.142.0.0/16       unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: (rt, 553, 200)
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-194.59.39.0/24       unicast [R192_175 2023-04-19 09:29:13] (100) [AS50964i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 50964
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-153.96.254.0/24      unicast [R192_175 2023-04-19 09:29:13] (100) [AS5501i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 5501
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.197.70.0/24      unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-134.60.0.0/16        unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: (rt, 553, 200)
+ 	BGP.large_community: (6695, 1000, 1)
+1007-192.76.243.0/24      unicast [R192_175 2023-04-19 09:29:13] (100) [AS35052i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 35052
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-141.72.0.0/16        unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,100) (553,600) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-153.96.88.0/22       unicast [R192_175 2023-04-19 09:29:13] (100) [AS60824i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 60824
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (553,1281) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-141.72.0.0/17        unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,120) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-193.196.160.0/22     unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,100) (553,600) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-153.96.54.0/23       unicast [R192_175 2023-04-19 09:29:13] (100) [AS5501i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 5501
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.197.130.0/24     unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,100) (553,600) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.196.152.0/24     unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-192.44.37.0/24       unicast [R192_175 2023-04-19 09:29:13] (100) [AS5501i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 5501
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-129.233.0.0/17       unicast [R192_175 2023-04-19 09:29:13] (100) [AS5501i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 5501
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.196.16.0/20      unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: (rt, 553, 200)
+ 	BGP.large_community: (6695, 1000, 1)
+1007-141.68.0.0/15        unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,100) (553,600) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-153.97.26.0/24       unicast [R192_175 2023-04-19 09:29:13] (100) [AS5501i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 5501
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-141.70.128.0/17      unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: (rt, 553, 200)
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-192.108.68.0/24      unicast [R192_175 2023-04-19 09:29:13] (100) [AS58069i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 34878 58069
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.197.28.0/22      unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,100) (553,600) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-192.108.35.0/24      unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-192.129.30.0/24      unicast [R192_175 2023-04-19 09:29:13] (100) [AS42873i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 42873
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-153.96.144.0/23      unicast [R192_175 2023-04-19 09:29:13] (100) [AS5501i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 5501
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-192.52.32.0/20       unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: (rt, 553, 200)
+ 	BGP.large_community: (6695, 1000, 1)
+1007-192.44.0.0/22        unicast [R192_175 2023-04-19 09:29:13] (100) [AS5501i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 5501
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.197.160.0/22     unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,100) (553,600) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-194.59.36.0/24       unicast [R192_175 2023-04-19 09:29:13] (100) [AS50964i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 50964
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-153.96.83.0/24       unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,100) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-153.96.8.0/23        unicast [R192_175 2023-04-19 09:29:13] (100) [AS5501i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 5501
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-192.52.0.0/19        unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: (rt, 553, 200)
+ 	BGP.large_community: (6695, 1000, 1)
+1007-144.41.0.0/16        unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: (rt, 553, 200)
+ 	BGP.large_community: (6695, 1000, 1)
+1007-192.108.36.0/22      unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-192.124.28.0/24      unicast [R192_175 2023-04-19 09:29:13] (100) [AS42873i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 42873
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-193.197.200.0/21     unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,120) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-134.2.0.0/16         unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: (rt, 553, 200)
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-153.96.16.0/23       unicast [R192_175 2023-04-19 09:29:13] (100) [AS5501i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 5501
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.196.13.0/24      unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: (rt, 553, 200)
+ 	BGP.large_community: (6695, 1000, 1)
+1007-129.206.0.0/16       unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: (rt, 553, 200)
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-194.59.36.0/22       unicast [R192_175 2023-04-19 09:29:13] (100) [AS50964i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 50964
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-185.237.153.0/24     unicast [R192_175 2023-04-19 09:29:13] (100) [AS213068i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 34878 213068
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (23456,1001) (34878,100) (34878,10100) (34878,10200) (34878,10300) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (213068, 1001, 1) (6695, 1000, 1)
+1007-193.196.154.0/23     unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: (rt, 553, 200)
+ 	BGP.large_community: (6695, 1000, 1)
+1007-137.251.0.0/16       unicast [R192_175 2023-04-19 09:29:13] (100) [AS5501i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 5501
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.197.94.0/24      unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,120) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-134.34.0.0/16        unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: (rt, 553, 200)
+ 	BGP.large_community: (6695, 1000, 1)
+1007-141.62.0.0/17        unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,100) (553,600) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.197.64.0/22      unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: (rt, 553, 200)
+ 	BGP.large_community: (6695, 1000, 1)
+1007-153.96.10.0/24       unicast [R192_175 2023-04-19 09:29:13] (100) [AS5501i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 5501
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-192.42.143.0/24      unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: (rt, 553, 200)
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-141.62.0.0/16        unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,100) (553,600) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-153.96.114.0/23      unicast [R192_175 2023-04-19 09:29:13] (100) [AS60824i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 60824
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (553,1281) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.197.132.0/22     unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-141.70.0.0/16        unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,100) (553,600) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-153.96.12.0/22       unicast [R192_175 2023-04-19 09:29:13] (100) [AS5501i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 5501
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.197.32.0/19      unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,100) (553,600) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-192.67.189.0/24      unicast [R192_175 2023-04-19 09:29:13] (100) [AS204680i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 204680
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-132.230.0.0/16       unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: (rt, 553, 200)
+ 	BGP.large_community: (6695, 1000, 1)
+1007-129.13.0.0/16        unicast [R192_175 2023-04-19 09:29:13] (100) [AS34878i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 34878
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (34878,9) (34878,10100) (34878,10200) (34878,10300) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.197.120.0/21     unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,120) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-141.7.0.0/16         unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,100) (553,600) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-194.113.96.0/22      unicast [R192_175 2023-04-19 09:29:13] (100) [AS60824i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 60824 60824 60824
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (553,1281) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-185.52.244.0/22      unicast [R192_175 2023-04-19 09:29:13] (100) [AS202113i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 202113
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-129.233.196.0/24     unicast [R192_175 2023-04-19 09:29:13] (100) [AS60824i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 60824
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (553,1281) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-153.96.204.0/23      unicast [R192_175 2023-04-19 09:29:13] (100) [AS60824i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 60824
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (553,1281) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.196.9.0/24       unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,120) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.197.20.0/23      unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,120) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-129.134.163.0/24     unicast [R192_175 2023-04-19 09:29:13] (100) [AS63293i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 212522 63293
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (212522, 3000, 0) (212522, 3000, 63293) (6695, 1000, 2) (6695, 1001, 1)
+1007-153.96.70.0/23       unicast [R192_175 2023-04-19 09:29:13] (100) [AS60824i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 60824
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (553,1281) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-185.65.241.0/24      unicast [R192_175 2023-04-19 09:29:13] (100) [AS202329i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 204680 202329 202329
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (204680, 100, 202329) (6695, 1000, 1)
+1007-153.96.206.0/24      unicast [R192_175 2023-04-19 09:29:13] (100) [AS60824i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 60824
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (553,1281) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-129.233.194.0/23     unicast [R192_175 2023-04-19 09:29:13] (100) [AS60824i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 60824
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (553,1281) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-161.42.0.0/16        unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: (rt, 553, 200)
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-141.31.0.0/16        unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,100) (553,600) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-192.124.25.0/24      unicast [R192_175 2023-04-19 09:29:13] (100) [AS42873i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 42873
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-91.213.198.0/24      unicast [R192_175 2023-04-19 09:29:13] (100) [AS49739i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 49739
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-134.107.202.0/24     unicast [R192_175 2023-04-19 09:29:13] (100) [AS42873i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 42873
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-193.197.86.0/23      unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,120) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-153.97.182.0/23      unicast [R192_175 2023-04-19 09:29:13] (100) [AS5501i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 5501
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-193.197.157.0/24     unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.196.176.0/20     unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,100) (553,600) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-141.47.0.0/16        unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,120) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.197.152.0/22     unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,100) (553,600) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-153.96.0.0/21        unicast [R192_175 2023-04-19 09:29:13] (100) [AS5501i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 5501
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-192.41.227.0/24      unicast [R192_175 2023-04-19 09:29:13] (100) [AS60824i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 60824
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (553,1281) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-45.12.168.0/23       unicast [R192_175 2023-04-19 09:29:13] (100) [AS208974i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 204680 208974
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (204680, 100, 208974) (208974, 3, 0) (6695, 1000, 2) (6695, 1001, 1)
+1007-141.79.0.0/16        unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,100) (553,600) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-141.87.0.0/16        unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,100) (553,600) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-185.237.152.0/24     unicast [R192_175 2023-04-19 09:29:13] (100) [AS213068i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 34878 213068
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (23456,1001) (34878,100) (34878,10100) (34878,10200) (34878,10300) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (213068, 1001, 1) (6695, 1000, 1)
+1007-193.197.224.0/19     unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,100) (553,600) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-129.233.192.0/24     unicast [R192_175 2023-04-19 09:29:13] (100) [AS60824i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 60824
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (553,1281) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-192.44.24.0/24       unicast [R192_175 2023-04-19 09:29:13] (100) [AS5501i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 5501
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-141.28.0.0/16        unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,120) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-193.197.85.0/24      unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-129.233.193.0/24     unicast [R192_175 2023-04-19 09:29:13] (100) [AS60824i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 60824
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (553,1281) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-192.124.26.0/23      unicast [R192_175 2023-04-19 09:29:13] (100) [AS42873i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 42873
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-194.76.38.0/23       unicast [R192_175 2023-04-19 09:29:13] (100) [AS50964i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 50964
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-141.52.0.0/16        unicast [R192_175 2023-04-19 09:29:13] (100) [AS34878i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 34878
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (34878,9) (34878,10100) (34878,10200) (34878,10300) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-153.96.72.0/22       unicast [R192_175 2023-04-19 09:29:13] (100) [AS60824i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 60824
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (553,1281) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-45.12.170.0/24       unicast [R192_175 2023-04-19 09:29:13] (100) [AS208974i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 204680 208974
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (204680, 100, 208974) (208974, 3, 0) (6695, 1000, 2) (6695, 1001, 1)
+1007-141.68.0.0/16        unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,120) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-134.155.0.0/16       unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,111) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: (rt, 553, 200)
+ 	BGP.large_community: (6695, 1000, 1)
+1007-192.92.125.0/24      unicast [R192_175 2023-04-19 09:29:13] (100) [AS35052i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 35052
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-45.12.171.0/24       unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 2) (6695, 1001, 1)
+1007-192.44.27.0/24       unicast [R192_175 2023-04-19 09:29:13] (100) [AS60824i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553 60824
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,112) (553,1200) (553,1281) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+1007-193.196.144.0/21     unicast [R192_175 2023-04-19 09:29:13] (100) [AS553i]
+ 	via 111.111.111.111 on vx0
+1008-	Type: BGP univ
+1012-	BGP.origin: IGP
+ 	BGP.as_path: 553
+ 	BGP.next_hop: 111.111.111.111
+ 	BGP.local_pref: 100
+ 	BGP.community: (553,120) (65101,1001) (65102,1000) (65103,276) (65104,150)
+ 	BGP.ext_community: 
+ 	BGP.large_community: (6695, 1000, 1)
+0000 

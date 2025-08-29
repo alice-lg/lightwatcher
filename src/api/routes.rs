@@ -196,6 +196,9 @@ pub async fn list_routes_noexport(
 }
 
 /// List all routes in a table
+/// Please note that the routes count cutoff is not applied
+/// on this endpoint, as it is intended for syncing the
+/// table to the Alice.
 pub async fn list_routes_table(
     Path(table): Path<String>,
 ) -> Result<RoutesResponse, Error> {
@@ -339,6 +342,54 @@ mod tests {
         let result = list_routes_received(Path(id.into())).await;
         let result = result.expect("must be ok");
 
+        assert!(result.routes.len() > 5);
+    }
+
+    #[tokio::test]
+    async fn test_list_routes_filtered_cutoff() {
+        // Set cutoff to 5
+        env::set_var("LIGHTWATCHER_ROUTES_PROTOCOL_CUTOFF", "5");
+
+        let cutoff = config::get_routes_protocol_cutoff();
+        assert_eq!(cutoff, Some(5));
+
+        let id = "R1";
+        let result = list_routes_filtered(Path(id.into())).await.unwrap();
+
+        assert!(result.routes.len() <= 5);
+
+        // Reset cutoff and cache
+        env::remove_var("LIGHTWATCHER_ROUTES_PROTOCOL_CUTOFF");
+        {
+            let mut cache = ROUTES_FILTERED_CACHE.lock().await;
+            cache.clear();
+        }
+
+        let result = list_routes_filtered(Path(id.into())).await.unwrap();
+        assert!(result.routes.len() > 5);
+    }
+
+    #[tokio::test]
+    async fn test_list_routes_noexport_cutoff() {
+        // Set cutoff to 5
+        env::set_var("LIGHTWATCHER_ROUTES_PROTOCOL_CUTOFF", "5");
+
+        let cutoff = config::get_routes_protocol_cutoff();
+        assert_eq!(cutoff, Some(5));
+
+        let id = "R1";
+        let result = list_routes_noexport(Path(id.into())).await.unwrap();
+
+        assert!(result.routes.len() <= 5);
+
+        // Reset cutoff and cache
+        env::remove_var("LIGHTWATCHER_ROUTES_PROTOCOL_CUTOFF");
+        {
+            let mut cache = ROUTES_NO_EXPORT_CACHE.lock().await;
+            cache.clear();
+        }
+
+        let result = list_routes_noexport(Path(id.into())).await.unwrap();
         assert!(result.routes.len() > 5);
     }
 }
