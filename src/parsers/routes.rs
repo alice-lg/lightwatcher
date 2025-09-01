@@ -36,7 +36,7 @@ lazy_static! {
     /// Regex for a Key: Value pair
     static ref RE_KEY_VALUE: Regex = Regex::new(r"(?x)
         .*?\s+
-        (?P<key>[\s\w\.]+):
+        (?P<key>[\s\w\.\[\]]+):
         \s+
         (?P<value>.+)
     ").unwrap();
@@ -454,5 +454,28 @@ mod tests {
 
         assert_eq!(route.bgp.large_communities.len(), 2);
         assert_eq!(route.bgp.otc, Some("213973".into()));
+    }
+
+    #[test]
+    fn test_parse_route_with_transitive_attr() {
+        let block = include_str!("../../tests/birdc/show-route-tattr");
+        let block: Vec<String> =
+            block.split("\n").map(|s| s.to_string()).collect();
+        let routes = PrefixGroup::parse(block).unwrap();
+
+        assert_eq!(routes.len(), 1);
+        let route = &routes[0];
+
+        assert_eq!(route.network, "192.88.10.0/24");
+        assert_eq!(route.bgp.as_path, vec!["24993", "3257", "3356", "786"]);
+        assert_eq!(route.bgp.communities.len(), 5);
+        assert_eq!(route.bgp.large_communities.len(), 1);
+
+        // Verify the transitive attribute line didn't break parsing
+        // and didn't get added to communities
+        assert_eq!(
+            route.bgp.large_communities[0],
+            LargeCommunity(16374, 1101, 8)
+        );
     }
 }
