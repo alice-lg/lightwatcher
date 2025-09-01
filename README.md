@@ -1,4 +1,4 @@
-# Birdwatcher 3.0.0
+# Birdwatcher 3.0 (Preview)
 
 [![Build and Test](https://github.com/alice-lg/lightwatcher/actions/workflows/rust.yml/badge.svg)](https://github.com/alice-lg/lightwatcher/actions/workflows/rust.yml)
 
@@ -43,6 +43,9 @@ Lightwatcher is configured entirely using environment variables:
 
 `LIGHTWATCHER_ROUTES_WORKER_POOL_SIZE` (default: `<cpu cores>`)
  * Number of worker threads for route parsing.
+
+`LIGHTWATCHER_ROUTES_PROTOCOL_CUTOFF` (default: `<disabled>`)
+ * Maximum number of routes to return per protocol. Leave empty or unset to disable cutoff.
 
 ### Rate Limiting
 
