@@ -321,7 +321,9 @@ mod tests {
     #[tokio::test]
     async fn test_list_routes_received_cutoff() {
         // Set cutoff to 5
-        env::set_var("LIGHTWATCHER_ROUTES_PROTOCOL_CUTOFF", "5");
+        unsafe {
+            env::set_var("LIGHTWATCHER_ROUTES_PROTOCOL_CUTOFF", "5");
+        }
 
         let cutoff = config::get_routes_protocol_cutoff();
         assert_eq!(cutoff, Some(5));
@@ -333,7 +335,10 @@ mod tests {
         assert!(result.routes.len() <= 5);
 
         // Reset cutoff and cache
-        env::remove_var("LIGHTWATCHER_ROUTES_PROTOCOL_CUTOFF");
+        unsafe {
+            env::remove_var("LIGHTWATCHER_ROUTES_PROTOCOL_CUTOFF");
+        }
+
         {
             let mut cache = ROUTES_RECEIVED_CACHE.lock().await;
             cache.clear();
@@ -348,7 +353,9 @@ mod tests {
     #[tokio::test]
     async fn test_list_routes_filtered_cutoff() {
         // Set cutoff to 5
-        env::set_var("LIGHTWATCHER_ROUTES_PROTOCOL_CUTOFF", "5");
+        unsafe {
+            env::set_var("LIGHTWATCHER_ROUTES_PROTOCOL_CUTOFF", "5");
+        }
 
         let cutoff = config::get_routes_protocol_cutoff();
         assert_eq!(cutoff, Some(5));
@@ -359,7 +366,10 @@ mod tests {
         assert!(result.routes.len() <= 5);
 
         // Reset cutoff and cache
-        env::remove_var("LIGHTWATCHER_ROUTES_PROTOCOL_CUTOFF");
+        unsafe {
+            env::remove_var("LIGHTWATCHER_ROUTES_PROTOCOL_CUTOFF");
+        }
+
         {
             let mut cache = ROUTES_FILTERED_CACHE.lock().await;
             cache.clear();
@@ -372,7 +382,9 @@ mod tests {
     #[tokio::test]
     async fn test_list_routes_noexport_cutoff() {
         // Set cutoff to 5
-        env::set_var("LIGHTWATCHER_ROUTES_PROTOCOL_CUTOFF", "5");
+        unsafe {
+            env::set_var("LIGHTWATCHER_ROUTES_PROTOCOL_CUTOFF", "5");
+        }
 
         let cutoff = config::get_routes_protocol_cutoff();
         assert_eq!(cutoff, Some(5));
@@ -383,7 +395,10 @@ mod tests {
         assert!(result.routes.len() <= 5);
 
         // Reset cutoff and cache
-        env::remove_var("LIGHTWATCHER_ROUTES_PROTOCOL_CUTOFF");
+        unsafe {
+            env::remove_var("LIGHTWATCHER_ROUTES_PROTOCOL_CUTOFF");
+        }
+
         {
             let mut cache = ROUTES_NO_EXPORT_CACHE.lock().await;
             cache.clear();
