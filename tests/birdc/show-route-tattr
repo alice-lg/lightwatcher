@@ -1,0 +1,14 @@
+0001 BIRD 2.16.1 ready.
+show route filtered all 192.88.10.0/24
+1007-Table master4:
+ 192.88.10.0/24       unicast [pb_0145_as24993 2025-07-21 09:03:25 from 2001:7f8:19:1::61a1:1] * (100) [AS786i]
+        via 193.178.185.75 on eth1
+1008-   Type: BGP univ
+1012-   BGP.origin: IGP
+        BGP.as_path: 24993 3257 3356 786
+        BGP.next_hop: 193.178.185.75
+        BGP.local_pref: 100
+        BGP.community: (3257,10043) (3257,30138) (3257,50001) (3257,54900) (3257,54905)
+        BGP.14 [t]: 00 01 00 01 9f 56 a1 9d 02 9e 9f 56 ad 0d
+        BGP.large_community: (16374, 1101, 8)
+0000 
