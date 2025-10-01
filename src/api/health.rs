@@ -1,5 +1,5 @@
 use crate::{
-    api::{responses::HealthResponse, Error},
+    api::{Error, responses::HealthResponse},
     bird::Birdc,
     config,
 };

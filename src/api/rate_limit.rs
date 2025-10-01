@@ -1,11 +1,11 @@
 use std::{collections::HashMap, net::SocketAddr, sync::Arc};
 
 use axum::{
+    Extension,
     extract::{ConnectInfo, Request},
-    http::{header, StatusCode},
+    http::{StatusCode, header},
     middleware::Next,
     response::Response,
-    Extension,
 };
 use chrono::{DateTime, Utc};
 use tokio::sync::Mutex;

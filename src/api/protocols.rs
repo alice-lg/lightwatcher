@@ -5,7 +5,7 @@ use lazy_static::lazy_static;
 use tokio::sync::Mutex;
 
 use crate::{
-    api::{cache::ResponseCache, responses::ProtocolsResponse, Error},
+    api::{Error, cache::ResponseCache, responses::ProtocolsResponse},
     bird::{Birdc, ProtocolsMap},
     config,
 };
