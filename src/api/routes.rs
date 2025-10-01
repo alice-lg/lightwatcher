@@ -1,22 +1,23 @@
 use std::sync::Arc;
 
 use anyhow::Result;
-use axum::extract::Path;
+use axum::extract::{Path, Query};
 use lazy_static::lazy_static;
 use tokio::sync::Mutex;
 use tracing::{error, warn};
 
 use crate::{
     api::{
-        cache::{CacheKey, ResponseCache},
-        responses::RoutesResponse,
         Error,
+        cache::{CacheKey, ResponseCache},
+        responses::{RoutesCountResponse, RoutesResponse},
     },
     bird::{Birdc, PeerID, ProtocolID, TableID},
     config,
 };
 
 type RoutesCache = Arc<Mutex<ResponseCache<RoutesResponse>>>;
+type RoutesCountCache = Arc<Mutex<ResponseCache<RoutesCountResponse>>>;
 
 lazy_static! {
     static ref ROUTES_RECEIVED_CACHE: RoutesCache = {
@@ -40,6 +41,18 @@ lazy_static! {
         Arc::new(Mutex::new(ResponseCache::new(config)))
     };
     static ref ROUTES_TABLE_FILTERED_CACHE: RoutesCache = {
+        let config = config::get_routes_cache_config();
+        Arc::new(Mutex::new(ResponseCache::new(config)))
+    };
+    static ref ROUTES_PEER_CACHE: RoutesCache = {
+        let config = config::get_routes_cache_config();
+        Arc::new(Mutex::new(ResponseCache::new(config)))
+    };
+    static ref ROUTES_PIPE_FILTERED_CACHE: RoutesCache = {
+        let config = config::get_routes_cache_config();
+        Arc::new(Mutex::new(ResponseCache::new(config)))
+    };
+    static ref ROUTES_PIPE_FILTERED_COUNT_CACHE: RoutesCountCache = {
         let config = config::get_routes_cache_config();
         Arc::new(Mutex::new(ResponseCache::new(config)))
     };
@@ -73,15 +86,16 @@ pub async fn list_routes_received(
 
                 // If we have a resource limit and are over the
                 // cutoff limit stop the parsing.
-                if let Some(cutoff) = cutoff {
-                    if routes.len() >= cutoff {
-                        warn!(
-                            protocol = id,
-                            routes = routes.len(),
-                            cutoff = cutoff,
-                            "cutting off routes parser as max routes received reached");
-                        break;
-                    }
+                if let Some(cutoff) = cutoff
+                    && routes.len() >= cutoff
+                {
+                    warn!(
+                        protocol = id,
+                        routes = routes.len(),
+                        cutoff = cutoff,
+                        "cutting off routes parser as max routes received reached"
+                    );
+                    break;
                 }
             }
             let response = RoutesResponse {
@@ -123,15 +137,16 @@ pub async fn list_routes_filtered(
                 }
 
                 // Apply resource limit (cutoff)
-                if let Some(cutoff) = cutoff {
-                    if routes.len() >= cutoff {
-                        warn!(
-                            protocol = id,
-                            routes = routes.len(),
-                            cutoff = cutoff,
-                            "cutting off routes parser as max routes filtered reached");
-                        break;
-                    }
+                if let Some(cutoff) = cutoff
+                    && routes.len() >= cutoff
+                {
+                    warn!(
+                        protocol = id,
+                        routes = routes.len(),
+                        cutoff = cutoff,
+                        "cutting off routes parser as max routes filtered reached"
+                    );
+                    break;
                 }
             }
             let response = RoutesResponse {
@@ -173,15 +188,16 @@ pub async fn list_routes_noexport(
                     }
                 }
                 // Apply resource limit (cutoff)
-                if let Some(cutoff) = cutoff {
-                    if routes.len() >= cutoff {
-                        warn!(
-                            protocol = id,
-                            routes = routes.len(),
-                            cutoff = cutoff,
-                            "cutting off routes parser as max routes filtered reached");
-                        break;
-                    }
+                if let Some(cutoff) = cutoff
+                    && routes.len() >= cutoff
+                {
+                    warn!(
+                        protocol = id,
+                        routes = routes.len(),
+                        cutoff = cutoff,
+                        "cutting off routes parser as max routes filtered reached"
+                    );
+                    break;
                 }
             }
             let response = RoutesResponse {
@@ -307,6 +323,158 @@ pub async fn list_routes_table_filtered(
             };
             let mut cache = ROUTES_TABLE_FILTERED_CACHE.lock().await;
             cache.put(&table, response.clone());
+            Ok(response)
+        }
+    }
+}
+
+/// List all routes from a specific peer
+pub async fn list_routes_peer(
+    Path(peer): Path<String>,
+) -> Result<RoutesResponse, Error> {
+    let birdc = Birdc::default();
+    let peer_id = PeerID::parse(&peer)?;
+
+    let res = {
+        let cache = ROUTES_PEER_CACHE.lock().await;
+        cache.get(&peer_id).cloned()
+    };
+
+    match res {
+        Some(res) => Ok(res),
+        None => {
+            let cutoff = config::get_routes_protocol_cutoff();
+            let mut results = birdc.show_route_all_peer(&peer_id).await?;
+            let mut routes = vec![];
+            while let Some(result) = results.recv().await {
+                match result {
+                    Ok(prefix_group) => routes.extend(prefix_group),
+                    Err(e) => {
+                        error!("error decoding routes block: {}", e);
+                    }
+                }
+
+                // Apply resource limit (cutoff)
+                if let Some(cutoff) = cutoff
+                    && routes.len() >= cutoff
+                {
+                    warn!(
+                        peer = peer,
+                        routes = routes.len(),
+                        cutoff = cutoff,
+                        "cutting off routes parser as max routes peer reached"
+                    );
+                    break;
+                }
+            }
+            let response = RoutesResponse {
+                routes,
+                ..Default::default()
+            };
+            let mut cache = ROUTES_PEER_CACHE.lock().await;
+            cache.put(&peer_id, response.clone());
+            Ok(response)
+        }
+    }
+}
+
+#[derive(serde::Deserialize)]
+pub struct PipeFilteredParams {
+    pub table: String,
+    pub pipe: String,
+    pub protocol: Option<String>,
+}
+
+/// List filtered routes from a pipe
+pub async fn list_routes_pipe_filtered(
+    Query(params): Query<PipeFilteredParams>,
+) -> Result<RoutesResponse, Error> {
+    let birdc = Birdc::default();
+    let table = TableID::parse(&params.table)?;
+    let pipe = ProtocolID::parse(&params.pipe)?;
+
+    let key: CacheKey = if let Some(ref protocol_str) = params.protocol {
+        format!("{}-{}-{}", table, pipe, protocol_str).into()
+    } else {
+        format!("{}-{}", table, pipe).into()
+    };
+
+    let res = {
+        let cache = ROUTES_PIPE_FILTERED_CACHE.lock().await;
+        cache.get(&key).cloned()
+    };
+
+    match res {
+        Some(res) => Ok(res),
+        None => {
+            let mut results = if let Some(protocol_str) = params.protocol {
+                let protocol = ProtocolID::parse(&protocol_str)?;
+                birdc
+                    .show_route_table_noexport_pipe_protocol(
+                        &table, &pipe, &protocol,
+                    )
+                    .await?
+            } else {
+                birdc.show_route_table_noexport_pipe(&table, &pipe).await?
+            };
+
+            let mut routes = vec![];
+            while let Some(result) = results.recv().await {
+                match result {
+                    Ok(prefix_group) => routes.extend(prefix_group),
+                    Err(e) => {
+                        error!("error decoding routes block: {}", e);
+                    }
+                }
+            }
+
+            let response = RoutesResponse {
+                routes,
+                ..Default::default()
+            };
+            let mut cache = ROUTES_PIPE_FILTERED_CACHE.lock().await;
+            cache.put(&key, response.clone());
+            Ok(response)
+        }
+    }
+}
+
+#[derive(serde::Deserialize)]
+pub struct PipeFilteredCountParams {
+    pub table: String,
+    pub pipe: String,
+    pub address: String,
+}
+
+/// List filtered routes count from a pipe for a neighbor
+pub async fn list_routes_pipe_filtered_count(
+    Query(params): Query<PipeFilteredCountParams>,
+) -> Result<RoutesCountResponse, Error> {
+    let birdc = Birdc::default();
+    let table = TableID::parse(&params.table)?;
+    let pipe = ProtocolID::parse(&params.pipe)?;
+    let address = PeerID::parse(&params.address)?;
+
+    let key: CacheKey = format!("{}-{}-{}", table, pipe, address).into();
+
+    let res = {
+        let cache = ROUTES_PIPE_FILTERED_COUNT_CACHE.lock().await;
+        cache.get(&key).cloned()
+    };
+
+    match res {
+        Some(res) => Ok(res),
+        None => {
+            let count = birdc
+                .show_route_table_noexport_pipe_count(&table, &pipe, &address)
+                .await?;
+
+            let response = RoutesCountResponse {
+                routes: count,
+                ..Default::default()
+            };
+            let mut cache = ROUTES_PIPE_FILTERED_COUNT_CACHE.lock().await;
+            cache.put(&key, response.clone());
             Ok(response)
         }
     }
