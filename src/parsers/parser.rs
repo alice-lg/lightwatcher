@@ -74,11 +74,7 @@ impl Iterator for BlockGroup {
             }
         }
 
-        if block.is_empty() {
-            None
-        } else {
-            Some(block)
-        }
+        if block.is_empty() { None } else { Some(block) }
     }
 }
 
@@ -156,11 +152,7 @@ impl<R: BufRead> Iterator for BlockIterator<R> {
             }
         }
 
-        if block.is_empty() {
-            None
-        } else {
-            Some(block)
-        }
+        if block.is_empty() { None } else { Some(block) }
     }
 }
 
