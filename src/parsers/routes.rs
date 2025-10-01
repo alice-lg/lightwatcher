@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use lazy_static::lazy_static;
 use regex::Regex;
 
@@ -360,8 +360,7 @@ mod tests {
 
     #[test]
     fn test_match_route_header() {
-        let line =
-            "1007-203.17.254.0/24      unicast [R192_172 2023-04-19 09:28:42] * (100) [AS7545i]";
+        let line = "1007-203.17.254.0/24      unicast [R192_172 2023-04-19 09:28:42] * (100) [AS7545i]";
         let caps = RE_ROUTE_HEADER.captures(line).unwrap();
         println!("{:?}", caps);
 
@@ -372,8 +371,7 @@ mod tests {
 
     #[test]
     fn test_match_route_header_follow() {
-        let line =
-            "1007-                     unicast [R197_58 2023-04-19 09:28:23] (100) [AS9318i]";
+        let line = "1007-                     unicast [R197_58 2023-04-19 09:28:23] (100) [AS9318i]";
         let caps = RE_ROUTE_HEADER.captures(line).unwrap();
         println!("{:?}", caps.name("from_protocol").unwrap().as_str());
     }
