@@ -1,5 +1,5 @@
 use anyhow::Result;
-use axum::{middleware, routing::get, Extension, Router};
+use axum::{Extension, Router, middleware, routing::get};
 use tokio::net::TcpListener;
 use tower_http::{
     compression::CompressionLayer,
@@ -54,6 +54,15 @@ pub async fn start() -> Result<()> {
         .route(
             "/routes/table/{table}/peer/{peer}",
             get(routes::list_routes_table_peer),
+        )
+        .route("/routes/peer/{peer}", get(routes::list_routes_peer))
+        .route(
+            "/routes/pipe/filtered",
+            get(routes::list_routes_pipe_filtered),
+        )
+        .route(
+            "/routes/pipe/filtered/count",
+            get(routes::list_routes_pipe_filtered_count),
         )
         .layer(NormalizePathLayer::trim_trailing_slash())
         .layer(CompressionLayer::new())

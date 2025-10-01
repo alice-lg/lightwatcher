@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
 use axum::{
-    response::{IntoResponse, Response},
     Json,
+    response::{IntoResponse, Response},
 };
 use chrono::{DateTime, Duration, Utc};
 use serde::{Deserialize, Serialize};
@@ -207,5 +207,43 @@ impl IntoResponse for HealthResponse {
             axum::http::StatusCode::SERVICE_UNAVAILABLE
         };
         (status_code, Json(self)).into_response()
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct RoutesCountResponse {
+    pub api: ApiStatus,
+    pub cached_at: DateTime<Utc>,
+    pub routes: u32,
+}
+
+impl Default for RoutesCountResponse {
+    fn default() -> Self {
+        RoutesCountResponse {
+            api: ApiStatus::default(),
+            cached_at: Utc::now(),
+            routes: 0,
+        }
+    }
+}
+
+impl CachedResponse for RoutesCountResponse {
+    fn mark_cached(&mut self) {
+        self.api.mark_cached();
+        self.cached_at = Utc::now();
+    }
+
+    fn is_expired(&self) -> bool {
+        self.api.is_expired()
+    }
+
+    fn get_cached_at(&self) -> DateTime<Utc> {
+        self.cached_at
+    }
+}
+
+impl IntoResponse for RoutesCountResponse {
+    fn into_response(self) -> Response {
+        Json::from(self).into_response()
     }
 }

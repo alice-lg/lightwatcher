@@ -18,6 +18,7 @@ use crate::{
         parser::{BlockIterator, Parse},
         protocols::{ProtocolReader, ProtocolReceiver},
         routes::RE_ROUTES_START,
+        routes_count,
         routes_worker::RoutesResultsReceiver,
     },
 };
@@ -86,10 +87,10 @@ impl QueryValue {
     /// Parse a query value from a string. This will fail
     /// if the input is invalid.
     pub fn parse(s: &str) -> Result<Self> {
-        let table = s.to_string();
-        validate_string(&table)?;
+        let value = s.to_string();
+        validate_string(&value)?;
 
-        Ok(Self(table))
+        Ok(Self(value))
     }
 
     /// Get the value as string
@@ -514,6 +515,64 @@ impl Birdc {
             format!("show route all table '{}' where from={}\n", table, peer,);
         let routes = self.fetch_routes_cmd(&cmd).await?;
         Ok(routes)
+    }
+
+    /// Get routes for a specific peer
+    pub async fn show_route_all_peer(
+        &self,
+        peer: &PeerID,
+    ) -> Result<RoutesResultsReceiver> {
+        let cmd = format!("show route all where from={}\n", peer);
+        let routes = self.fetch_routes_cmd(&cmd).await?;
+        Ok(routes)
+    }
+
+    /// Get filtered routes from pipe for a table
+    pub async fn show_route_table_noexport_pipe(
+        &self,
+        table: &TableID,
+        pipe: &ProtocolID,
+    ) -> Result<RoutesResultsReceiver> {
+        let cmd =
+            format!("show route table '{}' noexport '{}' all\n", table, pipe);
+        let routes = self.fetch_routes_cmd(&cmd).await?;
+        Ok(routes)
+    }
+
+    /// Get filtered routes from pipe for a table with protocol filter
+    pub async fn show_route_table_noexport_pipe_protocol(
+        &self,
+        table: &TableID,
+        pipe: &ProtocolID,
+        protocol: &ProtocolID,
+    ) -> Result<RoutesResultsReceiver> {
+        let cmd = format!(
+            "show route table '{}' noexport '{}' protocol '{}' all\n",
+            table, pipe, protocol
+        );
+        let routes = self.fetch_routes_cmd(&cmd).await?;
+        Ok(routes)
+    }
+
+    /// Get count of filtered routes from pipe for a neighbor
+    pub async fn show_route_table_noexport_pipe_count(
+        &self,
+        table: &TableID,
+        pipe: &ProtocolID,
+        address: &PeerID,
+    ) -> Result<u32> {
+        let mut stream =
+            BIRD_CONNECTION_POOL.acquire().await.open(&self.socket)?;
+        let cmd = format!(
+            "show route table '{}' noexport '{}' where from='{}' count\n",
+            table, pipe, address
+        );
+        stream.write_all(cmd.as_bytes())?;
+
+        let reader = BufReader::new(stream);
+        let count = routes_count::parse_routes_count(reader)?;
+
+        Ok(count)
     }
 }
 
