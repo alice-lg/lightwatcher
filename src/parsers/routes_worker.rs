@@ -21,21 +21,23 @@ impl RoutesWorker {
 
         // Parsing is quite CPU bound, so this is spawned
         // on a thread.
-        tokio::task::spawn_blocking(move || loop {
-            match jobs_rx.blocking_recv() {
-                None => break, // channel closed
-                Some(job) => {
-                    let RouteBlockParseJob { block, results } = job;
-                    if results.is_closed() {
-                        continue; // next job
-                    }
-                    // Do heavy lifting.
-                    let routes = PrefixGroup::parse(block);
-                    if results.blocking_send(routes).is_err() {
-                        tracing::warn!(
-                            "routes parse job results receiver dropped"
-                        );
-                        continue;
+        tokio::task::spawn_blocking(move || {
+            loop {
+                match jobs_rx.blocking_recv() {
+                    None => break, // channel closed
+                    Some(job) => {
+                        let RouteBlockParseJob { block, results } = job;
+                        if results.is_closed() {
+                            continue; // next job
+                        }
+                        // Do heavy lifting.
+                        let routes = PrefixGroup::parse(block);
+                        if results.blocking_send(routes).is_err() {
+                            tracing::warn!(
+                                "routes parse job results receiver dropped"
+                            );
+                            continue;
+                        }
                     }
                 }
             }
@@ -95,15 +97,17 @@ impl RoutesWorkerPool {
 
         // Feed workers
         let mut next_worker: usize = 0;
-        tokio::task::spawn_blocking(move || loop {
-            match jobs_rx.blocking_recv() {
-                None => break,
-                Some(job) => {
-                    // round robin fanout
-                    next_worker = (next_worker + 1) % num_workers;
-                    if let Err(e) = workers[next_worker].accept(job) {
-                        tracing::error!("worker stopped: {}", e);
-                        panic!();
+        tokio::task::spawn_blocking(move || {
+            loop {
+                match jobs_rx.blocking_recv() {
+                    None => break,
+                    Some(job) => {
+                        // round robin fanout
+                        next_worker = (next_worker + 1) % num_workers;
+                        if let Err(e) = workers[next_worker].accept(job) {
+                            tracing::error!("worker stopped: {}", e);
+                            panic!();
+                        }
                     }
                 }
             }
